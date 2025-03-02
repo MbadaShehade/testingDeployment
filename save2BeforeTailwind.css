@@ -170,6 +170,14 @@
     font-size: 1.8rem;
     padding: 15px;
   }
+  
+  .hero-text-content {
+    max-width: 650px;
+  }
+  
+  .hero-description {
+    max-width: 650px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -219,12 +227,13 @@
   }
   
   .hero-text-content {
-    max-width: 60%;
+    max-width: 70%;
   }
   
   .beehive-image-container {
     width: 40%;
     max-width: 300px;
+    
   }
   
   .main-title {
@@ -232,11 +241,13 @@
   }
   
   .left-flower-bee {
-    max-width: 100px;
+    max-width: 170px !important;
+    transform: scale(1.15);
   }
   
   .hero-description {
-    font-size: 1rem;
+    max-width: 100%;
+    font-size: 1.2rem;
   }
   
   .login-button {
@@ -369,7 +380,8 @@
   }
   
   .hero-text-content {
-    max-width: 55%;
+    max-width: 100%;
+    padding-right: 0;
   }
   
   .beehive-image-container {
@@ -382,11 +394,12 @@
   }
   
   .hero-description {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
   
   .left-flower-bee {
-    max-width: 80px;
+    max-width: 140px !important;
+    transform: scale(1.1);
   }
   
   /* Button size adjustment */
@@ -482,19 +495,22 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 40px;
+  gap: 30px;
+  max-width: 1300px;
+  margin: 0 auto;
 }
 
 .hero-text-content {
-  flex: 1;
-  max-width: 600px;
+  flex: 1.2;
+  max-width: 750px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-right: 20px;
 }
 
 .beehive-image-container {
-  flex: 1;
+  flex: 0.8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -509,11 +525,15 @@
 .left-flower-bee-container {
   margin-top: 30px;
   align-self: flex-start;
+  margin-left: -280px !important;
+  position: relative;
+  z-index: 5;
 }
 
 .left-flower-bee {
-  max-width: 120px;
+  max-width: 200px !important;
   height: auto;
+  transform: scale(1.2);
 }
 
 /* Main Title Styles */
@@ -542,12 +562,13 @@
 
 /* Hero Description */
 .hero-description {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1.5rem;
+  line-height: 1.5;
   margin-bottom: 30px;
   color: #333;
-  max-width: 600px;
+  max-width: 750px;
   text-align: left;
+  word-wrap: break-word;
 }
 
 .dark-mode .hero-description {
@@ -651,6 +672,7 @@
   line-height: 1.5;
 }
 
+
 /* Side flower decorations for problem section */
 .side-flower {
   position: fixed; /* Keep fixed to viewport */
@@ -691,8 +713,19 @@
 }
 
 .discover-solution {
-  text-align: center;
+  position: relative;
   margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0 50px;
+  box-sizing: border-box;
+}
+
+.discover-content {
+  text-align: center;
+  z-index: 2;
 }
 
 .discover-link {
@@ -832,4 +865,38 @@
 
 .toggle-icon.dark .rays {
   box-shadow: none;
+}
+
+.honey-spoon-image {
+  position: absolute;
+  right: -25%;
+  max-height: 500px;
+  z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .honey-spoon-image {
+    max-height: 450px;
+    right: 5%;
+  }
+}
+
+@media (max-width: 768px) {
+  .discover-solution {
+    flex-direction: column;
+    padding: 0 20px;
+  }
+  
+  .honey-spoon-image {
+    position: relative;
+    right: auto;
+    max-height: 350px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .honey-spoon-image {
+    max-height: 200px;
+  }
 }
