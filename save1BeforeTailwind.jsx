@@ -4,6 +4,8 @@ import leftFlower from './images/mainPage/leftTopSidesFlower.png';
 import rightFlower from './images/mainPage/rightTopSidesFlower.png';
 import beeHiveImage from './images/mainPage/beeHiveMainPage.png';
 import leftFlowerWithBee from './images/mainPage/leftFlowerWithBee.png';
+import leftSideFlowers from './images/mainPage/ leftSideFlowers.png';
+import rightSideFlowers from './images/mainPage/rightSideFlowers.png';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,6 +24,31 @@ function App() {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Control flower visibility based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const problemSection = document.getElementById('problem');
+      const flowers = document.querySelectorAll('.side-flower');
+      
+      if (problemSection) {
+        const rect = problemSection.getBoundingClientRect();
+        const isVisible = 
+          rect.top < window.innerHeight && 
+          rect.bottom > 0;
+        
+        flowers.forEach(flower => {
+          flower.style.opacity = isVisible ? '1' : '0';
+        });
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleTheme = () => {
@@ -152,6 +179,10 @@ function App() {
         </section>
 
         <section id="problem" className="problem-section">
+          {/* Side flower decorations for problem section */}
+          <img src={leftSideFlowers} className="side-flower side-flower-left" alt="Left side decorative flowers" />
+          <img src={rightSideFlowers} className="side-flower side-flower-right" alt="Right side decorative flowers" />
+          
           <h2 className="section-title">The Problem</h2>
           
           <div className="problem-items">
