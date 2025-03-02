@@ -464,6 +464,7 @@
   margin: 0 auto;
   z-index: 5;
   position: relative;
+  overflow: visible; /* Allow flowers to extend beyond the container */
 }
 
 .hero-section {
@@ -584,7 +585,9 @@
   max-width: 1200px;
   margin: 0 auto;
   text-align: left;
-  
+  position: relative;
+  overflow: visible; /* Allow flowers to extend beyond the container */
+  z-index: 1; /* Lower z-index than the flowers */
 }
 
 .dark-mode .problem-section {
@@ -646,6 +649,41 @@
   margin: 0;
   color: #000000;
   line-height: 1.5;
+}
+
+/* Side flower decorations for problem section */
+.side-flower {
+  position: fixed; /* Keep fixed to viewport */
+  height: auto;
+  z-index: 100; /* Very high z-index to ensure visibility */
+  pointer-events: none; /* Allow clicks to pass through */
+  transition: opacity 0.3s ease; /* Smooth transition for opacity changes */
+}
+
+.side-flower-left {
+  left: 0;
+  width: 150px;
+  transform: translateY(-92%)
+}
+
+.side-flower-right {
+  right: 0;
+  width: 150px;
+  top: 1%; /* Position from top of viewport */
+  transform: translateY(33%)
+
+}
+
+@media (max-width: 1024px) {
+  .side-flower {
+    width: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .side-flower {
+    width: 80px;
+  }
 }
 
 .dark-mode .problem-description {
