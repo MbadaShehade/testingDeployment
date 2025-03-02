@@ -4,8 +4,9 @@ import leftFlower from './images/mainPage/leftTopSidesFlower.png';
 import rightFlower from './images/mainPage/rightTopSidesFlower.png';
 import beeHiveImage from './images/mainPage/beeHiveMainPage.png';
 import leftFlowerWithBee from './images/mainPage/leftFlowerWithBee.png';
-import leftSideFlowers from './images/mainPage/ leftSideFlowers.png';
-import rightSideFlowers from './images/mainPage/rightSideFlowers.png';
+import honeySpoon from './images/mainPage/honeySpoon.png';
+//import leftSideFlowers from './images/mainPage/ leftSideFlowers.png';
+//import rightSideFlowers from './images/mainPage/rightSideFlowers.png';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -160,19 +161,24 @@ function App() {
               <p className="hero-description">
                 HiveGuard offers an innovative IoT-based monitoring system that prevents mold growth in
                 beehives. Our smart sensors continuously track temperature and humidity levels, providing real-
-                time data through an intuitive dashboard
+                time data through an intuitive dashboard.
               </p>
               
               <button className="login-button">
                 <b>log in now</b>
               </button>
               
-              <div className="left-flower-bee-container">
-                <img src={leftFlowerWithBee} alt="Flower with bee" className="left-flower-bee" />
+              <div className="left-flower-bee-container" style={{ marginLeft: '-180px', position: 'relative', zIndex: 5 }}>
+                <img 
+                  src={leftFlowerWithBee} 
+                  alt="Flower with bee" 
+                  className="left-flower-bee" 
+                  style={{ maxWidth: '220px', transform: 'scale(1.3)' }}
+                />
               </div>
             </div>
             
-            <div className="beehive-image-container">
+            <div className="beehive-image-container" style={{ marginRight: '-50px', position: 'relative', zIndex: 4 }}>
               <img src={beeHiveImage} alt="Beehive with monitoring system" className="beehive-image" />
             </div>
           </div>
@@ -180,8 +186,8 @@ function App() {
 
         <section id="problem" className="problem-section">
           {/* Side flower decorations for problem section */}
-          <img src={leftSideFlowers} className="side-flower side-flower-left" alt="Left side decorative flowers" />
-          <img src={rightSideFlowers} className="side-flower side-flower-right" alt="Right side decorative flowers" />
+          {/*<img src={leftSideFlowers} className="side-flower side-flower-left" alt="Left side decorative flowers" />*/}
+          {/*<img src={rightSideFlowers} className="side-flower side-flower-right" alt="Right side decorative flowers" />*/}
           
           <h2 className="section-title">The Problem</h2>
           
@@ -208,10 +214,13 @@ function App() {
           </div>
           
           <div className="discover-solution">
-            <a href="#solution" className="discover-link">
-              <h3 className="discover-text">Discover Our Solution</h3>
-              <div className="arrow-down">▼</div>
-            </a>
+            <div className="discover-content">
+              <a href="#solution" className="discover-link">
+                <h3 className="discover-text">Discover Our Solution</h3>
+                <div className="arrow-down">▼</div>
+              </a>
+            </div>
+            <img src={honeySpoon} alt="Honey spoon" className="honey-spoon-image" />
           </div>
         </section>
       </main>
