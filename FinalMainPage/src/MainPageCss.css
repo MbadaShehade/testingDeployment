@@ -1,4 +1,3 @@
-/* Add this at the beginning of the file */
 p {
   font-family: FreeMono, monospace;
 }
@@ -250,8 +249,8 @@ p {
   }
   
   .left-flower-bee {
-    max-width: 170px !important;
-    transform: scale(1.15);
+    max-width: 200px !important;
+    transform: scale(1.3);
   }
   
   .hero-description {
@@ -407,8 +406,8 @@ p {
   }
   
   .left-flower-bee {
-    max-width: 140px !important;
-    transform: scale(1.1);
+    max-width: 170px !important;
+    transform: scale(1.2);
   }
   
   /* Button size adjustment */
@@ -534,15 +533,15 @@ p {
 .left-flower-bee-container {
   margin-top: 30px;
   align-self: flex-start;
-  margin-left: -280px !important;
+  margin-left: -380px !important;
   position: relative;
   z-index: 5;
 }
 
 .left-flower-bee {
-  max-width: 200px !important;
+  max-width: 250px !important;
   height: auto;
-  transform: scale(1.2);
+  transform: scale(1.4);
 }
 
 /* Main Title Styles */
@@ -762,41 +761,6 @@ p {
   color: #000000;
   line-height: 1.5;
   font-family: FreeMono, monospace;
-}
-
-/* Side flower decorations for problem section */
-.side-flower {
-  position: fixed; /* Keep fixed to viewport */
-  height: auto;
-  z-index: 100; /* Very high z-index to ensure visibility */
-  pointer-events: none; /* Allow clicks to pass through */
-  transition: opacity 0.3s ease; /* Smooth transition for opacity changes */
-}
-
-.side-flower-left {
-  left: 0;
-  width: 150px;
-  transform: translateY(-92%)
-}
-
-.side-flower-right {
-  right: 0;
-  width: 150px;
-  top: 1%; /* Position from top of viewport */
-  transform: translateY(33%)
-
-}
-
-@media (max-width: 1024px) {
-  .side-flower {
-    width: 120px;
-  }
-}
-
-@media (max-width: 768px) {
-  .side-flower {
-    width: 80px;
-  }
 }
 
 .dark-mode .problem-description {
