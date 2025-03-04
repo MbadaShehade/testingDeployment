@@ -9,8 +9,7 @@ import leftFlyingBee from './images/mainPage/leftFlyingBeeP3.png';
 import rightFlyingBee from './images/mainPage/rightFlyingBeeP3.png';
 import beeHiveHouse from './images/mainPage/beeHiveHouse.png';
 import honeySpoonLast from './images/mainPage/honeySpoonLast.png';
-//import leftSideFlowers from './images/mainPage/ leftSideFlowers.png';
-//import rightSideFlowers from './images/mainPage/rightSideFlowers.png';
+
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
