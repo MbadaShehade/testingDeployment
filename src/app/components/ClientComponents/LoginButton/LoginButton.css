@@ -1,0 +1,76 @@
+/* Login Button */
+.login-button {
+    background: linear-gradient(to right, #8d7864, #5f462e);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 12px 30px;
+    font-size: 1.5rem;
+    font-weight: 2600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: FreeMono, monospace;
+    position: relative;
+    overflow: hidden;
+    min-width: 220px;
+  }
+  
+  .login-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 248, 248, 0.4),
+      transparent
+    );
+    animation: shine 4s infinite ease-in-out;
+  }
+  
+  @keyframes shine {
+    0% {
+      left: -100%;
+    }
+    40% {
+      left: 100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+  
+  .login-button:hover {
+    background-color: #483420;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .login-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  
+  .fade-in.visible {
+    animation: fadeIn 1.5s ease-out forwards;
+}

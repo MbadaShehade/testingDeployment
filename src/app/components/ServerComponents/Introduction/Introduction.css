@@ -1,0 +1,108 @@
+.main-content {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    z-index: 5;
+    position: relative;
+    overflow: visible;
+  }
+  
+  .hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .hero-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  
+  .hero-text-content {
+    flex: 1.2;
+    max-width: 750px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 20px;
+  }
+  
+  .beehive-image-container {
+    flex: 0.8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .beehive-image {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .left-flower-bee-container {
+    margin-top: 30px;
+    align-self: flex-start;
+    margin-left: 0 !important;
+    position: relative;
+    z-index: 5;
+    left: 0;
+    display: block;
+  }
+  
+  .left-flower-bee {
+    max-width: 150px !important;
+    height: auto;
+    transform: scale(1.4);
+    left:-50px
+  }
+  
+  /* Main Title Styles */
+  .main-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.2;
+  }
+  
+  .title-regular {
+    font-family: FreeMono, monospace;
+    background: linear-gradient(to right, #ba6719, #5b5142);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 1000;
+  }
+  
+  .dark .title-regular {
+    color: #ce8644;
+    background: linear-gradient(to right, #ba6719, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+ 
+  .hero-description {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    color: #333;
+    max-width: 750px;
+    text-align: left;
+    word-wrap: break-word;
+    font-family: FreeMono, monospace;
+  }
+  
+  .dark .hero-description {
+    color: #e0e0e0;
+  }

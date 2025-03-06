@@ -1,0 +1,39 @@
+.App-header {
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center; /* Center the header content */
+    padding: 20px 0; /* Adjust padding */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.corner-flower {
+    position: absolute;
+    width: 150px; /* Set consistent width for both flowers */
+    height: 175px; /* Set consistent height for both flowers */
+    object-fit: contain; /* Maintain aspect ratio within dimensions */
+    z-index: 10;
+    top: 0;
+  }
+  
+  .corner-flower-left {
+    left: 0;
+  }
+  
+  .corner-flower-right {
+    right: 0;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 20;
+    margin: 0 160px; /* Add margin to prevent overlap with flower decorations */
+  }

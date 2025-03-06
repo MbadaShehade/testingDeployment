@@ -1,0 +1,25 @@
+.login-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  justify-content: space-between;
+  background-color: #FAF3EC; /* Light mode background color */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: background-color 0.3s ease;
+}
+
+/* Dark mode styles - using the same selector as in globals.css */
+:root[class~="dark"] .login-page-container {
+  background-color: #1A1A1A; /* Dark mode background color */
+}
+
+/* This ensures the footer stays at the bottom without scrolling */
+.login-page-container > :nth-child(2) {
+  flex: 1;
+  margin-bottom: 15px;
+} 
