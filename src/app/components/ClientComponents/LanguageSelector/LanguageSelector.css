@@ -1,0 +1,28 @@
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background-color: rgba(201, 162, 39, 0.1);
+  color: #ba6719;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.language-selector:hover {
+  background-color: rgba(201, 162, 39, 0.2);
+}
+
+.globe-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ba6719;
+}
+
+.dropdown-arrow {
+  font-size: 0.7rem;
+  margin-left: 5px;
+}
