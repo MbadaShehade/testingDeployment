@@ -41,6 +41,7 @@
   margin: 0 160px; /* Add margin to prevent overlap with flower decorations */
 }
 
+
 @media (max-width: 992px) {
   .corner-flower {
       width: 120px;

@@ -7,6 +7,7 @@ import ProblemSection from './components/ServerComponents/ProblemSection/Problem
 import Introduction from './components/ServerComponents/Introduction/Introduction';
 import HowItWorksSection from './components/ServerComponents/HowItWorksSection/HowItWorksSection';
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
+import SideFlowers from './components/ServerComponents/SideFlowers/SideFlowers';
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <ScrollHandler />
       <Header />
       <ScrollAnimations />
+      <SideFlowers /> {/* only for screens above 1560px */}
 
       <main className="main-content">
         <Introduction />

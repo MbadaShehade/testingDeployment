@@ -1,13 +1,13 @@
-'use client';
-
 import './Introduction.css';
 import Image from 'next/image';
 import leftFlowerWithBee from '/public/leftFlowerWithBee.png';
 import beeHiveImage from '/public/beeHiveMainPage.png';
 import LoginButton from '../../ClientComponents/LoginButton/LoginButton';
 
+
 export default function Introduction() {
     return (
+        <>
             <section className="hero-section">
                 <div className="hero-content-wrapper">
                     <div className="hero-text-content">
@@ -62,6 +62,7 @@ export default function Introduction() {
                     />
                     </div>
                 </div>
-            </section>
-);
+            </section> 
+        </>
+    );
 }

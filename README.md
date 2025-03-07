@@ -83,5 +83,3 @@ The system is tested for:
 - **Mbada Shehady**  
 
 ---
-
-  

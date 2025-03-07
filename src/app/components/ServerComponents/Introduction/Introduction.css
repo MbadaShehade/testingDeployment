@@ -109,6 +109,8 @@
   color: #e0e0e0;
 }
 
+
+
 @media (max-width: 992px) {
   .hero-text-content {
       max-width: 55%;

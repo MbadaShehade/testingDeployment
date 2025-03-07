@@ -1,0 +1,54 @@
+@media (min-width: 1415px) {
+    .rightSideFlower {
+      position: absolute;
+      right: 0;
+      top: 180px;
+      width: 100px;
+      height: 300px;
+      z-index: 5;
+    }
+    .rightSideFlower2 {
+      position: absolute;
+      right: 0;
+      top: 1950px;
+      width: 100px;
+      height: 300px;
+      z-index: 5;
+    }
+    .rightSideFlower3 {
+      position: absolute;
+      right: 0;
+      top: 3800px;
+      width: 100px;
+      height: 300px;
+    }
+    .rightSideFlower4 {
+      position: absolute;
+      right: 0;
+      top: 5700px;
+      width: 100px;
+      height: 300px;
+    }
+  
+    .leftSideFlower {
+      position: absolute;
+      left: 0;
+      top: 1050px;
+      width: 100px;
+      height: 300px;
+      z-index: 5;
+    }
+    .leftSideFlower2 {
+      position: absolute;
+      left: 0;
+      top: 2850px;
+      width: 100px;
+    }
+    .leftSideFlower3 {
+      position: absolute;
+      left: 0;
+      top: 4700px;
+      width: 100px;
+      height: 300px;
+    }
+}  
