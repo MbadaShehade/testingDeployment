@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 30;
+    z-index: 1000;
     padding: 10px;
   }
 
@@ -43,34 +43,67 @@
 
   /* Mobile Menu Dropdown */
   .mobile-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 180px);
-    background-color: rgba(250, 245, 239, 0.95);
+    position: fixed;
+    top: 80px;
+    left: 90px;
+    right: 90px;
+    width: auto;
+    background-color: rgba(250, 245, 239, 0.98);
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    z-index: 25;
+    z-index: 999;
     display: flex;
     flex-direction: column;
     gap: 20px;
     animation: slideDown 0.3s ease;
     border-radius: 0 0 10px 10px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
   }
 
   .dark .mobile-menu {
-    background-color: rgba(45, 45, 45, 0.95);
+    background-color: rgba(45, 45, 45, 0.98);
   }
 
   @keyframes slideDown {
     from {
-      opacity: 0;
-      transform: translateY(-20px) translateX(-50%);
+        opacity: 0;
+        transform: translateY(-20px);
     }
     to {
-      opacity: 1;
-      transform: translateY(0) translateX(-50%);
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+
+  /* Update media queries for mobile and tablet */
+  @media (max-width: 576px) {
+    .mobile-menu {
+      left: 20px;
+      right: 20px;
+      top: 70px;
+    }
+
+    .mobile-nav-links .nav-link {
+      font-size: 1.6rem;
+    }
+  }
+
+  @media (min-width: 577px) and (max-width: 1500px) {
+    .mobile-menu {
+      left: 90px;
+      right: 90px;
+      top: 80px;
+    }
+
+    .mobile-nav-links .nav-link {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (min-width: 1501px) {
+    .hamburger-menu {
+      display: none;
     }
   }
 
@@ -82,6 +115,26 @@
     padding: 0;
     list-style: none;
     align-items: center;
+  }
+
+  .mobile-nav-links .nav-link {
+    color: #5b5142;
+    font-size: 1.8rem;
+    padding: 15px;
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(to right, #ba6719, #ce8644, #5b5142);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .dark .mobile-nav-links .nav-link {
+    background: linear-gradient(to right, #ba6719, #ce8644, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .mobile-header-controls {

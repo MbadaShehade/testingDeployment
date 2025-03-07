@@ -366,6 +366,18 @@ html {
   }
 }
 
+/* 769 - 1103*/ 
+@media (min-width: 769px) and (max-width: 1290px) {
+  .logo-text {
+    margin-left: -10px;
+  }
+  .margin-content{
+    margin-left: 0px;
+  }
+
+ 
+}
+
 html {
   scroll-behavior: smooth;
 }

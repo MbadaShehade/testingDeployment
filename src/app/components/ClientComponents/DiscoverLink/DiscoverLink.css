@@ -78,3 +78,27 @@
       transform: translateY(-5px);
     }
   }
+
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    .discover-text{
+      font-size: 2.3rem;
+    }
+    .honey-spoon-image{
+      width: 300px;
+      height: 400px;
+      margin-top: 250px;
+    }
+  }
+
+
+  @media (min-width: 993px) and (max-width: 1200px) {
+    .discover-text{
+      font-size: 2.5rem;
+    }
+    .honey-spoon-image{
+      width: 300px;
+      height: 400px;
+      margin-top: 250px;
+    }
+  }

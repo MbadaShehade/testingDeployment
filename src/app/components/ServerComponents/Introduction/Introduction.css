@@ -20,7 +20,7 @@
   .hero-content-wrapper {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     gap: 30px;
     max-width: 1300px;
@@ -28,8 +28,8 @@
   }
   
   .hero-text-content {
-    flex: 1.2;
-    max-width: 750px;
+    flex: 1;
+    max-width: 60%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -40,13 +40,16 @@
     flex: 0.8;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     position: relative;
+    width: 40%;
+    min-width: 300px;
   }
   
   .beehive-image {
     max-width: 100%;
     height: auto;
+    object-fit: contain;
   }
   
   .left-flower-bee-container {
@@ -94,10 +97,9 @@
  
   .hero-description {
     font-size: 1.5rem;
-    line-height: 1.5;
+    line-height: 1.6;
     margin-bottom: 30px;
     color: #333;
-    max-width: 750px;
     text-align: left;
     word-wrap: break-word;
     font-family: FreeMono, monospace;
@@ -105,4 +107,110 @@
   
   .dark .hero-description {
     color: #e0e0e0;
+  }
+
+  @media (max-width: 992px) {
+    .hero-text-content {
+        max-width: 55%;
+    }
+
+    .beehive-image-container {
+        width: 45%;
+    }
+
+    .hero-description {
+        font-size: 1.3rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-content-wrapper {
+        gap: 20px;
+    }
+
+    .hero-text-content {
+        max-width: 50%;
+    }
+
+    .beehive-image-container {
+        width: 50%;
+    }
+
+    .hero-description {
+        font-size: 1.2rem;
+        line-height: 1.5;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .hero-section {
+        padding: 30px 10px;
+    }
+
+    .hero-content-wrapper {
+        gap: 15px;
+    }
+
+    .hero-text-content {
+        max-width: 50%;
+        padding-right: 10px;
+    }
+
+    .beehive-image-container {
+        min-width: 200px;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section {
+        padding: 20px 10px;
+    }
+
+    .beehive-image-container {
+        max-width: 250px;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+  }
+
+  @media(min-width: 577px) and (max-width: 755px){
+    .title-regular{
+        font-size: 1.5rem;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
+    }
+  }
+
+
+  @media(min-width: 755px) and (max-width: 816px){
+    .title-regular{
+        font-size: 1.8rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+  }
+
+  @media(min-width: 817px) and (max-width: 1200px){
+    .title-regular{
+        font-size: 2.2.3rem;
+    }
+
+    .hero-description {
+        font-size: 1.4rem;
+    }
   }

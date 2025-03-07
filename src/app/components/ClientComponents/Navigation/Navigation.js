@@ -16,9 +16,26 @@ export default function Navigation() {
   useEffect(() => {
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
-    //auto-close the mobile menu when switching to a larger screen.
     window.addEventListener('resize', handleResize);
 
+    // Handle page refresh - always start from top
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
+      window.scrollTo(0, 0);
+      if (window.location.hash) {
+        router.replace('/');
+      }
+    } 
+    // Handle navigation from other pages (like /login)
+    else if (window.location.hash && pathname === '/') {
+      const targetId = window.location.hash.substring(1);
+      const element = document.getElementById(targetId);
+      if (element) {
+        // Give time for the page to properly load and render
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      }
+    }
 
     // 1. menuOpen - the menu must currently be open
     // 2. menuRef.current exists - the menu DOM element must be rendered
@@ -37,35 +54,31 @@ export default function Navigation() {
     //event listener to close menu when clicking outside
     document.addEventListener('mousedown', handleClickOutside);
 
-    // Handle hash navigation when coming from another page
-    if (window.location.hash) {
-      setTimeout(() => {
-        const targetId = window.location.hash.substring(1);
-        const element = document.getElementById(targetId);
-        if (element) {
-          window.scrollTo({
-            top: 0,
-            behavior: 'auto'
-          });
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
-      }, 300);
-    }
-
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [menuOpen]);
 
-  const handleSmoothScroll = (e, targetId) => {
+  const handleSmoothScroll = async (e, targetId) => {
     e.preventDefault();
     
     // If we're not on the home page, navigate to home page with hash
     if (pathname !== '/') {
-      router.push(`/#${targetId}`);
+      // Store the target section in sessionStorage
+      sessionStorage.setItem('scrollTarget', targetId);
+      await router.push('/');
+      
+      // After navigation, check for stored target and scroll
+      const element = document.getElementById(targetId);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+          // Clear the stored target
+          sessionStorage.removeItem('scrollTarget');
+        }, 350);
+      }
+      
       if (menuOpen) {
         setMenuOpen(false);
       }
@@ -75,16 +88,7 @@ export default function Navigation() {
     // If we're already on the home page, just scroll to the element
     const element = document.getElementById(targetId);
     if (element) {
-      // First scroll to top, then to the element for better UX
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto'
-      });
-      
-      setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      
+      element.scrollIntoView({ behavior: 'smooth' });
       if (menuOpen) {
         setMenuOpen(false);
       }
@@ -97,7 +101,7 @@ export default function Navigation() {
 
   return (
     <>
-      {windowWidth <= 768 ? (
+      {windowWidth <= 1500 ? (
         <>
           <div className="hamburger-menu" onClick={toggleMenu} ref={hamburgerRef}>
             <div className={`hamburger ${menuOpen ? 'open' : ''}`}>

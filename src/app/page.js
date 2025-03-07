@@ -6,11 +6,12 @@ import ScrollAnimations from './components/ClientComponents/ScrollAnimations/Scr
 import ProblemSection from './components/ServerComponents/ProblemSection/ProblemSection';
 import Introduction from './components/ServerComponents/Introduction/Introduction';
 import HowItWorksSection from './components/ServerComponents/HowItWorksSection/HowItWorksSection';
+import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
 
 export default function Home() {
-
   return (
     <div className="App">
+      <ScrollHandler />
       <Header />
       <ScrollAnimations />
 

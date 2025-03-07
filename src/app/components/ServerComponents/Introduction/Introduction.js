@@ -32,12 +32,13 @@ export default function Introduction() {
                             maxWidth: '220px', 
                             transform: 'scale(1.3)',
                             position: 'relative',
-                            left: '-150px !important',
+                            left: '-10px',
                             display: 'block'
                         }}
                         width={220}
                         height={220}
                         priority={true}
+                        draggable={false}
                         />
                     </div>
                     </div>
@@ -47,8 +48,17 @@ export default function Introduction() {
                         src={beeHiveImage} 
                         alt="Beehive with monitoring system" 
                         className="beehive-image" 
-                        width={400} 
-                        height={400} 
+                        width={600} 
+                        height={600}
+                        priority={true}
+                        quality={100}
+                        draggable={false}
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            maxHeight: '600px'
+                        }}
                     />
                     </div>
                 </div>

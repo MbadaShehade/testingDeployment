@@ -31,7 +31,7 @@ export default function ProblemSection() {
       
       <div className="discover-solution">
         <DiscoverLink />
-        <Image src={honeySpoon} alt="Honey spoon" className="honey-spoon-image" width={300} height={300} />
+        <Image src={honeySpoon} alt="Honey spoon" className="honey-spoon-image" width={300} height={300} draggable={false} />
       </div>
     </section>
   );

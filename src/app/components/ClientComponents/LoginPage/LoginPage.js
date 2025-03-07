@@ -202,6 +202,7 @@ export default function LoginPage() {
             alt="Login illustration" 
             width={500}
             height={500}
+            draggable={false}
           />
         </div>
       </div>

@@ -47,7 +47,7 @@
   }
   
   .section-title {
-    font-size:4rem;
+    font-size:4.5rem;
     margin-bottom: 50px;
     text-align: center;
     font-family: FreeMono, monospace;
@@ -69,7 +69,7 @@
   }
   
   .dark .section-title {
-    background: linear-gradient(to right, #ba6719 30%, #ffffff);
+    background: linear-gradient(to right, #ba6719 42%, #ffffff 70%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -88,7 +88,7 @@
   }
   
   .dark .problem-subtitle {
-    background: linear-gradient(to right, #ba6719, #ffffff 50%);
+    background: linear-gradient(to right, #ba6719 2%, #ffffff 20%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -164,5 +164,33 @@
   
   .discover-solution {
     padding: 0 10px;
+  }
+}
+
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .discover-solution{
+    margin-top: 30px;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 993px)  {
+  .honey-spoon-image{
+    width: 300px;
+    height: 400px;
+    margin-top: 150px;
+    margin-right: 40px;
+  }
+}
+
+
+@media (min-width: 1200px)  {
+  .honey-spoon-image{
+    width: 300px;
+    height: 400px;
+    margin-top: 250px;
+    margin-right: 130px;
+
   }
 }

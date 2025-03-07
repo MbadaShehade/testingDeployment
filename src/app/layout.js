@@ -27,8 +27,15 @@ export default function RootLayout({ children }) {
           .theme-loading {
             visibility: hidden;
           }
+          html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+          }
+          body {
+            scroll-behavior: smooth;
+          }
         `}} />
-        {/* Script to prevent flash of unstyled content */}
+        {/* Script to prevent flash of unstyled content and handle page refresh */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -41,6 +48,11 @@ export default function RootLayout({ children }) {
                   setTimeout(function() {
                     document.body.classList.remove('theme-loading');
                   }, 50);
+
+                  // Handle page refresh - always scroll to top
+                  if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
+                    window.scrollTo(0, 0);
+                  }
                 } catch (e) {
                   console.error('Error in theme script:', e);
                 }

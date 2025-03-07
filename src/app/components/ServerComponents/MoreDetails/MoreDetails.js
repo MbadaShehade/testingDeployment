@@ -32,6 +32,7 @@ export default function MoreDetails() {
             }} 
             width={400}
             height={400}
+            draggable={false}
           />
         </div>
       </div>

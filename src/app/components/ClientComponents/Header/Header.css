@@ -7,6 +7,8 @@
     padding: 20px 0; /* Adjust padding */
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
 
 .corner-flower {
@@ -16,17 +18,18 @@
     object-fit: contain; /* Maintain aspect ratio within dimensions */
     z-index: 10;
     top: 0;
-  }
+    transition: all 0.3s ease;
+}
   
-  .corner-flower-left {
+.corner-flower-left {
     left: 0;
-  }
+}
   
-  .corner-flower-right {
+.corner-flower-right {
     right: 0;
-  }
+}
 
-  .header-content {
+.header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -36,4 +39,57 @@
     position: relative;
     z-index: 20;
     margin: 0 160px; /* Add margin to prevent overlap with flower decorations */
-  }
+}
+
+@media (max-width: 992px) {
+    .corner-flower {
+        width: 120px;
+        height: 140px;
+    }
+    .header-content {
+        margin: 0 130px;
+    }
+}
+
+@media (max-width: 768px) {
+    .corner-flower {
+        width: 100px;
+        height: 120px;
+    }
+    .header-content {
+        margin: 0 110px;
+    }
+}
+
+@media (max-width: 576px) {
+    .corner-flower {
+        width: 80px;
+        height: 100px;
+    }
+    .header-content {
+        margin: 0 90px;
+    }
+    .App-header {
+        padding: 15px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .corner-flower {
+        width: 60px;
+        height: 80px;
+    }
+    .header-content {
+        margin: 0 70px;
+    }
+}
+
+@media (min-width: 769px) {
+    .corner-flower {
+        width: 130px;
+        height: 120px;
+    }
+    .header-content {
+        margin: 0 140px;
+    }
+}
