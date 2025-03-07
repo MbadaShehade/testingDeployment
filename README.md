@@ -1,5 +1,3 @@
-<img width="1088" alt="Screenshot 2025-03-07 at 16 48 44" src="https://github.com/user-attachments/assets/ea8a3e18-441e-4539-b071-e698f5f4efe8" /># 🐝 Prevention of Mold in Beehives
-
 ## 📌 Project Overview  
 Mold growth in beehives is a major concern for beekeepers, impacting colony health, reducing honey production, and leading to potential colony collapse. This project presents an **IoT-based system** that integrates **sensors and machine learning** to monitor and regulate hive conditions, preventing mold formation.
 
