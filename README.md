@@ -1,4 +1,4 @@
-# 🐝 Prevention of Mold in Beehives
+<img width="1088" alt="Screenshot 2025-03-07 at 16 48 44" src="https://github.com/user-attachments/assets/ea8a3e18-441e-4539-b071-e698f5f4efe8" /># 🐝 Prevention of Mold in Beehives
 
 ## 📌 Project Overview  
 Mold growth in beehives is a major concern for beekeepers, impacting colony health, reducing honey production, and leading to potential colony collapse. This project presents an **IoT-based system** that integrates **sensors and machine learning** to monitor and regulate hive conditions, preventing mold formation.
@@ -45,30 +45,17 @@ Mold growth in beehives is a major concern for beekeepers, impacting colony heal
 ## 📸 Screenshots  
 <img width="1451" alt="Screenshot 2025-03-07 at 16 42 33" src="https://github.com/user-attachments/assets/0df9442d-4c74-487f-ab3d-229af8036b5e" />
 <img width="1320" alt="Screenshot 2025-03-07 at 16 42 52" src="https://github.com/user-attachments/assets/74899e13-532f-42c2-9e4c-1c0500b5ea65" />
-<img width="593" alt="Screenshot 2025-03-07 at 16 43 13" src="https://github.com/user-attachments/assets/b187b3c4-9fc2-4162-9871-f328416823af" />
-<img width="510" alt="Screenshot 2025-03-07 at 16 43 24" src="https://github.com/user-attachments/assets/fcf161eb-ac8b-49a5-b767-7023e668c6b4" />
+<img width="1236" alt="Screenshot 2025-03-07 at 16 48 11" src="https://github.com/user-attachments/assets/bbade806-0742-4f52-af9d-3f7094a80057" />
+<img width="1125" alt="Screenshot 2025-03-07 at 16 48 59" src="https://github.com/user-attachments/assets/6e3c9e2f-d08b-4df2-8f73-2dd8d556adf8" />
+<img width="1273" alt="Screenshot 2025-03-07 at 16 49 16" src="https://github.com/user-attachments/assets/f8307798-b261-4fd1-a04a-59a8300d005f" />
+
+
 
 
 ---
 
 ## 📥 Installation & Setup  
-### 1️⃣ Clone the repository:  
-```bash
- git clone https://github.com/MbadaShehade/Prevention-of-mold-in-beehives.git
- cd Prevention-of-mold-in-beehives
-```
-
-### 2️⃣ Install backend dependencies:  
-```bash
- pip install -r requirements.txt
-```
-
-### 3️⃣ Install frontend dependencies:  
-```bash
- cd frontend  
- npm install  
- npm run dev  
-```
+-Not Yet-
 
 ### 4️⃣ Set up MQTT broker & LoRa868 connectivity.  
 ### 5️⃣ Connect the sensors and ensure data transmission is active.  
@@ -97,5 +84,4 @@ The system is tested for:
 
 ---
 
-## 📝 License  
-This project is licensed under the **MIT License**.  
+  
