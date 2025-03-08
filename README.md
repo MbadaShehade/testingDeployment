@@ -48,6 +48,8 @@ Mold growth in beehives is a major concern for beekeepers, impacting colony heal
 <img width="1459" alt="Screenshot 2025-03-08 at 2 00 55" src="https://github.com/user-attachments/assets/edd08466-02b7-486f-91ac-065dd89174e4" />
 <img width="1457" alt="Screenshot 2025-03-08 at 2 01 21" src="https://github.com/user-attachments/assets/422fd07a-3289-4876-8881-e219ff7ab735" />
 <img width="1458" alt="Screenshot 2025-03-08 at 2 01 49" src="https://github.com/user-attachments/assets/c1babdac-60db-4dce-8d7d-cd6d773a2592" />
+<img width="1454" alt="Screenshot 2025-03-08 at 2 02 43" src="https://github.com/user-attachments/assets/696a59dc-565e-48ce-af75-1c4b3fe4f874" />
+
 
 
 
