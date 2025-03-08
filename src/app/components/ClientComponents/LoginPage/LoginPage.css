@@ -580,7 +580,7 @@
 .separator span {
   padding: 0 10px;
   font-size: 14px;
-  color: #5f6368;
+  color: #2b2c2d;
   text-transform: uppercase;
 }
 
@@ -591,5 +591,5 @@
 }
 
 .theme-dark .separator span {
-  color: #9aa0a6;
+  color: #ffffff;
 } 

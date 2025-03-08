@@ -101,7 +101,7 @@ export default function Navigation() {
 
   return (
     <>
-      {windowWidth <= 1500 ? (
+      {windowWidth <= 1420 ? (
         <>
           <div className="hamburger-menu" onClick={toggleMenu} ref={hamburgerRef}>
             <div className={`hamburger ${menuOpen ? 'open' : ''}`}>

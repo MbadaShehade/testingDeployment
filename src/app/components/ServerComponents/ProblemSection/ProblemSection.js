@@ -5,7 +5,7 @@ import honeySpoon from '/public/honeySpoon.png';
 
 export default function ProblemSection() {
   return (
-    <section id="problem" className="problem-section lg:mt-12">
+    <section id="problem" className="problem-section">
       <h2 className="section-title">The Problem</h2>
       <div className="problem-items">
         <div className="problem-item">
