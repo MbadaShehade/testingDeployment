@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import './LoginPage.css';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(false); 
@@ -15,7 +16,9 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('');
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState('');
   const modalRef = useRef(null);
+  const router = useRouter();
   
   const { theme } = useTheme();
 
@@ -42,12 +45,53 @@ export default function LoginPage() {
     };
   }, [showForgotPassword]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLogin) {
-      console.log('Login submitted:', { username, password });
-    } else {
-      console.log('Signup submitted:', { username, email, password, confirmPassword });
+    setError('');
+
+    if (!isLogin && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: isLogin ? 'login' : 'signup',
+          username,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error === 'User not found, Sign Up first') {
+          // Switch to signup form and clear fields
+          setIsLogin(false);
+          setUsername('');
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+        }
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      // Clear form after successful authentication
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+
+      // Redirect to logged in page
+      router.push('/loggedIn');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -77,6 +121,8 @@ export default function LoginPage() {
         {/* Left side - Form */}
         <div className="login-card">
           <h1 className="login-title">Account Access</h1>
+          
+          {error && <div className="error-message">{error}</div>}
           
           {/* Google Sign In Button */}
           <button 
@@ -149,20 +195,36 @@ export default function LoginPage() {
             )}
             
             {isLogin && (
-              <div className="form-group">
-                <label htmlFor="username" className="form-label">
-                  User Name
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
+              <>
+                <div className="form-group">
+                  <label htmlFor="username" className="form-label">
+                    User Name
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </div>
+              </>
             )}
             
             <div className="form-group">
