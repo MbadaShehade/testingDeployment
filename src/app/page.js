@@ -23,7 +23,6 @@ export default function Home() {
         <HowItWorksSection />
         <MoreDetails />
       </main>
-      
       <Footer />
     </div>
   );

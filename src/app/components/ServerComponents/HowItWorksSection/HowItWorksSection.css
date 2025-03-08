@@ -1,6 +1,6 @@
 .how-it-works-section {
   padding: 60px 20px;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 120px auto 0;
   position: relative;
   margin-top: 400px;
@@ -272,3 +272,11 @@ z-index: 2;
     font-size: 1.5rem;
   }
 }
+
+@media (min-width: 676px) and (max-width: 809px) {
+  .monitoring-image{
+    margin-left: 270px;
+    margin-top: -40px;
+  }
+  
+} 
