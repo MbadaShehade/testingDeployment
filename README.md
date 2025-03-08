@@ -43,15 +43,14 @@ Mold growth in beehives is a major concern for beekeepers, impacting colony heal
 ---
 
 ## 📸 Screenshots  
-<img width="1461" alt="Screenshot 2025-03-08 at 1 59 22" src="https://github.com/user-attachments/assets/93614331-ee14-4361-a896-2518da23ab2c" />
-<img width="1462" alt="Screenshot 2025-03-08 at 2 00 11" src="https://github.com/user-attachments/assets/f43d3714-ff77-4f9c-8e96-fa47acdcb6d1" />
-<img width="1459" alt="Screenshot 2025-03-08 at 2 00 55" src="https://github.com/user-attachments/assets/edd08466-02b7-486f-91ac-065dd89174e4" />
-<img width="1457" alt="Screenshot 2025-03-08 at 2 01 21" src="https://github.com/user-attachments/assets/422fd07a-3289-4876-8881-e219ff7ab735" />
-<img width="1458" alt="Screenshot 2025-03-08 at 2 01 49" src="https://github.com/user-attachments/assets/c1babdac-60db-4dce-8d7d-cd6d773a2592" />
-<img width="1454" alt="Screenshot 2025-03-08 at 2 02 43" src="https://github.com/user-attachments/assets/696a59dc-565e-48ce-af75-1c4b3fe4f874" />
-
-
-
+<img width="1452" alt="Screenshot 2025-03-08 at 18 54 33" src="https://github.com/user-attachments/assets/8fa6d744-ff15-47c8-9c13-60018c98d850" />
+<img width="1451" alt="Screenshot 2025-03-08 at 18 55 13" src="https://github.com/user-attachments/assets/3e558730-d921-43c9-b45e-e8c0820f5f4d" />
+<img width="1451" alt="Screenshot 2025-03-08 at 18 55 51" src="https://github.com/user-attachments/assets/4cb77a3f-fc0e-4859-9a42-bb3efab80874" />
+<img width="1451" alt="Screenshot 2025-03-08 at 18 56 37" src="https://github.com/user-attachments/assets/71faef9a-0997-47a3-8cf0-15dd4c3fcd0b" />
+<img width="1450" alt="Screenshot 2025-03-08 at 18 57 04" src="https://github.com/user-attachments/assets/520d0d83-d676-43a1-8f28-a2d58e6e7b78" />
+<img width="1450" alt="Screenshot 2025-03-08 at 18 57 38" src="https://github.com/user-attachments/assets/f5926863-9fed-4e47-b7aa-a50958edf2e5" />
+<img width="1451" alt="Screenshot 2025-03-08 at 18 58 05" src="https://github.com/user-attachments/assets/990269b4-58b1-4570-b0b6-150ca1e5a54b" />
+<img width="1392" alt="Screenshot 2025-03-08 at 18 59 04" src="https://github.com/user-attachments/assets/90353c4d-e83a-4dec-ba5e-7ca0b751e4fe" />
 
 
 ---
