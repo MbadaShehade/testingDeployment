@@ -7,11 +7,10 @@ import { useTheme } from 'next-themes';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(false); // Default to sign up as shown in image
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -27,9 +26,9 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isLogin) {
-      console.log('Login submitted:', { email, password });
+      console.log('Login submitted:', { username, password });
     } else {
-      console.log('Signup submitted:', { firstName, lastName, email, password, confirmPassword });
+      console.log('Signup submitted:', { username, email, password, confirmPassword });
     }
   };
 
@@ -100,29 +99,29 @@ export default function LoginPage() {
             {!isLogin && (
               <>
                 <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">
-                    First Name
+                  <label htmlFor="username" className="form-label">
+                    User Name
                   </label>
                   <input
                     type="text"
-                    id="firstName"
-                    placeholder="Enter your first name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    id="username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="form-input"
                     required={!isLogin}
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">
-                    Last Name
+                  <label htmlFor="email" className="form-label">
+                    Email
                   </label>
                   <input
-                    type="text"
-                    id="lastName"
-                    placeholder="Enter your last name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="form-input"
                     required={!isLogin}
                   />
@@ -130,20 +129,22 @@ export default function LoginPage() {
               </>
             )}
             
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="form-input"
-                required
-              />
-            </div>
+            {isLogin && (
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  User Name
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="form-input"
+                  required
+                />
+              </div>
+            )}
             
             <div className="form-group">
               <label htmlFor="password" className="form-label">
