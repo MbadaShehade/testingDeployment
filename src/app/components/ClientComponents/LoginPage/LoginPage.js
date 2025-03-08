@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './LoginPage.css';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('');
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const modalRef = useRef(null);
   
   const { theme } = useTheme();
 
@@ -22,6 +23,24 @@ export default function LoginPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Handle click outside modal
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showForgotPassword && 
+          modalRef.current && 
+          !modalRef.current.contains(event.target)) {
+        setShowForgotPassword(false);
+        setResetEmailSent(false);
+        setResetEmail('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showForgotPassword]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -211,7 +230,7 @@ export default function LoginPage() {
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content" ref={modalRef}>
             <button 
               className="modal-close"
               onClick={() => {
