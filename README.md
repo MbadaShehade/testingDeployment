@@ -43,11 +43,11 @@ Mold growth in beehives is a major concern for beekeepers, impacting colony heal
 ---
 
 ## 📸 Screenshots  
-<img width="1451" alt="Screenshot 2025-03-07 at 16 42 33" src="https://github.com/user-attachments/assets/0df9442d-4c74-487f-ab3d-229af8036b5e" />
-<img width="1320" alt="Screenshot 2025-03-07 at 16 42 52" src="https://github.com/user-attachments/assets/74899e13-532f-42c2-9e4c-1c0500b5ea65" />
-<img width="1236" alt="Screenshot 2025-03-07 at 16 48 11" src="https://github.com/user-attachments/assets/bbade806-0742-4f52-af9d-3f7094a80057" />
-<img width="1125" alt="Screenshot 2025-03-07 at 16 48 59" src="https://github.com/user-attachments/assets/6e3c9e2f-d08b-4df2-8f73-2dd8d556adf8" />
-<img width="1273" alt="Screenshot 2025-03-07 at 16 49 16" src="https://github.com/user-attachments/assets/f8307798-b261-4fd1-a04a-59a8300d005f" />
+<img width="1461" alt="Screenshot 2025-03-08 at 1 59 22" src="https://github.com/user-attachments/assets/93614331-ee14-4361-a896-2518da23ab2c" />
+<img width="1462" alt="Screenshot 2025-03-08 at 2 00 11" src="https://github.com/user-attachments/assets/f43d3714-ff77-4f9c-8e96-fa47acdcb6d1" />
+<img width="1459" alt="Screenshot 2025-03-08 at 2 00 55" src="https://github.com/user-attachments/assets/edd08466-02b7-486f-91ac-065dd89174e4" />
+<img width="1457" alt="Screenshot 2025-03-08 at 2 01 21" src="https://github.com/user-attachments/assets/422fd07a-3289-4876-8881-e219ff7ab735" />
+<img width="1458" alt="Screenshot 2025-03-08 at 2 01 49" src="https://github.com/user-attachments/assets/c1babdac-60db-4dce-8d7d-cd6d773a2592" />
 
 
 
