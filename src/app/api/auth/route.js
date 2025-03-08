@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/app/lib/mongodb';
+import bcrypt from 'bcrypt';
+
 
 export async function POST(request) {
   try {
@@ -21,12 +23,16 @@ export async function POST(request) {
         );
       }
 
-      // Create new user
+            // Hash the password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      
+
+      // Create new user with hashed password
       const result = await users.insertOne({
         username,
         email,
-        password, // TO-DO: hash the password before storing
-        createdAt: new Date()
+        password: hashedPassword,
       });
 
       return NextResponse.json({ 
@@ -40,12 +46,12 @@ export async function POST(request) {
 
       if (!user) {
         return NextResponse.json(
-          { error: 'User not found' },
+          { error: 'User not found, Sign Up first' },
           { status: 401 }
         );
       }
 
-      // Check password
+      // Check username
       if (user.username !== username) {
         return NextResponse.json(
           { error: 'Invalid username' },
@@ -53,7 +59,9 @@ export async function POST(request) {
         );
       }
       
-      if (user.password !== password) { // TO-DO: compare hashed passwords
+      // Compare password with hashed password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
         return NextResponse.json(
           { error: 'Invalid password' },
           { status: 401 }

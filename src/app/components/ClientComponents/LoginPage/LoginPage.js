@@ -71,10 +71,18 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.error === 'User not found, Sign Up first') {
+          // Switch to signup form and clear fields
+          setIsLogin(false);
+          setUsername('');
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+        }
         throw new Error(data.error || 'Authentication failed');
       }
 
-      // Clear form
+      // Clear form after successful authentication
       setUsername('');
       setEmail('');
       setPassword('');
