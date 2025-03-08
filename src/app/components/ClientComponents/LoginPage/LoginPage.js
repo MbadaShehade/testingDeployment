@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useTheme } from 'next-themes';
 
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(false); // Default to sign up as shown in image
+  const [isLogin, setIsLogin] = useState(false); 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,13 +53,13 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = () => {
     console.log('Sign in with Google clicked');
-    // Here you would implement Google OAuth authentication
+    // TO DO: Google OAuth authentication implementation
   };
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
     console.log('Password reset requested for:', resetEmail);
-    // Here you would typically call an API to send a password reset email
+    // TO DO: call an API to send a password reset email
     setResetEmailSent(true);
     // Reset the form after 3 seconds and close the modal
     setTimeout(() => {
