@@ -15,14 +15,30 @@ export default function LoggedInPage() {
   const username = searchParams.get('username') || 'User';
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = () => {
     router.push('/');
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutConfirm(false);
+  };
+
+  const handleOverlayClick = (e) => {
+    // Only close if the click is directly on the overlay, not its children
+    if (e.target.className === 'logout-modal-overlay') {
+      setShowLogoutConfirm(false);
+    }
   };
 
   if (!mounted) return null;
@@ -40,7 +56,7 @@ export default function LoggedInPage() {
           and access historical data to ensure your bees thrive in a healthy environment.
         </p>
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           className='logout-button'
         >
          <Image 
@@ -53,7 +69,36 @@ export default function LoggedInPage() {
          <b className='logout-text'>Logout</b>
         </button>
         
-
+        {showLogoutConfirm && (
+          <div className="logout-modal-overlay" onClick={handleOverlayClick}>
+            <div className="logout-modal">
+              <div className="logout-modal-content">
+                <h3 className="logout-modal-title">Are you sure you want to logout?</h3>
+                <div className="logout-modal-buttons">
+                  <button 
+                    onClick={handleCancelLogout} 
+                    className="logout-modal-button cancel-button"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleConfirmLogout} 
+                    className="logout-modal-button confirm-button"
+                  >
+                    <Image 
+                      src={"/logout.png"} 
+                      className='logout-image' 
+                      alt="Logout"
+                      width={16}
+                      height={16}
+                    />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
