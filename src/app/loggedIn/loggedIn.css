@@ -1,0 +1,86 @@
+.logout-button {
+  background: linear-gradient(to right, #8d7864, #5f462e);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 8px 20px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: FreeMono, monospace;
+  position: relative;
+  overflow: hidden;
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.logout-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 248, 248, 0.4),
+    transparent
+  );
+  animation: shine 4s infinite ease-in-out;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  40% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.logout-button:hover {
+  background-color: #483420;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-image {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 567px) {
+    .logout-button {
+        min-width: 120px;
+        padding: 6px 15px;
+        height: auto;
+    }
+  .logout-image {
+    width: 18px;
+    height: 18px;
+  }
+  .logout-text {
+    font-size: 0.9rem;
+  }
+}
+@media (min-width: 1331px) {
+    .logout-button {
+        position: fixed;
+        right: 30px;
+        top: 160px;
+    }
+}
