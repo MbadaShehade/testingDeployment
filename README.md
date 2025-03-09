@@ -71,11 +71,3 @@ The system is tested for:
 - ✅ **UI functionality** (dashboard & alerts)  
 
 ---
-
-## 📌 Future Enhancements  
-🚀 Expand ML capabilities for more accurate predictions.  
-📱 Implement mobile app support.  
-🔋 Improve power efficiency using adaptive energy management.  
-
----
-
