@@ -6,11 +6,11 @@
   padding: 8px 20px;
   font-size: 1.2rem;
   font-weight: 600;
-  cursor: pointer;
+  cursor: pointer !important;
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: FreeMono, monospace;
-  position: relative;
+  right: 30px;
   overflow: hidden;
   min-width: 160px;
   display: flex;
@@ -18,9 +18,10 @@
   justify-content: center;
   gap: 10px;
   margin-left: auto;
-  position: fixed;
+  position: relative;
   right: 30px;
-  top: 160px;
+  top: 30px;
+  z-index: 10;
 }
 
 
@@ -55,6 +56,7 @@
 .logout-button:hover {
   background-color: #483420;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer !important;
 }
 
 .logout-button:active {
@@ -90,7 +92,7 @@
   text-align: left;
   line-height: 1.2;
   font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719, #5b5142);
+  background: linear-gradient(to right, #ba6719 , #5b5142 15%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -100,10 +102,17 @@
 
 .welcome-title.dark {
   color: #ce8644;
-  background: linear-gradient(to right, #ba6719, #ffffff);
+  background: linear-gradient(to right, #ba6719, #ffffff 15%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Add new media query for screens 1298px and below */
+@media (max-width: 1298px) {
+  .welcome-title {
+    margin-left: 20px; /* Move the title to the right */
+  }
 }
 
 @media (max-width: 567px) {
@@ -124,6 +133,7 @@
   font-family: FreeMono, monospace;
   max-width: 1200px;
   margin-top: -25px;
+  margin-left: 30px;
 }
 
 .dark .welcome-description {
@@ -138,12 +148,17 @@
 }
 
 .main-content {
-  margin-left: 70px;
+  padding: 40px 20px;
+  max-width: 1300px;
+  margin: 0 auto;
+  z-index: 5;
+  position: relative;
+  overflow: visible;
 }
 
 @media (max-width: 900px) {
   .main-content {
-    margin-left: 5px;
+    margin: 0 auto;
   }
   .welcome-title {
     font-size: 2rem;
@@ -153,17 +168,17 @@
     font-size: 1.1rem;
     margin-bottom: 20px;
     margin-top: 5px;
-
   }
   .logout-button {
-    width: 5%;
+    min-width: 120px;
+    width: auto;
     height: 40px;
+    cursor: pointer !important;
   }
   .logout-image {
     width: 20px;
     height: 20px;
   }
-
 }
 
 /* Logout Modal Styles */
@@ -178,7 +193,6 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(3px);
   cursor: pointer;
 }
 
