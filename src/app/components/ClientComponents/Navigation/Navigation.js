@@ -5,14 +5,14 @@ import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import { useRouter, usePathname } from 'next/navigation';
 
-export default function Navigation() {
+export default function Navigation({ isLoggedIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
-
+  
   useEffect(() => {
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -101,43 +101,65 @@ export default function Navigation() {
 
   return (
     <>
-      {windowWidth <= 1420 ? (
+      {isLoggedIn ? (
         <>
-          <div className="hamburger-menu" onClick={toggleMenu} ref={hamburgerRef}>
-            <div className={`hamburger ${menuOpen ? 'open' : ''}`}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-
-          {menuOpen && (
-            <div className="mobile-menu" ref={menuRef}>
-              <nav>
-                <ul className="mobile-nav-links">
-                  <li><a href="#problem" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'problem')}><i>The Problem</i></a></li>
-                  <li><a href="#how-it-works" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'how-it-works')}><i>Our Solution</i></a></li>
-                </ul>
-              </nav>
+          {windowWidth <= 700 ? (
+            <>
               <div className="mobile-header-controls">
                 <LanguageSelector />
                 <ThemeToggle />
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              <div className="header-controls">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
+            </>
           )}
         </>
       ) : (
         <>
-          <nav>
-            <ul className="nav-links">
-              <li><a href="#problem" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'problem')}><i>The Problem</i></a></li>
-              <li><a href="#how-it-works" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'how-it-works')}><i>Our Solution</i></a></li>
-            </ul>
-          </nav>
-          <div className="header-controls">
-            <LanguageSelector />
-            <ThemeToggle />
-          </div>
+          {windowWidth <= 1420 ? (
+            <>
+              <div className="hamburger-menu" onClick={toggleMenu} ref={hamburgerRef}>
+                <div className={`hamburger ${menuOpen ? 'open' : ''}`}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+
+              {menuOpen && (
+                <div className="mobile-menu" ref={menuRef}>
+                  <nav>
+                    <ul className="mobile-nav-links">
+                      <li><a href="#problem" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'problem')}><i>The Problem</i></a></li>
+                      <li><a href="#how-it-works" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'how-it-works')}><i>Our Solution</i></a></li>
+                    </ul>
+                  </nav>
+                  <div className="mobile-header-controls">
+                    <LanguageSelector />
+                    <ThemeToggle />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <nav>
+                <ul className="nav-links">
+                  <li><a href="#problem" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'problem')}><i>The Problem</i></a></li>
+                  <li><a href="#how-it-works" className="nav-link" onClick={(e) => handleSmoothScroll(e, 'how-it-works')}><i>Our Solution</i></a></li>
+                </ul>
+              </nav>
+              <div className="header-controls">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
+            </>
+          )}
         </>
       )}
     </>

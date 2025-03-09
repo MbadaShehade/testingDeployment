@@ -6,7 +6,7 @@ import leftFlower from '/public/leftTopSidesFlower.png';
 import rightFlower from '/public/rightTopSidesFlower.png';
 import Navigation from '../Navigation/Navigation';
 
-export default function Header() {
+export default function Header({ isLoggedIn }) {
   const router = useRouter();
 
   const handleLogoClick = () => {
@@ -21,7 +21,7 @@ export default function Header() {
         
         <div className="header-content">
           <h1 className="logo-text cursor-pointer" onClick={handleLogoClick}>HiveGuard</h1>
-          <Navigation />
+          <Navigation isLoggedIn={isLoggedIn}/>
         </div>
       </header>
     </>
