@@ -603,4 +603,62 @@
   margin-bottom: 1rem;
   text-align: center;
   font-size: 0.875rem;
+}
+
+/* Password visibility toggle styles */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .form-input {
+  width: 100%;
+  padding-right: 40px; /* Make room for the toggle button */
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  color: #6d6c6c;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #333;
+}
+
+.theme-dark .password-toggle-btn {
+  color: #000000;
+}
+
+.theme-dark .password-toggle-btn:hover {
+  color: #636060;
+}
+
+/* Ensure the button doesn't submit the form */
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+/* Media query adjustments for password toggle */
+@media (max-width: 768px) {
+  .password-toggle-btn {
+    right: 8px;
+  }
+  
+  .password-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+  }
 } 

@@ -20,7 +20,8 @@ export default function Header({ isLoggedIn }) {
         <Image src={rightFlower} className="corner-flower corner-flower-right" alt="Decorative flower" width={200} height={200} draggable={false} />
         
         <div className="header-content">
-          <h1 className="logo-text cursor-pointer" onClick={handleLogoClick}>HiveGuard</h1>
+          
+          <h1 className="logo-text cursor-pointer" onClick={() => isLoggedIn ? null : router.push('/')}>HiveGuard</h1>
           <Navigation isLoggedIn={isLoggedIn}/>
         </div>
       </header>
