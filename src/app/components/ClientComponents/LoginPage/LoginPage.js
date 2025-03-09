@@ -89,8 +89,8 @@ export default function LoginPage() {
       setPassword('');
       setConfirmPassword('');
 
-      // Redirect to logged in page
-      router.push('/loggedIn');
+      // Redirect to logged in page with username as query parameter
+      router.push(`/loggedIn?username=${encodeURIComponent(username)}`);
     } catch (err) {
       setError(err.message);
     }
