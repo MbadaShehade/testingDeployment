@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 import Header from '../components/ClientComponents/Header/Header';
 import '../globals.css'; 
+import Image from 'next/image';
+import './loggedIn.css';
+
 
 export default function LoggedInPage() {
   const router = useRouter();
@@ -15,10 +18,19 @@ export default function LoggedInPage() {
     <div className="App">
       <Header isLoggedIn={true}/>
       <main className="main-content">
+      
         <button
           onClick={handleLogout}
+          className='logout-button'
         >
-          Logout
+         <Image 
+           src={"/logout.png"} 
+           className='logout-image' 
+           alt="Logout"
+           width={20}
+           height={20}
+         />
+         <b className='logout-text'>Logout</b>
         </button>
       </main>
     </div>

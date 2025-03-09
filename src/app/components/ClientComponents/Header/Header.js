@@ -21,7 +21,7 @@ export default function Header({ isLoggedIn }) {
         
         <div className="header-content">
           
-          <h1 className="logo-text cursor-pointer" onClick={() => isLoggedIn ? null : router.push('/')}>HiveGuard</h1>
+          <h1 style={{cursor: isLoggedIn ? 'default' : 'pointer'}} className="logo-text" onClick={() => isLoggedIn ? null : router.push('/')}>HiveGuard</h1>
           <Navigation isLoggedIn={isLoggedIn}/>
         </div>
       </header>
