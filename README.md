@@ -79,8 +79,3 @@ The system is tested for:
 
 ---
 
-## 🏆 Contributors  
-- **Tamer Amer**  
-- **Mbada Shehady**  
-
----
