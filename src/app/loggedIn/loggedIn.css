@@ -165,3 +165,153 @@
   }
 
 }
+
+/* Logout Modal Styles */
+.logout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.logout-modal {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+  cursor: default;
+}
+
+.dark .logout-modal {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logout-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logout-modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  text-align: center;
+  font-family: FreeMono, monospace;
+  color: #333;
+}
+
+.dark .logout-modal-title {
+  color: #e0e0e0;
+}
+
+.logout-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 15px;
+}
+
+.logout-modal-button {
+  padding: 10px 20px;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: FreeMono, monospace;
+  border: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.dark .cancel-button {
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.cancel-button:hover {
+  background-color: #d0d0d0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .cancel-button:hover {
+  background-color: #444;
+}
+
+.confirm-button {
+  background: linear-gradient(to right, #8d7864, #5f462e);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-button:hover {
+  background: linear-gradient(to right, #7d6854, #4f361e);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 248, 248, 0.4),
+    transparent
+  );
+  animation: shine 4s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@media (max-width: 567px) {
+  .logout-modal {
+    padding: 20px;
+  }
+  
+  .logout-modal-title {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .logout-modal-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+}
