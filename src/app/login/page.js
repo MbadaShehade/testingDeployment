@@ -6,7 +6,7 @@ import './login-page.css';
 export default function Login() {
   return (
     <div className="login-page-container">
-      <Header />
+      <Header isLoggedIn={false}/>
       <LoginPage />
       <Footer />
     </div>

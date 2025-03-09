@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div className="App">
       <ScrollHandler />
-      <Header />
+      <Header isLoggedIn={false}/>
       <ScrollAnimations />
       <SideFlowers /> {/* only for screens above 1560px */}
 
