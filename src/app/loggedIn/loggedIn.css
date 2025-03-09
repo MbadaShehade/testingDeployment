@@ -18,7 +18,11 @@
   justify-content: center;
   gap: 10px;
   margin-left: auto;
+  position: fixed;
+  right: 30px;
+  top: 160px;
 }
+
 
 .logout-button::before {
   content: "";
@@ -77,10 +81,87 @@
     font-size: 0.9rem;
   }
 }
-@media (min-width: 1331px) {
-    .logout-button {
-        position: fixed;
-        right: 30px;
-        top: 160px;
-    }
+
+
+/* Welcome title styling */
+.welcome-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-align: left;
+  line-height: 1.2;
+  font-family: FreeMono, monospace;
+  background: linear-gradient(to right, #ba6719, #5b5142);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 1000;
+  margin-left: -20px;
+}
+
+.welcome-title.dark {
+  color: #ce8644;
+  background: linear-gradient(to right, #ba6719, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 567px) {
+  .welcome-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+}
+
+/* Welcome description styling */
+.welcome-description {
+  font-size: 1.5rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #333;
+  text-align: left;
+  word-wrap: break-word;
+  font-family: FreeMono, monospace;
+  max-width: 1200px;
+  margin-top: -25px;
+}
+
+.dark .welcome-description {
+  color: #e0e0e0;
+}
+
+@media (max-width: 567px) {
+  .welcome-description {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+}
+
+.main-content {
+  margin-left: 70px;
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 5px;
+  }
+  .welcome-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  .welcome-description {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    margin-top: 5px;
+
+  }
+  .logout-button {
+    width: 5%;
+    height: 40px;
+  }
+  .logout-image {
+    width: 20px;
+    height: 20px;
+  }
+
 }
