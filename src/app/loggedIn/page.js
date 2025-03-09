@@ -2,12 +2,11 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/ClientComponents/Header/Header';
-import '../globals.css'; 
 import Image from 'next/image';
 import './loggedIn.css';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-
+import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
 
 export default function LoggedInPage() {
   const router = useRouter();
@@ -45,61 +44,68 @@ export default function LoggedInPage() {
 
   return (
     <div className="App">
-      <Header isLoggedIn={true}/>
-      <main className="main-content">
+      <div className={showLogoutConfirm ? 'header-hidden' : ''}>
+        <Header isLoggedIn={true}/>
+        <button
+            onClick={handleLogoutClick}
+            className='logout-button'
+            
+          >
+           <Image 
+             src={"/logout.png"} 
+             className='logout-image' 
+             alt="Logout"
+             width={20}
+             height={20}
+           />
+           <b className='logout-text'>Logout</b>
+          </button>
+      </div>
+      <main className={`main-content ${showLogoutConfirm ? 'content-hidden' : ''}`}>
+        
         <h2 className={`welcome-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-          Welcome, {username}!
+          Welcome,{username}!
         </h2>
         <p className="welcome-description">
           Your HiveGuard dashboard gives you real-time insights into your beehive conditions. 
           Monitor temperature and humidity levels, receive alerts for potential mold risks, 
           and access historical data to ensure your bees thrive in a healthy environment.
         </p>
-        <button
-          onClick={handleLogoutClick}
-          className='logout-button'
-        >
-         <Image 
-           src={"/logout.png"} 
-           className='logout-image' 
-           alt="Logout"
-           width={20}
-           height={20}
-         />
-         <b className='logout-text'>Logout</b>
-        </button>
-        
-        {showLogoutConfirm && (
-          <div className="logout-modal-overlay" onClick={handleOverlayClick}>
-            <div className="logout-modal">
-              <div className="logout-modal-content">
-                <h3 className="logout-modal-title">Are you sure you want to logout?</h3>
-                <div className="logout-modal-buttons">
-                  <button 
-                    onClick={handleCancelLogout} 
-                    className="logout-modal-button cancel-button"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleConfirmLogout} 
-                    className="logout-modal-button confirm-button"
-                  >
-                    <Image 
-                      src={"/logout.png"} 
-                      className='logout-image' 
-                      alt="Logout"
-                      width={16}
-                      height={16}
-                    />
-                    Logout
-                  </button>
-                </div>
+      </main>
+      <div className={showLogoutConfirm ? 'beehive-management-hidden' : ''}>
+        <BeehiveManagement />
+      </div>
+      
+      {showLogoutConfirm && (
+        <div className="logout-modal-overlay" onClick={handleOverlayClick}>
+          <div className="logout-modal">
+            <div className="logout-modal-content">
+              <h3 className="logout-modal-title">Are you sure you want to logout?</h3>
+              <div className="logout-modal-buttons">
+                <button 
+                  onClick={handleCancelLogout} 
+                  className="logout-modal-button cancel-button"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmLogout} 
+                  className="logout-modal-button confirm-button"
+                >
+                  <Image 
+                    src={"/logout.png"} 
+                    className='logout-image' 
+                    alt="Logout"
+                    width={16}
+                    height={16}
+                  />
+                  Logout
+                </button>
               </div>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 }
