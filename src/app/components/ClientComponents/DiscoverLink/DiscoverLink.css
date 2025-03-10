@@ -20,7 +20,7 @@
   margin: 0 0 10px 0;
   font-family: FreeMono, monospace;
   color: #5b5142;
-  background: linear-gradient(to right, #ba6719, #5b5142);
+  background: linear-gradient(to right, #ba6719, #5b5142 78%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -47,7 +47,7 @@
 }
 
 .dark .discover-text {
-  background: linear-gradient(to right, #ba6719, #ffffff);
+  background: linear-gradient(to right, #ba6719, #ffffff 78%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
