@@ -77,7 +77,7 @@
   font-family: FreeMono, monospace;
   font-weight: 650;
   color: #5b5142;
-  background: linear-gradient(to right, #E0740F , #5B5142 80%);
+  background: linear-gradient(to right, #E0740F 35%, #5B5142 60%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -87,7 +87,7 @@
 }
 
 .dark .step-title {
-  background: linear-gradient(to right, #ba6719 45%, #ffffff 60%);
+  background: linear-gradient(to right, #ba6719 50%, #ffffff 60%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -115,11 +115,17 @@
 
 /* Specific styling for the monitoring title to ensure visibility */
 .monitoring-title {
-background: linear-gradient(to right, #ba6719 49%, #5b5142 55%);
+background: linear-gradient(to right, #ba6719 50%, #5b5142 55%);
 -webkit-background-clip: text;
 background-clip: text;
 -webkit-text-fill-color: transparent;
 font-weight: bold;
+}
+.dark .monitoring-title {
+  background: linear-gradient(to right, #ba6719 45%, #ffffff 54%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .step-itemLeft{

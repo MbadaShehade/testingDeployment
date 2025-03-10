@@ -22,7 +22,7 @@
   font-family: FreeMono, monospace;
   font-weight: 1000;
   color: #5b5142;
-  background: linear-gradient(to right, #ba6719, #5b5142);
+  background: linear-gradient(to right, #ba6719, #5b5142 66%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,7 +48,7 @@
 }
 
 .dark .more-details-text {
-  background: linear-gradient(to right, #ba6719, #ffffff);
+  background: linear-gradient(to right, #ba6719, #ffffff 60%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
