@@ -7,7 +7,7 @@ import ProblemSection from './components/ServerComponents/ProblemSection/Problem
 import Introduction from './components/ServerComponents/Introduction/Introduction';
 import HowItWorksSection from './components/ServerComponents/HowItWorksSection/HowItWorksSection';
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
-import SideFlowers from './components/ServerComponents/SideFlowers/SideFlowers';
+import FlowersRenderer from './components/ClientComponents/FlowersRenderer/FlowersRenderer';
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
       <ScrollHandler />
       <Header isLoggedIn={false}/>
       <ScrollAnimations />
-      <SideFlowers /> {/* only for screens above 1560px */}
+      <FlowersRenderer /> {/* only for screens above 1560px */}
 
       <main className="main-content">
         <Introduction />

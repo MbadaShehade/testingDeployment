@@ -52,7 +52,7 @@
   text-align: center;
   font-family: FreeMono, monospace;
   color: #5b5142;
-  background: linear-gradient(to right, #ba6719, #5b5142 80%);
+  background: linear-gradient(to right, #ba6719 50%, #5b5142 60%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -69,7 +69,7 @@
 }
 
 .dark .section-title {
-  background: linear-gradient(to right, #ba6719 42%, #ffffff 70%);
+  background: linear-gradient(to right, #ba6719 50%, #ffffff 60%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

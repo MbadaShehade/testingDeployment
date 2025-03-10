@@ -64,7 +64,7 @@ html {
 .logo-text {
   font-family: "Kaushan Script", cursive;
   font-size: 2.5rem;
-  background: linear-gradient(to right, #ba6719, #ce8644, #5b5142);
+  background: linear-gradient(to right, #ba6719, #ce8644, #5b5142 80%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -76,7 +76,7 @@ html {
 }
 
 .dark .logo-text {
-  background: linear-gradient(to right, #ba6719, #ce8644, #ffffff);
+  background: linear-gradient(to right, #ba6719, #ce8644, #ffffff 80%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
