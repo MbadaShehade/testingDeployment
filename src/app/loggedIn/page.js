@@ -7,6 +7,7 @@ import './loggedIn.css';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
+import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
 
 export default function LoggedInPage() {
   const router = useRouter();
@@ -61,6 +62,7 @@ export default function LoggedInPage() {
            <b className='logout-text'>Logout</b>
           </button>
       </div>
+      <FlowersRenderer />
       <main className={`main-content ${showLogoutConfirm ? 'content-hidden' : ''}`}>
         
         <h2 className={`welcome-title ${theme === 'dark' ? 'dark' : 'light'}`}>

@@ -1,16 +1,12 @@
-'use client';
 import './SideFlowers.css';
 import Image from 'next/image';
 import rightSideFlower from '/public/rightSideFlower.png';
 import leftSideFlower from '/public/leftSideFlower.png';
-import ClientWrapper from '../../ClientComponents/ClientSidesWrapper/ClientWrapper';
-import { usePathname } from 'next/navigation';
 
-export default function SideFlowers() {
-    const pathname = usePathname();
+
+export default function SideFlowers({pathname}) {
 
     return (
-        <ClientWrapper>
             <div>
                 {pathname === '/' && (
                     <>
@@ -29,7 +25,14 @@ export default function SideFlowers() {
                         <Image src={leftSideFlower} className="leftSideFlowerLogin" alt="leftSideFlower" draggable={false} />
                     </>
                 )} 
+                {pathname === '/loggedIn' && (
+                    <>
+                        <Image src={leftSideFlower} className="leftSideFlowerLoggedIn" alt="leftSideFlower" draggable={false} />
+                        <Image src={rightSideFlower} className="rightSideFlowerLoggedIn" alt="rightSideFlower" draggable={false} />
+                        <Image src={leftSideFlower} className="leftSideFlowerLoggedIn2" alt="leftSideFlower" draggable={false} />
+                        <Image src={rightSideFlower} className="rightSideFlowerLoggedIn2" alt="rightSideFlower" draggable={false} />
+                    </>
+                )}
             </div>
-        </ClientWrapper>
     );
 }
