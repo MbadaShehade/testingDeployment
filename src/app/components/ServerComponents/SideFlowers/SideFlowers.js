@@ -25,7 +25,7 @@ export default function SideFlowers({pathname}) {
                         <Image src={leftSideFlower} className="leftSideFlowerLogin" alt="leftSideFlower" draggable={false} />
                     </>
                 )} 
-                {pathname === '/loggedIn' || pathname === '/hiveDetails' && (
+                {(pathname === '/loggedIn' || pathname === '/hiveDetails') && (
                     <>
                         <Image src={leftSideFlower} className="leftSideFlowerLoggedIn" alt="leftSideFlower" draggable={false} />
                         <Image src={rightSideFlower} className="rightSideFlowerLoggedIn" alt="rightSideFlower" draggable={false} />

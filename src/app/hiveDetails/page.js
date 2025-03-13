@@ -561,7 +561,7 @@ const HiveDetails = () => {
           <div className="metrics-container">
             <div className="metric-card temperature">
               <div className="metric-circle">
-                <div className="metric-icon">
+                <div className="metric-icon-temperature">
                   <Thermometer size={24} />
                 </div>
                 <div className="metric-content">
@@ -576,7 +576,7 @@ const HiveDetails = () => {
 
             <div className="metric-card humidity">
               <div className="metric-circle">
-                <div className="metric-icon">
+                <div className="metric-icon-humidity">
                   <Droplets size={24} />
                 </div>
                 <div className="metric-content">

@@ -139,6 +139,25 @@
   justify-content: center;
 }
 
+.metric-card.temperature .metric-circle {
+  box-shadow: 0 4px 6px rgba(171, 25, 6, 0.2);  /* Temperature color shadow */
+  transition: box-shadow 0.3s ease;
+}
+
+.metric-card.temperature .metric-circle:hover {
+  box-shadow: 0 4px 16px rgba(171, 25, 6, 0.2);  /* Stronger temperature shadow on hover */
+}
+
+.metric-card.humidity .metric-circle {
+  box-shadow: 0 4px 6px rgba(0, 115, 255, 0.2);  /* Humidity color shadow */
+  transition: box-shadow 0.3s ease;
+}
+
+.metric-card.humidity .metric-circle:hover {
+  box-shadow: 0 4px 16px rgba(0, 115, 255, 0.2);  /* Stronger humidity shadow on hover */
+}
+
+/* Remove the general shadow from metric-circle since we're using specific ones */
 .metric-circle {
   background: #FFFFFF;
   border-radius: 50%;
@@ -149,10 +168,15 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 }
 
-.metric-icon {
+.metric-icon-temperature {
+  color: #ab1906cc;
+  margin-bottom: 0.5rem;
+}
+
+.metric-icon-humidity {
   color: #0EA5E9;
   margin-bottom: 0.5rem;
 }
@@ -370,20 +394,22 @@
   background-color:#ffffff;
   border-radius: 15px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
+  transition: box-shadow 0.3s ease;
 }
+
 
 .chart-wrapper {
   height: 300px;
   margin-top: 1rem;
   position: relative;
+  /* Removed box-shadow */
 }
 
 /* Dark theme adjustments for charts */
 .theme-dark .chart-section {
   background: #1E293B;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  /* Removed box-shadow */
 }
 
 @media (max-width: 768px) {
@@ -824,7 +850,7 @@
 .summary-title {
   font-size: 2rem;
   font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719, #5b5142);
+  background: linear-gradient(to right, #ba6719 34%, #5b5142 66%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -833,7 +859,7 @@
 }
 
 .theme-dark .summary-title {
-  background: linear-gradient(to right, #ba6719, #ffffff);
+  background: linear-gradient(to right, #ba6719 34%, #ffffff 66%);
   -webkit-background-clip: text;
   background-clip: text;
 }
