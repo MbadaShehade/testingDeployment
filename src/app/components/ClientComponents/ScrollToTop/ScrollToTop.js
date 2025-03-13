@@ -21,7 +21,9 @@ const ScrollToTop = () => {
       style={{ cursor: 'pointer' }}
     >
       <p style={{fontSize: '12px', fontWeight: 'bold', fontFamily: 'FreeMono, monospace', marginLeft: '-3px'}}>Swipe up</p>
-      <ArrowUp size={44} />
+      <div className="arrow-up">
+        <ArrowUp size={44} />
+      </div>
     </button>
   );
 };
