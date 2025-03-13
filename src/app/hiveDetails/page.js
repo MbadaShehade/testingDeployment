@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import './hiveDetails.css';
 import Header from '../components/ClientComponents/Header/Header';
 import { useRouter } from 'next/navigation';
-import { Thermometer, Droplets, Download, Calendar, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
-import { Line } from 'react-chartjs-2';
+import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
+import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
+import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
+import HistoricalDataGraph from '../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -99,7 +101,6 @@ const HiveDetails = () => {
     temperature: true,
     humidity: true
   });
-  const [selectedMetric, setSelectedMetric] = useState('temperature');
 
   // Initialize with some data points
   const initialTemp = 30;
@@ -592,180 +593,43 @@ const HiveDetails = () => {
         </div>
 
         <div className="charts-container">
-          <div className="chart-section">
-            <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-              Real-Time temperature
-            </h1>
-            <div className="date-display">
-              Date: {formatDate(new Date())}
-            </div>
-            <div className="chart-wrapper" id="temperature-chart">
-              <Line data={temperatureData} options={chartOptions} />
-            </div>
-            <div className="export-container">
-              <button 
-                className="export-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveDropdown(activeDropdown === 'temperature' ? null : 'temperature');
-                }}
-              >
-                <Download size={20} />
-                Export Graph
-              </button>
-              <div 
-                className={`export-dropdown ${activeDropdown === 'temperature' ? 'show' : ''}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="format-option" onClick={() => handleExport('temperature', 'png')}>PNG</div>
-                <div className="format-option" onClick={() => handleExport('temperature', 'jpg')}>JPG</div>
-                <div className="format-option" onClick={() => handleExport('temperature', 'heic')}>HEIC</div>
-                <div className="format-option" onClick={() => handleExport('temperature', 'svg')}>SVG</div>
-              </div>
-            </div>
-          </div>
+          <RealTimeTemperatureGraph 
+            theme={theme}
+            temperatureData={temperatureData}
+            chartOptions={chartOptions}
+            formatDate={formatDate}
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
+            handleExport={handleExport}
+          />
 
-          <div className="chart-section">
-            <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-              Real-Time humidity
-            </h1>
-            <div className="date-display">
-              Date: {formatDate(new Date())}
-            </div>
-            <div className="chart-wrapper" id="humidity-chart">
-              <Line data={humidityData} options={chartOptions} />
-            </div>
-            <div className="export-container">
-              <button 
-                className="export-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveDropdown(activeDropdown === 'humidity' ? null : 'humidity');
-                }}
-              >
-                <Download size={20} />
-                Export Graph
-              </button>
-              <div 
-                className={`export-dropdown ${activeDropdown === 'humidity' ? 'show' : ''}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="format-option" onClick={() => handleExport('humidity', 'png')}>PNG</div>
-                <div className="format-option" onClick={() => handleExport('humidity', 'jpg')}>JPG</div>
-                <div className="format-option" onClick={() => handleExport('humidity', 'heic')}>HEIC</div>
-                <div className="format-option" onClick={() => handleExport('humidity', 'svg')}>SVG</div>
-              </div>
-            </div>
-          </div>
+          <RealTimeHumidityGraph 
+            theme={theme}
+            humidityData={humidityData}
+            chartOptions={chartOptions}
+            formatDate={formatDate}
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
+            handleExport={handleExport}
+          />
 
-          <div className="chart-section historical">
-            <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-              Historical Data
-            </h1>
-            <div className="metric-toggles">
-              <button 
-                className={`metric-toggle ${activeMetrics.temperature ? 'active' : ''}`}
-                onClick={() => setActiveMetrics(prev => ({ ...prev, temperature: !prev.temperature }))}
-              >
-                <Thermometer size={16} />
-                Temperature
-              </button>
-              <button 
-                className={`metric-toggle ${activeMetrics.humidity ? 'active' : ''}`}
-                onClick={() => setActiveMetrics(prev => ({ ...prev, humidity: !prev.humidity }))}
-              >
-                <Droplets size={16} />
-                Humidity
-              </button>
-            </div>
-            <div className="date-controls">
-              <button 
-                className={`date-range-button ${dateRange === 'lastWeek' ? 'active' : ''}`}
-                onClick={() => {
-                  setDateRange('lastWeek');
-                  updateHistoricalData('lastWeek');
-                }}
-              >
-                Last Week
-              </button>
-              <button 
-                className={`date-range-button ${dateRange === 'lastMonth' ? 'active' : ''}`}
-                onClick={() => {
-                  setDateRange('lastMonth');
-                  updateHistoricalData('lastMonth');
-                }}
-              >
-                Last Month
-              </button>
-              <button 
-                className={`date-range-button ${dateRange === 'lastYear' ? 'active' : ''}`}
-                onClick={() => {
-                  setDateRange('lastYear');
-                  updateHistoricalData('lastYear');
-                }}
-              >
-                Last Year
-              </button>
-              <button 
-                className={`date-range-button ${dateRange === 'custom' ? 'active' : ''}`}
-                onClick={() => setDateRange('custom')}
-              >
-                <Calendar size={16} />
-                Custom Range
-              </button>
-            </div>
-            <div className={`custom-date-inputs ${dateRange === 'custom' ? '' : 'hidden'}`}>
-              <div className="date-input-group">
-                <label className="date-input-label">Start Date:</label>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={customStartDate}
-                  onChange={(e) => handleCustomDateChange(true, e.target.value)}
-                  max={customEndDate || new Date().toISOString().split('T')[0]}
-                />
-              </div>
-              <div className="date-input-group">
-                <label className="date-input-label">End Date:</label>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={customEndDate}
-                  onChange={(e) => handleCustomDateChange(false, e.target.value)}
-                  min={customStartDate}
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </div>
-            <div className="chart-wrapper" id="historical-chart">
-              <Line data={historicalData} options={historicalChartOptions} />
-            </div>
-            <div className="export-container">
-              <button 
-                className="export-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveDropdown(activeDropdown === 'historical' ? null : 'historical');
-                }}
-              >
-                <Download size={20} />
-                Export Graph
-              </button>
-              <div 
-                className={`export-dropdown ${activeDropdown === 'historical' ? 'show' : ''}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="format-option" onClick={() => handleExport('historical', 'png')}>PNG</div>
-                <div className="format-option" onClick={() => handleExport('historical', 'jpg')}>JPG</div>
-                <div className="format-option" onClick={() => handleExport('historical', 'heic')}>HEIC</div>
-                <div className="format-option" onClick={() => handleExport('historical', 'svg')}>SVG</div>
-              </div>
-            </div>
-            <div className="about-data">
-              <h3>About This Data</h3>
-              <p>This chart displays historical temperature and humidity data from inside the beehive. Optimal hive temperature is typically between 32-36°C, and optimal humidity ranges between 50-70%.</p>
-            </div>
-          </div>
+          <HistoricalDataGraph 
+            theme={theme}
+            historicalData={historicalData}
+            historicalChartOptions={historicalChartOptions}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            activeMetrics={activeMetrics}
+            setActiveMetrics={setActiveMetrics}
+            customStartDate={customStartDate}
+            customEndDate={customEndDate}
+            handleCustomDateChange={handleCustomDateChange}
+            formatDate={formatDate}
+            updateHistoricalData={updateHistoricalData}
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
+            handleExport={handleExport}
+          />
 
           <div className="condition-summary">
             <h1 className={`summary-title ${theme === 'dark' ? 'dark' : 'light'}`}>
@@ -802,36 +666,6 @@ const HiveDetails = () => {
               >
                 Last Year
               </button>
-              <button 
-                className={`date-range-button ${dateRange === 'custom' ? 'active' : ''}`}
-                onClick={() => setDateRange('custom')}
-              >
-                <Calendar size={16} />
-                Custom Range
-              </button>
-            </div>
-            <div className={`custom-date-inputs ${dateRange === 'custom' ? '' : 'hidden'}`}>
-              <div className="date-input-group">
-                <label className="date-input-label">Start Date:</label>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={customStartDate}
-                  onChange={(e) => handleCustomDateChange(true, e.target.value)}
-                  max={customEndDate || new Date().toISOString().split('T')[0]}
-                />
-              </div>
-              <div className="date-input-group">
-                <label className="date-input-label">End Date:</label>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={customEndDate}
-                  onChange={(e) => handleCustomDateChange(false, e.target.value)}
-                  min={customStartDate}
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
             </div>
             <table className="metrics-table">
               <thead>
