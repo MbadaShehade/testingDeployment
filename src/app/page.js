@@ -8,12 +8,13 @@ import Introduction from './components/ServerComponents/Introduction/Introductio
 import HowItWorksSection from './components/ServerComponents/HowItWorksSection/HowItWorksSection';
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
 import FlowersRenderer from './components/ClientComponents/FlowersRenderer/FlowersRenderer';
+import ScrollToTop from './components/ClientComponents/ScrollToTop/ScrollToTop';
 
 export default function Home() {
   return (
     <div className="App">
       <ScrollHandler />
-      <Header isLoggedIn={false}/>
+      <Header isLoggedIn={false} hiveDetails={false}/>
       <ScrollAnimations />
       <FlowersRenderer /> {/* only for screens above 1560px */}
 
@@ -23,6 +24,7 @@ export default function Home() {
         <HowItWorksSection />
         <MoreDetails />
       </main>
+      <ScrollToTop />
       <Footer />
     </div>
   );

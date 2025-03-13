@@ -1,7 +1,7 @@
 import './ProblemSection.css';
 import Image from 'next/image';
 import DiscoverLink from '../../ClientComponents/DiscoverLink/DiscoverLink';
-import honeySpoon from '/public/honeySpoon.png';
+import honeySpoon from '/public/honeySpoon.png'; 
 
 export default function ProblemSection() {
   return (

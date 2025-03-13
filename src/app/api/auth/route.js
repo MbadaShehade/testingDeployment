@@ -10,7 +10,7 @@ export async function POST(request) {
     const db = client.db('MoldInBeehives');
     const users = db.collection('users');
 
-    if (action === 'signup') {
+    if (action === 'signup') { //###################SIGNUP API REQUEST###################
       // Check if user already exists
       const existingUser = await users.findOne({ 
         $or: [{ email }] 
@@ -23,11 +23,10 @@ export async function POST(request) {
         );
       }
 
-            // Hash the password
+      // Hash the password
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       
-
       // Create new user with hashed password
       const result = await users.insertOne({
         username,
@@ -35,12 +34,12 @@ export async function POST(request) {
         password: hashedPassword,
       });
 
-      return NextResponse.json({ 
+      return NextResponse.json({ //SIGNUP API RESPONSE
         message: 'User created successfully',
         userId: result.insertedId 
       });
 
-    } else if (action === 'login') {
+    } else if (action === 'login') { //###################LOGIN API REQUEST###################
       // Find user
       const user = await users.findOne({ email });
 
@@ -68,11 +67,24 @@ export async function POST(request) {
         );
       } 
 
-      return NextResponse.json({
+      return NextResponse.json({ //LOGIN API RESPONSE
         message: 'Login successful',
         userId: user._id
       });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   } catch (error) {
     console.error('Authentication error:', error);
