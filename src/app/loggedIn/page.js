@@ -7,7 +7,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
-import classes from './loggedIn.css';
+import './loggedIn.css';
 export default function LoggedInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
