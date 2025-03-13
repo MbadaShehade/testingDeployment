@@ -13,8 +13,8 @@ export default function SwipeUpButton() {
   return (
     <div className="swipe-up-button-content cursor-pointer">
       <a className="swipe-up-button-link" onClick={handleClick}>
-        <h1 className="swipe-up-button-text">Swipe Up</h1>
         <div className="arrow-up">▲</div>
+        <h3 className="swipe-up-button-text">Swipe Up</h3>
       </a>
     </div>
   );

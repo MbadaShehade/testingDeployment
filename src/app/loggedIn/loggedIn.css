@@ -340,6 +340,8 @@
   -webkit-text-fill-color: transparent;
   font-weight: 700;
   margin-bottom: 1.5rem;
+  margin-top: 15rem;
+
 }
   
 .compare-hives-title.dark {
@@ -351,5 +353,5 @@
   -webkit-text-fill-color: transparent;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  margin-top: 15.5rem;
+  margin-top: 15rem;
 }

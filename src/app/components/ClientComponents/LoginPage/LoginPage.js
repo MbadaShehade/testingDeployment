@@ -18,6 +18,8 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const modalRef = useRef(null);
   const router = useRouter();
   
@@ -49,9 +51,11 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     if (!isLogin && password !== confirmPassword) {
       setError('Passwords do not match');
+      setIsLoading(false);
       return;
     }
 
@@ -88,10 +92,18 @@ export default function LoginPage() {
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      
+      // Show success state for 2 seconds
+      setIsLoading(false);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        // Redirect to logged in page with username as query parameter
+        router.push(`/loggedIn?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`);
+      }, 1000);
 
-      // Redirect to logged in page with username as query parameter
-      router.push(`/loggedIn?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -118,6 +130,28 @@ export default function LoginPage() {
 
   return (
     <div className={`login-container theme-${theme}`}>
+      {(isLoading || isSuccess) && (
+        <div className="loading-overlay">
+          <div className="loading-card">
+            {isLoading ? (
+              <>
+                <div className="loading-spinner"></div>
+                <p className="loading-text">Processing your request...</p>
+              </>
+            ) : (
+              <>
+                <div className="success-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <p className="loading-text">Success! Redirecting...</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+      
       <div className="login-wrapper">
         {/* Left side - Form */}
         <div className="login-card">
