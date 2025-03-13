@@ -12,7 +12,7 @@ export async function GET(request) {
   // Set up SSE headers
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
-    async start(controller) {
+    async start(controller) {x
       try {
         const client = await clientPromise;
         const db = client.db('MoldInBeehives');
