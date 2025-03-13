@@ -68,7 +68,11 @@ const HiveDetails = () => {
     humidity: 54.9
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [dateRange, setDateRange] = useState('lastWeek');
+  
+  // Replace single dateRange with separate states for each component
+  const [summaryDateRange, setSummaryDateRange] = useState('lastWeek');
+  const [historicalDateRange, setHistoricalDateRange] = useState('lastWeek');
+  
   const [historicalData, setHistoricalData] = useState({
     labels: [],
     datasets: [
@@ -95,6 +99,35 @@ const HiveDetails = () => {
       }
     ]
   });
+
+  // Add new state for summary data
+  const [summaryData, setSummaryData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: 'Temperature (°C)',
+        data: [],
+        borderColor: '#ba6719',
+        backgroundColor: '#ba6719',
+        tension: 0.4,
+        pointRadius: 2,
+        borderWidth: 2,
+        fill: false
+      },
+      {
+        label: 'Humidity (%)',
+        data: [],
+        borderColor: '#0EA5E9',
+        backgroundColor: '#0EA5E9',
+        tension: 0.4,
+        pointRadius: 2,
+        borderWidth: 2,
+        fill: false,
+        yAxisID: 'humidity'
+      }
+    ]
+  });
+
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [activeMetrics, setActiveMetrics] = useState({
@@ -250,7 +283,7 @@ const HiveDetails = () => {
   };
 
   // Update the updateHistoricalData function to handle custom dates
-  const updateHistoricalData = (range, customStart = null, customEnd = null) => {
+  const updateHistoricalData = (range, customStart = null, customEnd = null, forComponent = 'historical') => {
     let startDate = new Date();
     let endDate = new Date();
 
@@ -272,6 +305,13 @@ const HiveDetails = () => {
           return;
         }
         break;
+    }
+
+    // Update the appropriate state based on the component
+    if (forComponent === 'summary') {
+      setSummaryDateRange(range);
+    } else if (forComponent === 'historical') {
+      setHistoricalDateRange(range);
     }
 
     let filteredData = HISTORICAL_DATA.filter(
@@ -301,7 +341,7 @@ const HiveDetails = () => {
       filteredData = Object.values(monthlyData).sort((a, b) => a.date - b.date);
     }
 
-    setHistoricalData({
+    const newData = {
       labels: filteredData.map(data => 
         range === 'lastYear' 
           ? data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -335,13 +375,25 @@ const HiveDetails = () => {
           yAxisID: 'y2'
         }] : [])
       ]
-    });
+    };
+
+    // Update the appropriate data state based on the component
+    if (forComponent === 'summary') {
+      setSummaryData(newData);
+    } else {
+      setHistoricalData(newData);
+    }
   };
 
   // Update historical data when date range changes
   useEffect(() => {
-    updateHistoricalData(dateRange);
-  }, [dateRange]);
+    updateHistoricalData(historicalDateRange, null, null, 'historical');
+  }, [historicalDateRange]);
+
+  // Update summary data when its date range changes
+  useEffect(() => {
+    updateHistoricalData(summaryDateRange, null, null, 'summary');
+  }, [summaryDateRange]);
 
   // Historical chart options
   const historicalChartOptions = {
@@ -403,8 +455,8 @@ const HiveDetails = () => {
 
   // Update historical data when activeMetrics changes
   useEffect(() => {
-    updateHistoricalData(dateRange);
-  }, [dateRange, activeMetrics]);
+    updateHistoricalData(historicalDateRange, null, null, 'historical');
+  }, [historicalDateRange, activeMetrics]);
 
   useEffect(() => {
     setMounted(true);
@@ -617,15 +669,15 @@ const HiveDetails = () => {
             theme={theme}
             historicalData={historicalData}
             historicalChartOptions={historicalChartOptions}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
+            dateRange={historicalDateRange}
+            setDateRange={setHistoricalDateRange}
             activeMetrics={activeMetrics}
             setActiveMetrics={setActiveMetrics}
             customStartDate={customStartDate}
             customEndDate={customEndDate}
             handleCustomDateChange={handleCustomDateChange}
             formatDate={formatDate}
-            updateHistoricalData={updateHistoricalData}
+            updateHistoricalData={(range) => updateHistoricalData(range, null, null, 'historical')}
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
             handleExport={handleExport}
@@ -640,28 +692,25 @@ const HiveDetails = () => {
             </div>
             <div className="date-controls">
               <button 
-                className={`date-range-button ${dateRange === 'lastWeek' ? 'active' : ''}`}
+                className={`date-range-button ${summaryDateRange === 'lastWeek' ? 'active' : ''}`}
                 onClick={() => {
-                  setDateRange('lastWeek');
-                  updateHistoricalData('lastWeek');
+                  updateHistoricalData('lastWeek', null, null, 'summary');
                 }}
               >
                 Last Week
               </button>
               <button 
-                className={`date-range-button ${dateRange === 'lastMonth' ? 'active' : ''}`}
+                className={`date-range-button ${summaryDateRange === 'lastMonth' ? 'active' : ''}`}
                 onClick={() => {
-                  setDateRange('lastMonth');
-                  updateHistoricalData('lastMonth');
+                  updateHistoricalData('lastMonth', null, null, 'summary');
                 }}
               >
                 Last Month
               </button>
               <button 
-                className={`date-range-button ${dateRange === 'lastYear' ? 'active' : ''}`}
+                className={`date-range-button ${summaryDateRange === 'lastYear' ? 'active' : ''}`}
                 onClick={() => {
-                  setDateRange('lastYear');
-                  updateHistoricalData('lastYear');
+                  updateHistoricalData('lastYear', null, null, 'summary');
                 }}
               >
                 Last Year
