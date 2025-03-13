@@ -5,7 +5,7 @@ import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import { useRouter, usePathname } from 'next/navigation';
 
-export default function Navigation({ isLoggedIn }) {
+export default function Navigation({ isLoggedIn, hiveDetails }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
   const menuRef = useRef(null);
@@ -101,7 +101,7 @@ export default function Navigation({ isLoggedIn }) {
 
   return (
     <>
-      {isLoggedIn ? (
+      {(isLoggedIn  || hiveDetails) ? (
         <>
           {windowWidth <= 700 ? (
             <>

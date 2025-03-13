@@ -3,16 +3,16 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/ClientComponents/Header/Header';
 import Image from 'next/image';
-import './loggedIn.css';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
-
+import classes from './loggedIn.css';
 export default function LoggedInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const username = searchParams.get('username') || 'User';
+  const username = searchParams.get('username');
+  const email = searchParams.get('email') ;
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -46,7 +46,7 @@ export default function LoggedInPage() {
   return (
     <div className="App">
       <div className={showLogoutConfirm ? 'header-hidden' : ''}>
-        <Header isLoggedIn={true}/>
+        <Header isLoggedIn={true} hiveDetails={false}/>
         <button
             onClick={handleLogoutClick}
             className='logout-button'
@@ -75,8 +75,9 @@ export default function LoggedInPage() {
         </p>
       </main>
       <div className={showLogoutConfirm ? 'beehive-management-hidden' : ''}>
-        <BeehiveManagement />
       </div>
+
+      <BeehiveManagement email={email} username={username}/>
       
       {showLogoutConfirm && (
         <div className="logout-modal-overlay" onClick={handleOverlayClick}>

@@ -17,6 +17,7 @@
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
   background-color: white;
+  animation: slideDown 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Dark theme */
@@ -662,5 +663,16 @@
   .password-toggle-btn svg {
     width: 16px;
     height: 16px;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-5vh);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 } 
