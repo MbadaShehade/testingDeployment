@@ -22,6 +22,44 @@ const BeehiveManagement = ({email, username}) => {
     }
   ]);
 
+  // Only show the UI after mounting to avoid hydration mismatch
+  useEffect(() => {
+    const fetchAllHives = async () => {
+      try {
+        const response = await fetch('/api/beehive/fetchAllHives', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch hives');
+        }
+
+        const data = await response.json();
+        if (!data.beehives || data.beehives.length === 0) {
+          setHiveGroups([{
+            id: 1,
+            hives: []
+          }]);
+        } else {
+          setHiveGroups(data.beehives);
+        }
+      } catch (error) {
+        console.error('Error fetching hives:', error);
+        setHiveGroups([{
+          id: 1,
+          hives: []
+        }]);
+      }
+    };
+
+    setMounted(true);
+    fetchAllHives();
+  }, [email]);
+
   // Initialize EventSource connection for MongoDB Change Streams
   useEffect(() => {
     // Create EventSource connection to the server endpoint
@@ -43,50 +81,9 @@ const BeehiveManagement = ({email, username}) => {
       eventSource.close();
     };
 
-    // Initial fetch of hives
-    fetchAllHives();
-
     return () => {
       eventSource.close();
     };
-  }, [email]);
-
-  const fetchAllHives = async () => {
-    try {
-      const response = await fetch('/api/beehive/fetchAllHives', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch hives');
-      }
-
-      const data = await response.json();
-      if (!data.beehives || data.beehives.length === 0) {
-        setHiveGroups([{
-          id: 1,
-          hives: []
-        }]);
-      } else {
-        setHiveGroups(data.beehives);
-      }
-    } catch (error) {
-      console.error('Error fetching hives:', error);
-      setHiveGroups([{
-        id: 1,
-        hives: []
-      }]);
-    }
-  }
-
-  // Only show the UI after mounting to avoid hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-    fetchAllHives();
   }, [email]);
 
   // Function to add a new hive
@@ -149,9 +146,6 @@ const BeehiveManagement = ({email, username}) => {
         
         return updatedGroups;
       });
-
-      // After successful add, force an immediate fetch
-      await fetchAllHives();
 
       setMessage({ text: 'Hive added successfully', type: 'success' });
       setTimeout(() => setMessage({ text: '', type: '' }), 4000);
