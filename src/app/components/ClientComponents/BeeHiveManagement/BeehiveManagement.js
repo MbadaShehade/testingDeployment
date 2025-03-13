@@ -183,37 +183,7 @@ const BeehiveManagement = ({email, username}) => {
   const selectHive = (hive) => {
     router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
   };
-  
-  // Function to return to main view
-  const returnToMain = () => {
-    setSelectedHive(null);
-  };
-  
-  // Function to resolve an alert
-  const resolveAlert = () => {
-    setHiveGroups(currentGroups => {
-      return currentGroups.map(group => {
-        return {
-          ...group,
-          hives: group.hives.map(hive => {
-            if (hive.id === selectedHive.id) {
-              return {
-                ...hive,
-                hasAlert: false,
-              };
-            }
-            return hive;
-          })
-        };
-      });
-    });
     
-    setSelectedHive(prev => ({
-      ...prev,
-      hasAlert: false,
-    }));
-  };
-  
   // Check if a group is full (all positions have hives)
   const isGroupFull = (group) => {
     return group.hives.length >= 7; // 7 hexagons per group

@@ -329,3 +329,27 @@
     font-size: 0.9rem;
   }
 }
+
+
+.compare-hives-title{
+  font-size: 2rem;
+  font-family: FreeMono, monospace;
+  background: linear-gradient(to right, #ba6719 34%, #5b5142 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+  
+.compare-hives-title.dark {
+  font-size: 2rem;
+  font-family: FreeMono, monospace;
+  background: linear-gradient(to right, #ba6719 34%, #ffffff 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 15.5rem;
+}
