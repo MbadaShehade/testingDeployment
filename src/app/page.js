@@ -8,8 +8,7 @@ import Introduction from './components/ServerComponents/Introduction/Introductio
 import HowItWorksSection from './components/ServerComponents/HowItWorksSection/HowItWorksSection';
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
 import FlowersRenderer from './components/ClientComponents/FlowersRenderer/FlowersRenderer';
-import ScrollToTop from './components/ClientComponents/ScrollToTop/ScrollToTop';
-
+import SwipeUpButton from './components/ClientComponents/SwipeUpButton/SwipeUpButton';
 export default function Home() {
   return (
     <div className="App">
@@ -24,7 +23,7 @@ export default function Home() {
         <HowItWorksSection />
         <MoreDetails />
       </main>
-      <ScrollToTop />
+      <SwipeUpButton />
       <Footer />
     </div>
   );

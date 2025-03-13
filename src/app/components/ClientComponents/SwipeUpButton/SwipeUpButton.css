@@ -1,0 +1,55 @@
+.swipe-up-button-content {
+  text-align: center;
+  z-index: 2;
+  margin-top: 60px;
+}
+
+.swipe-up-button-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.swipe-up-button-link:hover {
+  transform: translateY(5px);
+}
+
+.swipe-up-button-text {
+  font-size: 3.5rem;
+  margin: 0 0 10px 0;
+  font-family: FreeMono, monospace;
+  font-weight: 1000;
+  color: #5b5142;
+  background: linear-gradient(to right, #ba6719, #5b5142 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Add responsive styling for smaller screens */
+@media (max-width: 992px) {
+  .swipe-up-button-text {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .swipe-up-button-text {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .swipe-up-button-text {
+    font-size: 2rem;
+  }
+}
+
+.dark .swipe-up-button-text {
+  background: linear-gradient(to right, #ba6719, #ffffff 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
