@@ -9,6 +9,7 @@ import HowItWorksSection from './components/ServerComponents/HowItWorksSection/H
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
 import FlowersRenderer from './components/ClientComponents/FlowersRenderer/FlowersRenderer';
 import SwipeUpButton from './components/ClientComponents/SwipeUpButton/SwipeUpButton';
+
 export default function Home() {
   return (
     <div className="App">
@@ -24,7 +25,6 @@ export default function Home() {
         <MoreDetails />
       </main>
       <SwipeUpButton />
-      <Footer />
     </div>
   );
 }
