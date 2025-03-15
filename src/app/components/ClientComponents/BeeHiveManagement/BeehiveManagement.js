@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import  './BeehiveManagement.css';
 
-const BeehiveManagement = ({email, username}) => {
+const BeehiveManagement = ({email, username, hiveGroups, setHiveGroups}) => {
   const router = useRouter();
   const [selectedHive, setSelectedHive] = useState(null);
   const [mounted, setMounted] = useState(false);
@@ -15,76 +15,10 @@ const BeehiveManagement = ({email, username}) => {
   const [showAddHiveConfirm, setShowAddHiveConfirm] = useState(false);
   const [pendingHiveAdd, setPendingHiveAdd] = useState(null);
 
-  const [hiveGroups, setHiveGroups] = useState([
-    {
-      id: 1,
-      hives: []
-    }
-  ]);
-
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
-    const fetchAllHives = async () => {
-      try {
-        const response = await fetch('/api/beehive/fetchAllHives', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch hives');
-        }
-
-        const data = await response.json();
-        if (!data.beehives || data.beehives.length === 0) {
-          setHiveGroups([{
-            id: 1,
-            hives: []
-          }]);
-        } else {
-          setHiveGroups(data.beehives);
-        }
-      } catch (error) {
-        console.error('Error fetching hives:', error);
-        setHiveGroups([{
-          id: 1,
-          hives: []
-        }]);
-      }
-    };
-
     setMounted(true);
-    fetchAllHives();
-  }, [email]);
-
-  // Initialize EventSource connection for MongoDB Change Streams
-  useEffect(() => {
-    // Create EventSource connection to the server endpoint
-    const eventSource = new EventSource(`/api/beehive/changes?email=${encodeURIComponent(email)}`);
-
-    // Listen for hive updates from the change stream
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Received hive update:', data);
-      // Update the UI with the latest data
-      if (data.beehives) {
-        setHiveGroups(data.beehives);
-      }
-    };
-
-    // Handle any errors
-    eventSource.onerror = (error) => {
-      console.error('EventSource error:', error);
-      eventSource.close();
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, [email]);
+  }, []);
 
   // Function to add a new hive
   const addHive = async (groupId, hexIndex) => {
@@ -277,7 +211,6 @@ const BeehiveManagement = ({email, username}) => {
             </div>
           )}
         </div>
-        
         
         {/* Hexagon groups */}
         <div className="groups-container">

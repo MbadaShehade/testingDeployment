@@ -7,20 +7,90 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
+import HiveRankingSystem from '../components/ClientComponents/HiveRankingSystem/HiveRankingSystem';
 import './loggedIn.css';
+
 export default function LoggedInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const username = searchParams.get('username');
-  const email = searchParams.get('email') ;
+  const email = searchParams.get('email');
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [hiveGroups, setHiveGroups] = useState([]);
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Fetch hive data
+  useEffect(() => {
+    const fetchAllHives = async () => {
+      try {
+        const response = await fetch('/api/beehive/fetchAllHives', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch hives');
+        }
+
+        const data = await response.json();
+        if (!data.beehives || data.beehives.length === 0) {
+          setHiveGroups([{
+            id: 1,
+            hives: []
+          }]);
+        } else {
+          setHiveGroups(data.beehives);
+        }
+      } catch (error) {
+        console.error('Error fetching hives:', error);
+        setHiveGroups([{
+          id: 1,
+          hives: []
+        }]);
+      }
+    };
+
+    if (email) {
+      fetchAllHives();
+    }
+  }, [email]);
+
+  // Initialize EventSource connection for MongoDB Change Streams
+  useEffect(() => {
+    if (!email) return;
+
+    // Create EventSource connection to the server endpoint
+    const eventSource = new EventSource(`/api/beehive/changes?email=${encodeURIComponent(email)}`);
+
+    // Listen for hive updates from the change stream
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Received hive update:', data);
+      // Update the UI with the latest data
+      if (data.beehives) {
+        setHiveGroups(data.beehives);
+      }
+    };
+
+    // Handle any errors
+    eventSource.onerror = (error) => {
+      console.error('EventSource error:', error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [email]);
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true);
@@ -44,73 +114,72 @@ export default function LoggedInPage() {
   if (!mounted) return null;
 
   return (
-      <div className="App">
-        <div className={showLogoutConfirm ? 'header-hidden' : ''}>
-          <Header isLoggedIn={true} hiveDetails={false}/>
-          <button
-              onClick={handleLogoutClick}
-              className='logout-button'
-              
-            >
-            <Image 
-              src={"/logout.png"} 
-              className='logout-image' 
-              alt="Logout"
-              width={20}
-              height={20}
-            />
-            <b className='logout-text'>Logout</b>
-            </button>
-        </div>
-        <FlowersRenderer />
-        <main className={`main-content ${showLogoutConfirm ? 'content-hidden' : ''}`}>
-          
-          <h2 className={`welcome-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-            Welcome,{username}!
-          </h2>
-          <p className="welcome-description">
-            Your HiveGuard dashboard gives you real-time insights into your beehive conditions. 
-            Monitor temperature and humidity levels, receive alerts for potential mold risks, 
-            and access historical data to ensure your bees thrive in a healthy environment.
-          </p>
-        </main>
-        <div className={showLogoutConfirm ? 'beehive-management-hidden' : ''}>
-        </div>
+    <div className="App">
+      <div className={showLogoutConfirm ? 'header-hidden' : ''}>
+        <Header isLoggedIn={true} hiveDetails={false}/>
+        <button
+          onClick={handleLogoutClick}
+          className='logout-button'
+        >
+          <Image 
+            src={"/logout.png"} 
+            className='logout-image' 
+            alt="Logout"
+            width={20}
+            height={20}
+          />
+          <b className='logout-text'>Logout</b>
+        </button>
+      </div>
+      <FlowersRenderer />
+      <main className={`main-content ${showLogoutConfirm ? 'content-hidden' : ''}`}>
+        <h2 className={`welcome-title ${theme === 'dark' ? 'dark' : 'light'}`}>
+          Welcome, {username}!
+        </h2>
+        <p className="welcome-description">
+          Your HiveGuard dashboard gives you real-time insights into your beehive conditions. 
+          Monitor temperature and humidity levels, receive alerts for potential mold risks, 
+          and access historical data to ensure your bees thrive in a healthy environment.
+        </p>
+      </main>
+      <div className={showLogoutConfirm ? 'beehive-management-hidden' : ''}>
+      </div>
 
-        <BeehiveManagement email={email} username={username}/>
-        
-        {showLogoutConfirm && (
-          <div className="logout-modal-overlay" onClick={handleOverlayClick}>
-            <div className="logout-modal">
-              <div className="logout-modal-content">
-                <h3 className="logout-modal-title">Are you sure you want to logout?</h3>
-                <div className="logout-modal-buttons">
-                  <button 
-                    onClick={handleCancelLogout} 
-                    className="logout-modal-button cancel-button"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleConfirmLogout} 
-                    className="logout-modal-button confirm-button"
-                  >
-                    <Image 
-                      src={"/logout.png"} 
-                      className='logout-image' 
-                      alt="Logout"
-                      width={16}
-                      height={16}
-                    />
-                    Logout
-                  </button>
-                </div>
+      <BeehiveManagement email={email} username={username} hiveGroups={hiveGroups} setHiveGroups={setHiveGroups} />
+      
+      {showLogoutConfirm && (
+        <div className="logout-modal-overlay" onClick={handleOverlayClick}>
+          <div className="logout-modal">
+            <div className="logout-modal-content">
+              <h3 className="logout-modal-title">Are you sure you want to logout?</h3>
+              <div className="logout-modal-buttons">
+                <button 
+                  onClick={handleCancelLogout} 
+                  className="logout-modal-button cancel-button"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmLogout} 
+                  className="logout-modal-button confirm-button"
+                >
+                  <Image 
+                    src={"/logout.png"} 
+                    className='logout-image' 
+                    alt="Logout"
+                    width={16}
+                    height={16}
+                  />
+                  Logout
+                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <h1 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Compare Your Hives: Insights & Analysis</h1>
-      </div>
+      <h1 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Compare Your Hives: Insights & Analysis</h1>
+      <HiveRankingSystem hiveGroups={hiveGroups} />
+    </div>
   );
 }

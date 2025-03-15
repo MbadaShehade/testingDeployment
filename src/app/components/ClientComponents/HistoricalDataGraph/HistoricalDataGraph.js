@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Download, Calendar, Thermometer, Droplets } from 'lucide-react';
