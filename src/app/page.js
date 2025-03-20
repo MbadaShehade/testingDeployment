@@ -1,6 +1,5 @@
 import './globals.css';
 import Header from './components/ClientComponents/Header/Header';
-import Footer from './components/ServerComponents/Footer/Footer';
 import MoreDetails from './components/ServerComponents/MoreDetails/MoreDetails';
 import ScrollAnimations from './components/ClientComponents/ScrollAnimations/ScrollAnimations';
 import ProblemSection from './components/ServerComponents/ProblemSection/ProblemSection';

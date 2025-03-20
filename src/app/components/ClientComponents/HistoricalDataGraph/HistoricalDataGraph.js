@@ -29,14 +29,22 @@ const HistoricalDataGraph = ({
       <div className="metric-toggles">
         <button 
           className={`metric-toggle ${activeMetrics.temperature ? 'active' : ''}`}
-          onClick={() => setActiveMetrics(prev => ({ ...prev, temperature: !prev.temperature }))}
+          onClick={() => {
+            if (!activeMetrics.temperature || activeMetrics.humidity) {
+              setActiveMetrics(prev => ({ ...prev, temperature: !prev.temperature }));
+            }
+          }}
         >
           <Thermometer size={16} />
           Temperature
         </button>
         <button 
           className={`metric-toggle ${activeMetrics.humidity ? 'active' : ''}`}
-          onClick={() => setActiveMetrics(prev => ({ ...prev, humidity: !prev.humidity }))}
+          onClick={() => {
+            if (!activeMetrics.humidity || activeMetrics.temperature) {
+              setActiveMetrics(prev => ({ ...prev, humidity: !prev.humidity }));
+            }
+          }}
         >
           <Droplets size={16} />
           Humidity
@@ -127,7 +135,7 @@ const HistoricalDataGraph = ({
       </div>
       <div className="about-data">
         <h3>About This Data</h3>
-        <p>This chart displays historical temperature and humidity data from inside the beehive. Optimal hive temperature is typically between 32-36°C, and optimal humidity ranges between 50-70%.</p>
+        <p>This chart displays historical temperature and humidity data at their maximum values inside the beehive. Optimal hive temperature is typically between 32-36°C, and optimal humidity ranges between 50-70%.</p>
       </div>
     </div>
   );
