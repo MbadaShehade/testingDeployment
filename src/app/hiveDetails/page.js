@@ -151,11 +151,10 @@ const HiveDetails = () => {
 
   // Function to format date only
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   // State for chart data
@@ -282,7 +281,17 @@ const HiveDetails = () => {
     }
   };
 
-  // Update the updateHistoricalData function to handle custom dates
+  // Add new state for analysis data
+  const [analysisData, setAnalysisData] = useState({
+    tempAvg: 33.4,
+    tempMin: 29.4,
+    tempMax: 36.1,
+    humidityAvg: 55.5,
+    humidityMin: 38.7,
+    humidityMax: 66.7
+  });
+
+  // Update the updateHistoricalData function
   const updateHistoricalData = (range, customStart = null, customEnd = null, forComponent = 'historical') => {
     let startDate = new Date();
     let endDate = new Date();
@@ -318,8 +327,60 @@ const HiveDetails = () => {
       data => data.date >= startDate && data.date <= endDate
     );
 
+    // Calculate statistics from the filtered data
+    if (forComponent === 'summary') {
+      const stats = filteredData.reduce((acc, curr) => {
+        acc.tempSum += curr.temperature;
+        acc.humiditySum += curr.humidity;
+        acc.tempMin = Math.min(acc.tempMin, curr.temperature);
+        acc.tempMax = Math.max(acc.tempMax, curr.temperature);
+        acc.humidityMin = Math.min(acc.humidityMin, curr.humidity);
+        acc.humidityMax = Math.max(acc.humidityMax, curr.humidity);
+        return acc;
+      }, {
+        tempSum: 0,
+        humiditySum: 0,
+        tempMin: Infinity,
+        tempMax: -Infinity,
+        humidityMin: Infinity,
+        humidityMax: -Infinity
+      });
+
+      const count = filteredData.length;
+      setAnalysisData({
+        tempAvg: Number((stats.tempSum / count).toFixed(1)),
+        tempMin: Number(stats.tempMin.toFixed(1)),
+        tempMax: Number(stats.tempMax.toFixed(1)),
+        humidityAvg: Number((stats.humiditySum / count).toFixed(1)),
+        humidityMin: Number(stats.humidityMin.toFixed(1)),
+        humidityMax: Number(stats.humidityMax.toFixed(1))
+      });
+    }
+
+    // For last week and last month views, aggregate by day and keep maximum values
+    if (range === 'lastWeek' || range === 'lastMonth') {
+      const dailyData = {};
+      
+      filteredData.forEach(data => {
+        const dayKey = data.date.toISOString().split('T')[0]; // Format: "YYYY-MM-DD"
+        if (!dailyData[dayKey]) {
+          dailyData[dayKey] = {
+            date: new Date(data.date),
+            temperature: data.temperature,
+            humidity: data.humidity
+          };
+        } else {
+          // Keep the maximum values for each metric
+          dailyData[dayKey].temperature = Math.max(dailyData[dayKey].temperature, data.temperature);
+          dailyData[dayKey].humidity = Math.max(dailyData[dayKey].humidity, data.humidity);
+        }
+      });
+
+      // Convert back to array and sort by date
+      filteredData = Object.values(dailyData).sort((a, b) => a.date - b.date);
+    }
     // For yearly view, aggregate by month
-    if (range === 'lastYear') {
+    else if (range === 'lastYear') {
       const monthlyData = {};
       
       filteredData.forEach(data => {
@@ -347,8 +408,7 @@ const HiveDetails = () => {
           ? data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
           : data.date.toLocaleDateString('en-US', {
               month: 'short',
-              day: 'numeric',
-              hour: '2-digit'
+              day: 'numeric'
             })
       ),
       datasets: [
@@ -398,6 +458,40 @@ const HiveDetails = () => {
   // Historical chart options
   const historicalChartOptions = {
     ...chartOptions,
+    plugins: {
+      ...chartOptions.plugins,
+      tooltip: {
+        mode: 'nearest',
+        intersect: true,
+        backgroundColor: theme === 'dark' ? '#1E293B' : 'white',
+        titleColor: theme === 'dark' ? '#fff' : '#000',
+        bodyColor: theme === 'dark' ? '#fff' : '#000',
+        borderColor: theme === 'dark' ? '#fff' : '#000',
+        borderWidth: 1,
+        callbacks: {
+          title: function(context) {
+            if (context[0]) {
+              return context[0].label;
+            }
+            return '';
+          },
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y.toFixed(3);
+            }
+            return label;
+          },
+          // Filter out other metrics from tooltip
+          filter: function(tooltipItem) {
+            return tooltipItem.datasetIndex === tooltipItem.tooltipItems[0].datasetIndex;
+          }
+        }
+      }
+    },
     scales: {
       y: {
         type: 'linear',
@@ -416,26 +510,28 @@ const HiveDetails = () => {
           callback: function(value) {
             return value.toFixed(1);
           }
-        }
+        },
+        beginAtZero: false
       },
       y2: {
         type: 'linear',
         display: activeMetrics.humidity,
-        position: 'left',
+        position: 'right',
         title: {
           display: true,
           text: 'Humidity (%)',
           color: theme === 'dark' ? '#fff' : '#000'
         },
         grid: {
-          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          drawOnChartArea: false
         },
         ticks: {
           color: theme === 'dark' ? '#fff' : '#000',
           callback: function(value) {
             return value.toFixed(1);
           }
-        }
+        },
+        beginAtZero: false
       },
       x: {
         grid: {
@@ -688,7 +784,28 @@ const HiveDetails = () => {
               Hive Condition Summary
             </h1>
             <div className="summary-date">
-              Generated Summary for {formatDate(new Date(customStartDate || Date.now() - 7 * 24 * 60 * 60 * 1000))} to {formatDate(new Date(customEndDate || Date.now()))}
+              Generated Summary for {(() => {
+                const now = new Date();
+                let startDate = new Date();
+                
+                switch (summaryDateRange) {
+                  case 'lastWeek':
+                    startDate.setDate(now.getDate() - 7);
+                    break;
+                  case 'lastMonth':
+                    startDate.setMonth(now.getMonth() - 1);
+                    break;
+                  case 'lastYear':
+                    startDate.setFullYear(now.getFullYear() - 1);
+                    break;
+                  case 'custom':
+                    return `${formatDate(new Date(customStartDate || Date.now() - 7 * 24 * 60 * 60 * 1000))} to ${formatDate(new Date(customEndDate || Date.now()))}`;
+                  default:
+                    startDate.setDate(now.getDate() - 7);
+                }
+                
+                return `${formatDate(startDate)} to ${formatDate(now)}`;
+              })()}
             </div>
             <div className="date-controls">
               <button 
@@ -731,50 +848,64 @@ const HiveDetails = () => {
                   <td>Temperature (°C)</td>
                   <td>
                     <div className="metric-value-container">
-                      29.4°C
-                      <AlertTriangle className="status-icon critical" size={16} />
+                      {analysisData.tempMin}°C
+                      <AlertTriangle className={`status-icon ${analysisData.tempMin < 30 ? 'critical' : 'warning'}`} size={16} />
                     </div>
                   </td>
                   <td>
                     <div className="metric-value-container">
-                      36.1°C
-                      <AlertCircle className="status-icon warning" size={16} />
+                      {analysisData.tempMax}°C
+                      <AlertCircle className={`status-icon ${analysisData.tempMax > 35 ? 'critical' : 'warning'}`} size={16} />
                     </div>
                   </td>
                   <td>
                     <div className="metric-value-container">
-                      33.4°C
-                      <CheckCircle className="status-icon optimal" size={16} />
+                      {analysisData.tempAvg}°C
+                      <CheckCircle className={`status-icon ${analysisData.tempAvg >= 32 && analysisData.tempAvg <= 35 ? 'optimal' : 'warning'}`} size={16} />
                     </div>
                   </td>
-                  <td className="status-optimal">Optimal</td>
+                  <td className={analysisData.tempAvg >= 32 && analysisData.tempAvg <= 35 ? 'status-optimal' : 'status-warning'}>
+                    {analysisData.tempAvg >= 32 && analysisData.tempAvg <= 35 ? 'Optimal' : 'Warning'}
+                  </td>
                 </tr>
                 <tr>
                   <td>Humidity (%)</td>
                   <td>
                     <div className="metric-value-container">
-                      38.7%
-                      <AlertTriangle className="status-icon critical" size={16} />
+                      {analysisData.humidityMin}%
+                      <AlertTriangle className={`status-icon ${analysisData.humidityMin < 45 ? 'critical' : 'warning'}`} size={16} />
                     </div>
                   </td>
                   <td>
                     <div className="metric-value-container">
-                      66.7%
-                      <AlertCircle className="status-icon warning" size={16} />
+                      {analysisData.humidityMax}%
+                      <AlertCircle className={`status-icon ${analysisData.humidityMax > 65 ? 'critical' : 'warning'}`} size={16} />
                     </div>
                   </td>
                   <td>
                     <div className="metric-value-container">
-                      55.5%
-                      <CheckCircle className="status-icon optimal" size={16} />
+                      {analysisData.humidityAvg}%
+                      <CheckCircle className={`status-icon ${analysisData.humidityAvg >= 50 && analysisData.humidityAvg <= 65 ? 'optimal' : 'warning'}`} size={16} />
                     </div>
                   </td>
-                  <td className="status-optimal">Optimal</td>
+                  <td className={analysisData.humidityAvg >= 50 && analysisData.humidityAvg <= 65 ? 'status-optimal' : 'status-warning'}>
+                    {analysisData.humidityAvg >= 50 && analysisData.humidityAvg <= 65 ? 'Optimal' : 'Warning'}
+                  </td>
                 </tr>
               </tbody>
             </table>
             <div className="condition-analysis">
-              <p>During this period, the hive maintained an average temperature of 33.4°C, with concerning low temperatures dropping to 29.4°C. Humidity levels averaged 55.5%, with periods of dryness (38.7%) that could affect brood development. Overall, the hive conditions were excellent for colony health and honey production.</p>
+              <p>
+                During this period, the hive maintained an average temperature of {analysisData.tempAvg}°C, 
+                with concerning low temperatures dropping to {analysisData.tempMin}°C. 
+                Humidity levels averaged {analysisData.humidityAvg}%, with periods of 
+                {analysisData.humidityMin < 45 ? ' dryness' : ' high humidity'} ({analysisData.humidityMin}%) 
+                that could affect brood development. Overall, the hive conditions were 
+                {analysisData.tempAvg >= 32 && analysisData.tempAvg <= 36 && 
+                 analysisData.humidityAvg >= 50 && analysisData.humidityAvg <= 70 
+                  ? ' excellent' 
+                  : ' concerning'} for colony health and honey production.
+              </p>
             </div>
           </div>
         </div>
