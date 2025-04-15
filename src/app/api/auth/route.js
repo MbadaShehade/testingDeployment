@@ -73,19 +73,6 @@ export async function POST(request) {
       });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   } catch (error) {
     console.error('Authentication error:', error);
     return NextResponse.json(

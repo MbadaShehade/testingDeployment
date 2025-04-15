@@ -37,7 +37,6 @@
     color: #e0e0e0;
 }
 
-
 @media (max-width: 1024px) {
     .technical-description {
     font-size: 1.3rem;
@@ -71,4 +70,46 @@
     font-size: 1.1rem;
     line-height: 1.5;
     }
+}
+
+.login-link {
+  display: inline-block;
+  color: #0066cc;
+  font-weight: 500;
+  animation: colorChange 3s infinite;
+  text-shadow: 0 0 3px rgba(0, 102, 204, 0.2),
+               0 0 6px rgba(0, 102, 204, 0.15),
+               0 0 9px rgba(0, 102, 204, 0.1);
+}
+
+@keyframes colorChange {
+  0% {
+    color: #0066cc;
+  }
+  50% {
+    color: #3399ff;
+  }
+  100% {
+    color: #0066cc;
+  }
+}
+
+/* Dark theme styles */
+:root[class~="dark"] .login-link {
+  animation: colorChangeDark 3s infinite;
+  text-shadow: 0 0 3px rgba(77, 171, 255, 0.2),
+               0 0 6px rgba(77, 171, 255, 0.15),
+               0 0 9px rgba(77, 171, 255, 0.1);
+}
+
+@keyframes colorChangeDark {
+  0% {
+    color: #4dabff;
+  }
+  50% {
+    color: #99ccff;
+  }
+  100% {
+    color: #4dabff;
+  }
 }

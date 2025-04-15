@@ -15,10 +15,38 @@ export default function LoggedInPage() {
   const searchParams = useSearchParams();
   const username = searchParams.get('username');
   const email = searchParams.get('email');
+  const [userPassword, setUserPassword] = useState('');
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [hiveGroups, setHiveGroups] = useState([]);
+
+  // Store password in state and sessionStorage when component mounts
+  useEffect(() => {
+    const urlPassword = searchParams.get('password');
+    const storedPassword = sessionStorage.getItem('userPassword');
+    
+    console.log('LoggedIn: Checking password sources:', {
+      urlPassword: urlPassword ? '[PRESENT]' : '[MISSING]',
+      storedPassword: storedPassword ? '[PRESENT]' : '[MISSING]'
+    });
+
+    if (urlPassword) {
+      console.log('LoggedIn: Using password from URL');
+      setUserPassword(urlPassword);
+      sessionStorage.setItem('userPassword', urlPassword);
+    } else if (storedPassword) {
+      console.log('LoggedIn: Using password from sessionStorage');
+      setUserPassword(storedPassword);
+    } else {
+      console.log('LoggedIn: No password available');
+    }
+  }, [searchParams]);
+
+  // Log when userPassword changes
+  useEffect(() => {
+    console.log('LoggedIn: userPassword state updated:', userPassword ? '[PRESENT]' : '[MISSING]');
+  }, [userPassword]);
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
@@ -96,7 +124,10 @@ export default function LoggedInPage() {
     setShowLogoutConfirm(true);
   };
 
+  // Handle logout to clear stored password
   const handleConfirmLogout = () => {
+    sessionStorage.removeItem('userPassword');
+    setUserPassword('');
     router.push('/');
   };
 
@@ -109,6 +140,19 @@ export default function LoggedInPage() {
     if (e.target.className === 'logout-modal-overlay') {
       setShowLogoutConfirm(false);
     }
+  };
+
+  const handleHiveClick = (hiveId) => {
+    const email = searchParams.get('email');
+    const username = searchParams.get('username');
+    const password = searchParams.get('password');
+    
+    if (!password) {
+      console.error('No password found in URL parameters');
+      return;
+    }
+    
+    router.push(`/hiveDetails?id=${hiveId}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
   };
 
   if (!mounted) return null;
@@ -145,7 +189,13 @@ export default function LoggedInPage() {
       <div className={showLogoutConfirm ? 'beehive-management-hidden' : ''}>
       </div>
 
-      <BeehiveManagement email={email} username={username} hiveGroups={hiveGroups} setHiveGroups={setHiveGroups} />
+      <BeehiveManagement 
+        email={email} 
+        username={username} 
+        password={userPassword}
+        hiveGroups={hiveGroups} 
+        setHiveGroups={setHiveGroups} 
+      />
       
       {showLogoutConfirm && (
         <div className="logout-modal-overlay" onClick={handleOverlayClick}>

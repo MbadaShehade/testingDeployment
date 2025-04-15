@@ -5,8 +5,9 @@ import { AlertTriangle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import  './BeehiveManagement.css';
+import mqtt from 'mqtt';
 
-const BeehiveManagement = ({email, username, hiveGroups, setHiveGroups}) => {
+const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups}) => {
   const router = useRouter();
   const [selectedHive, setSelectedHive] = useState(null);
   const [mounted, setMounted] = useState(false);
@@ -14,6 +15,12 @@ const BeehiveManagement = ({email, username, hiveGroups, setHiveGroups}) => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [showAddHiveConfirm, setShowAddHiveConfirm] = useState(false);
   const [pendingHiveAdd, setPendingHiveAdd] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Log when props change
+  useEffect(() => {
+    console.log('BeehiveManagement props updated:', { email, username, password: password ? '[PRESENT]' : '[MISSING]' });
+  }, [email, username, password]);
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
@@ -114,8 +121,104 @@ const BeehiveManagement = ({email, username, hiveGroups, setHiveGroups}) => {
   };
   
   // Function to handle hive selection
-  const selectHive = (hive) => {
-    router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
+  const selectHive = async (hive) => {
+    console.log('Selecting hive with password:', password ? '[PRESENT]' : '[MISSING]');
+    setSelectedHive(hive);
+    setIsLoading(true);
+    setMessage({ text: 'Connecting to hive sensors...', type: 'info' });
+    
+    try {
+      // Try to get password from props or sessionStorage
+      const userPassword = password || sessionStorage.getItem('userPassword');
+      
+      if (!userPassword) {
+        console.error('No password provided to BeehiveManagement');
+        setMessage({ text: 'Error: Missing password', type: 'error' });
+        setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        setIsLoading(false);
+        return;
+      }
+
+      // Connect to MQTT and wait for initial data
+      const client = mqtt.connect('ws://test.mosquitto.org:8080', {
+        clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
+        clean: true,
+        reconnectPeriod: 1000,
+        connectTimeout: 30 * 1000
+      });
+
+      let initialDataReceived = {
+        temperature: false,
+        humidity: false
+      };
+
+      // First, create variables to store both values
+      let tempValue = null;
+      let humidityValue = null;
+
+      // Set a timeout for waiting for data
+      const timeout = setTimeout(() => {
+        client.end();
+        setMessage({ text: 'Timeout waiting for hive data. Please try again.', type: 'error' });
+        setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        setIsLoading(false);
+      }, 10000); // 10 second timeout
+
+      client.on('connect', () => {
+        console.log('Connected to MQTT broker for initial data');
+        const tempTopic = `${userPassword}/moldPrevention/hive${hive.id}/temp`;
+        const humidityTopic = `${userPassword}/moldPrevention/hive${hive.id}/humidity`;
+        
+        client.subscribe([tempTopic, humidityTopic]);
+      });
+
+      client.on('message', (topic, message) => {
+        const value = parseFloat(message.toString());
+        if (isNaN(value)) return;
+
+        if (topic.endsWith('/temp')) {
+          tempValue = value;  // Store temperature value
+          initialDataReceived.temperature = true;
+        } else if (topic.endsWith('/humidity')) {
+          humidityValue = value;  // Store humidity value
+          initialDataReceived.humidity = true;
+        }
+
+        // If we have both temperature and humidity data
+        if (initialDataReceived.temperature && initialDataReceived.humidity) {
+          clearTimeout(timeout);
+          client.end();
+          
+          // Store the initial data with correct values
+          localStorage.setItem(`hiveData_${hive.id}`, JSON.stringify({
+            data: {
+              temperature: tempValue,    // Use stored temperature
+              humidity: humidityValue,   // Use stored humidity
+              name: `Hive ${hive.id}`
+            },
+            timestamp: Date.now()
+          }));
+
+          // Navigate to hive details
+          router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(userPassword)}`);
+        }
+      });
+
+      client.on('error', (err) => {
+        console.error('MQTT Error:', err);
+        clearTimeout(timeout);
+        client.end();
+        setMessage({ text: 'Error connecting to hive sensors', type: 'error' });
+        setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        setIsLoading(false);
+      });
+
+    } catch (error) {
+      console.error('Error fetching hive data:', error);
+      setMessage({ text: 'Failed to load hive data', type: 'error' });
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+      setIsLoading(false);
+    }
   };
     
   // Check if a group is full (all positions have hives)
@@ -192,6 +295,14 @@ const BeehiveManagement = ({email, username, hiveGroups, setHiveGroups}) => {
   
   return (
     <div className={`app-container theme-${theme}`}>
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-card">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">Loading hive data...</p>
+          </div>
+        </div>
+      )}
       {message.text && (
         <div className={`message-banner ${message.type}`}>
           {message.text}
