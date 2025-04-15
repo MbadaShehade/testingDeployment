@@ -12,7 +12,7 @@ export default function HowItWorksSection() {
         <div className="steps-container">
             <div className="step-item1">
                 <h4 className="step-title">1.Setting sensors</h4>
-                <p className="step-description"> Using 2 sensors to Measure temperature & humidity inside the beehive</p>
+                <p className="step-description"> Using 2 sensors to Measure temperature & humidity inside the beehive and air pump to regulate the air inside the beehive</p>
             </div>
             <Image 
             src={rightFlyingBee} 

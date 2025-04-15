@@ -98,8 +98,9 @@ export default function LoginPage() {
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
-        // Redirect to logged in page with username as query parameter
-        router.push(`/loggedIn?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`);
+        // Store both the original password (for MQTT) and encrypted password (from DB)
+        const originalPassword = password; // The password before encryption
+        router.push(`/loggedIn?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(originalPassword)}`);
       }, 1000);
 
     } catch (err) {

@@ -1,6 +1,8 @@
 import './MoreDetails.css';
 import Image from 'next/image';
 import honeySpoonLast from '/public/honeySpoonLast.png';
+import Link from 'next/link';
+
 
 export default function MoreDetails() {
   return (
@@ -19,6 +21,10 @@ export default function MoreDetails() {
           <p>
             Once in the cloud, the data can be processed to generate graphs, charts, and additional insights for the beekeeper. The information will be accessible from anywhere.
           </p>
+          <br></br>
+          <Link href="/login" className="login-link">
+              Login in to View detailed sensor specifications
+          </Link>
           <Image 
             src={honeySpoonLast} 
             alt="Honey spoon illustration" 

@@ -135,7 +135,7 @@ const HistoricalDataGraph = ({
       </div>
       <div className="about-data">
         <h3>About This Data</h3>
-        <p>This chart displays historical temperature and humidity data at their maximum values inside the beehive. Optimal hive temperature is typically between 32-36°C, and optimal humidity ranges between 50-70%.</p>
+        <p>This chart displays historical temperature and humidity data at their maximum values inside the beehive. Optimal hive temperature is typically between 26-38°C, and optimal humidity ranges between 76.5-85.6%.</p>
       </div>
     </div>
   );
