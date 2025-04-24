@@ -5,6 +5,7 @@ import json
 from dotenv import load_dotenv
 from hive_pdf import create_hive_report_pdf
 import base64
+import datetime
 
 # Load environment variables
 load_dotenv('.env.local')
