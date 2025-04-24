@@ -125,11 +125,14 @@ def create_placeholder_chart(chart_type, value=None):
         plt.title(f'Humidity Data: Current {value}%')
         plt.ylim(value - 5, value + 5)
     
-    # Add fake timestamps on the x-axis
-    timestamps = [
-        '18:33:26', '18:33:27', '18:33:30', '18:33:32', '18:33:33',
-        '18:33:35', '18:33:36', '18:33:38', '18:33:39', '18:33:40'
-    ]
+    # Generate real timestamps based on current time
+    now = datetime.datetime.now()
+    timestamps = []
+    for i in range(10):
+        # Create timestamps going back in time (newest at the end)
+        time_point = now - datetime.timedelta(seconds=(9-i)*3)  # 3-second intervals
+        timestamps.append(time_point.strftime('%H:%M:%S'))
+    
     plt.xticks(x, timestamps, rotation=45)
     plt.xlabel('Time')
     plt.tight_layout()
