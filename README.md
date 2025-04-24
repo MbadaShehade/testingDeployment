@@ -83,3 +83,47 @@ The system is tested for:
 - ✅ **UI functionality** (dashboard & alerts)  
 
 ---
+
+## 📱 Telegram Reporting System
+
+This system allows you to receive beehive health reports directly on Telegram:
+
+### Features:
+- 📊 **PDF Reports**: Comprehensive hive health reports with temperature and humidity data
+- ⏰ **Scheduled Reports**: Set up daily reports at specific times
+- 🔄 **Test Mode**: Test the system by sending reports every 15 seconds
+
+### Setup Instructions:
+
+1. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Set up Environment Variables**:
+   Create a `.env.local` file with your Telegram bot token:
+   ```
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   TELEGRAM_CHAT_ID=your_default_chat_id_here
+   ```
+
+3. **Using Scheduled Reports**:
+   - **Via UI**: Enable scheduling in the Hive Details page
+   - **Via Command Line**:
+     ```bash
+     # For daily reports at 8:00 AM
+     python telegram_scheduler.py --hive_id 1 --chat_id "YOUR_CHAT_ID" --time "08:00"
+     
+     # For testing (every 15 seconds)
+     python telegram_scheduler.py --hive_id 1 --chat_id "YOUR_CHAT_ID" --test
+     ```
+
+4. **Managing Multiple Hives**:
+   Use a configuration file for multiple hives:
+   ```bash
+   python telegram_scheduler.py --config hive_scheduler_config.json
+   ```
+
+For more details on the scheduler, see `scheduler_README.md`.
+
+---

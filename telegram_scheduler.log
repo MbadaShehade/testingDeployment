@@ -1,0 +1,474 @@
+2025-04-24 18:39:54,098 - telegram_scheduler - INFO - Starting scheduler process with PID 89745
+2025-04-24 18:39:54,098 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 18:39:54,098 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:39:54,099 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 18:39:54,099 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:40:09,140 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:40:10,131 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:10,131 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:10,131 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:40:25,159 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:40:25,901 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:25,901 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:25,901 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:40:40,932 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:40:41,674 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:41,674 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:41,674 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:40:56,731 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:40:57,649 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:57,649 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:40:57,649 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:41:12,688 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:41:13,664 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:13,664 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:13,664 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:41:28,715 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:41:29,592 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:29,592 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:29,592 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:41:44,628 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:41:45,538 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:45,539 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:41:45,539 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:42:00,564 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:42:01,398 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:01,398 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:01,398 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:42:16,425 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:42:17,350 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:17,350 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:17,350 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:42:32,385 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:42:33,336 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:33,336 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:33,336 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:42:48,382 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:42:49,193 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:49,193 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:42:49,193 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:43:04,232 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:43:05,121 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:05,121 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:05,121 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:43:20,159 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:43:21,194 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:21,194 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:21,194 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:43:36,217 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:43:37,102 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:37,102 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:37,102 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:43:52,126 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:43:53,045 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:53,046 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:43:53,046 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:44:08,077 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:44:09,106 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:09,106 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:09,106 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:44:24,138 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:44:25,060 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:25,060 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:25,060 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:44:40,110 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:44:41,048 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:41,048 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:41,048 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:44:43,008 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:44:43,058 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:44:43,333 - telegram_scheduler - INFO - Starting scheduler process with PID 89931
+2025-04-24 18:44:43,334 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 18:44:43,334 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:44:43,334 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 18:44:43,334 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:44:58,382 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:44:59,241 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:59,241 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:44:59,241 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:45:14,259 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:45:15,215 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:45:15,216 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:45:15,216 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:45:30,242 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:45:31,035 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:45:31,035 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:45:31,035 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:45:43,726 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:45:43,771 - telegram_scheduler - INFO - Starting scheduler process with PID 89960
+2025-04-24 18:45:43,771 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 18:45:43,771 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:45:43,771 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 18:45:43,771 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 18:45:44,072 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:45:55,841 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:45:56,806 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:45:58,059 - telegram_scheduler - INFO - Starting scheduler process with PID 89975
+2025-04-24 18:45:58,059 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 18:45:58,059 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:45:58,059 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 18:45:58,059 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 18:48:44,302 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:48:44,372 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:48:44,375 - telegram_scheduler - INFO - Starting scheduler process with PID 90065
+2025-04-24 18:48:44,375 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 18:48:44,375 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:48:44,375 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 18:48:44,375 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:48:59,408 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:49:00,231 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:00,231 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:00,231 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:49:15,269 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:49:16,009 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:16,009 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:16,009 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:49:31,066 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:49:32,024 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:32,024 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:49:32,024 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:49:44,636 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:49:45,060 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:49:47,998 - telegram_scheduler - INFO - Starting scheduler process with PID 90098
+2025-04-24 18:49:47,998 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 18:49:47,998 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:49:47,998 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 18:49:47,998 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:50:03,038 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:50:03,839 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:03,839 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:03,839 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:50:18,872 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:50:19,695 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:19,695 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:19,695 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:50:34,731 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:50:35,652 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:35,653 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:35,653 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:50:50,689 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:50:51,726 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:51,726 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:50:51,726 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:51:06,765 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:51:07,537 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:07,538 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:07,538 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:51:22,574 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:51:23,549 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:23,549 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:23,549 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:51:38,598 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:51:39,506 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:39,506 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:39,506 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:51:54,545 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 18:51:55,301 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:55,302 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 18:51:55,302 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 18:52:00,123 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:52:00,320 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:52:01,588 - telegram_scheduler - INFO - Starting scheduler process with PID 90193
+2025-04-24 18:52:01,588 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 18:52:01,589 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:52:01,589 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 18:52:01,589 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 18:52:45,970 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 18:52:46,735 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 18:52:46,954 - telegram_scheduler - INFO - Starting scheduler process with PID 90215
+2025-04-24 18:52:46,954 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 18:52:46,954 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 18:52:46,954 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 18:52:46,954 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 19:07:01,931 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:07:02,502 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:07:02,851 - telegram_scheduler - INFO - Starting scheduler process with PID 90425
+2025-04-24 19:07:02,851 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 19:07:02,851 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:07:02,851 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 19:07:02,851 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:07:17,895 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:07:18,788 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:18,788 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:18,788 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:07:33,836 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:07:34,682 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:34,683 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:34,683 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:07:49,720 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:07:50,543 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:50,543 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:07:50,543 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:08:05,577 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:08:06,475 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:06,475 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:06,475 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:08:21,513 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:08:22,458 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:22,458 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:22,458 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:08:37,485 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:08:38,410 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:38,410 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:38,410 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:08:53,460 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:08:54,297 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:54,297 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:08:54,297 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:09:00,252 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:09:00,319 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:09:01,517 - telegram_scheduler - INFO - Starting scheduler process with PID 90518
+2025-04-24 19:09:01,517 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 19:09:01,517 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:09:01,517 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 19:09:01,517 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:09:16,564 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:09:17,553 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:17,553 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:17,554 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:09:32,596 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:09:33,476 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:33,476 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:33,477 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:09:48,519 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:09:49,435 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:49,436 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:09:49,436 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:10:04,478 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:10:05,373 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:05,373 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:05,373 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:10:20,403 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:10:21,382 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:21,383 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:21,383 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:10:36,409 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:10:37,257 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:37,258 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:37,258 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:10:52,283 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:10:53,376 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:53,376 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:10:53,376 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:11:05,125 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:11:05,172 - telegram_scheduler - INFO - Starting scheduler process with PID 90611
+2025-04-24 19:11:05,172 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 19:11:05,172 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:11:05,172 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 19:11:05,172 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 19:11:05,414 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:11:18,873 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:11:19,209 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:11:21,149 - telegram_scheduler - INFO - Starting scheduler process with PID 90627
+2025-04-24 19:11:21,149 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 19:11:21,149 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:11:21,149 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 19:11:21,149 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 19:22:40,686 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:22:40,941 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:22:48,213 - telegram_scheduler - INFO - Starting scheduler process with PID 90840
+2025-04-24 19:22:48,213 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 19:22:48,213 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:22:48,213 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 19:22:48,213 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:23:03,244 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:23:07,248 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:23:07,248 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:23:07,248 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:23:22,289 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:23:23,081 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:23:23,081 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:23:23,081 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:23:32,511 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:23:33,118 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:31:33,407 - telegram_scheduler - INFO - Starting scheduler process with PID 90987
+2025-04-24 19:31:33,407 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 19:31:33,407 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:31:33,407 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 19:31:33,408 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:31:47,151 - telegram_scheduler - INFO - Starting scheduler process with PID 90992
+2025-04-24 19:31:47,151 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 19:31:47,151 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:31:47,151 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 19:31:47,151 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:31:48,450 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:31:49,485 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:31:49,486 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:31:49,486 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:02,168 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:03,079 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:03,079 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:03,079 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:04,517 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:05,258 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:05,259 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:05,259 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:18,132 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:18,831 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:18,831 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:18,831 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:20,300 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:21,277 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:21,277 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:21,277 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:33,855 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:34,635 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:34,636 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:34,636 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:36,317 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:37,060 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:37,060 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:37,060 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:49,692 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:50,384 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:50,384 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:50,384 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:32:52,095 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:32:52,883 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:52,883 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:32:52,883 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:05,416 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:06,209 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:06,210 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:06,210 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:07,916 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:08,723 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:08,723 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:08,723 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:21,232 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:22,318 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:22,319 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:22,319 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:23,754 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:24,695 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:24,695 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:24,695 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:37,360 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:38,165 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:38,165 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:38,165 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:39,735 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:40,500 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:40,500 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:40,500 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:53,204 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:54,059 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:54,059 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:54,059 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:33:55,542 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:33:56,413 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:56,413 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:33:56,413 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:09,098 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:10,006 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:10,006 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:10,006 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:11,477 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:12,329 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:12,329 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:12,329 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:25,051 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:25,824 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:25,825 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:25,825 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:27,374 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:28,127 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:28,128 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:28,128 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:40,855 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:41,924 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:41,924 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:41,924 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:43,150 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 19:34:44,088 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:44,089 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 19:34:44,089 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 19:34:46,812 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:34:46,812 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 19:34:46,934 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:34:47,095 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 19:34:47,482 - telegram_scheduler - INFO - Starting scheduler process with PID 91177
+2025-04-24 19:34:47,482 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 19:34:47,482 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 19:34:47,482 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 19:34:47,482 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 20:21:13,182 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 20:21:13,276 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 20:30:37,410 - telegram_scheduler - INFO - Starting scheduler process with PID 93151
+2025-04-24 20:30:37,410 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 20:30:37,410 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 20:30:37,410 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 20:30:37,410 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:30:52,451 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:31:00,379 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:00,379 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:00,380 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:31:15,426 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:31:16,617 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:16,617 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:16,617 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:31:31,655 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:31:32,948 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:32,948 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:32,948 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:31:47,998 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:31:49,108 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:49,108 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:31:49,108 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:32:04,156 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:32:05,397 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:32:05,397 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:32:05,397 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:32:20,442 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:32:21,713 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:32:21,714 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:32:21,714 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:32:36,620 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 20:32:36,753 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 20:32:38,898 - telegram_scheduler - INFO - Starting scheduler process with PID 93216
+2025-04-24 20:32:38,898 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 20:32:38,898 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 20:32:38,898 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 20:32:38,898 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 20:50:00,448 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 20:50:01,025 - telegram_scheduler - INFO - Scheduler stopped.
+2025-04-24 20:53:17,617 - telegram_scheduler - INFO - Starting scheduler process with PID 93649
+2025-04-24 20:53:17,617 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='15s')
+2025-04-24 20:53:17,617 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 20:53:17,617 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=15s
+2025-04-24 20:53:17,617 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:53:32,654 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:53:33,830 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:53:33,831 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:53:33,831 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:53:48,883 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:53:50,147 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:53:50,147 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:53:50,147 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:54:05,208 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:54:06,458 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:06,458 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:06,458 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:54:21,503 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:54:22,690 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:22,690 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:22,690 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:54:37,713 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:54:39,023 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:39,024 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:39,024 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:54:54,065 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:54:55,212 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:55,212 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:54:55,212 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:55:10,249 - telegram_scheduler - INFO - Sending scheduled report for hive 1 to chat 1234204680
+2025-04-24 20:55:11,630 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:55:11,630 - telegram_scheduler - INFO - Report sent successfully
+2025-04-24 20:55:11,630 - telegram_scheduler - INFO - Waiting 15.0 seconds until next report...
+2025-04-24 20:55:20,716 - telegram_scheduler - INFO - Received termination signal. Gracefully shutting down...
+2025-04-24 20:55:21,371 - telegram_scheduler - INFO - Starting scheduler process with PID 93730
+2025-04-24 20:55:21,372 - telegram_scheduler - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', username='test', test=False, time='08:00', interval='1h')
+2025-04-24 20:55:21,372 - telegram_scheduler - INFO - Starting scheduler for hive 1
+2025-04-24 20:55:21,372 - telegram_scheduler - INFO - Settings: test_mode=False, report_time=08:00, interval=1h
+2025-04-24 20:55:21,372 - telegram_scheduler - INFO - Waiting 3600.0 seconds until next report...
+2025-04-24 20:55:21,654 - telegram_scheduler - INFO - Scheduler stopped.

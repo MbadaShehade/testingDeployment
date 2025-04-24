@@ -83,6 +83,37 @@ export async function POST(request) {
   }
 }
 
+export async function GET(request) {
+  try {
+    // Get the hiveId from the query parameters
+    const params = new URL(request.url).searchParams;
+    const hiveId = params.get('hiveId');
+    
+    if (!hiveId) {
+      return NextResponse.json({ 
+        error: 'Missing hiveId parameter' 
+      }, { status: 400 });
+    }
+    
+    // Since we're in a server-side API route, we can't directly access localStorage
+    // For this specific example, we'll return dummy data that will be overridden
+    // by the data from localStorage on the client side
+    
+    // In a production app, you'd query your database here
+    const dummyData = {
+      temperature: 33.5,
+      humidity: 55.2
+    };
+    
+    return NextResponse.json(dummyData);
+  } catch (error) {
+    console.error('Error fetching hive data:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch hive data: ' + error.message 
+    }, { status: 500 });
+  }
+}
+
 // Helper function to generate date labels
 function generateDateLabels(days) {
   const labels = [];
