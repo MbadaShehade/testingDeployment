@@ -32,6 +32,7 @@ export async function POST(request) {
         username,
         email,
         password: hashedPassword,
+        telegramChatId: null
       });
 
       return NextResponse.json({ //SIGNUP API RESPONSE

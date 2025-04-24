@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -48,6 +49,21 @@ export default function LoginPage() {
     };
   }, [showForgotPassword]);
 
+  // Function to determine if input is email or phone
+  const detectInputType = (value) => {
+    // Simple regex for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (emailRegex.test(value)) {
+      setLoginMethod('email');
+      setEmail(value);
+    } else {
+      // Still updating the contact info, but not setting a specific type yet
+      setLoginMethod('');
+      setEmail('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -55,6 +71,14 @@ export default function LoginPage() {
 
     if (!isLogin && password !== confirmPassword) {
       setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
       setIsLoading(false);
       return;
     }
@@ -73,7 +97,17 @@ export default function LoginPage() {
         }),
       });
 
-      const data = await response.json();
+      // Add specific error handling for JSON parsing
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // This catches the specific JSON parsing error
+        console.error('JSON parsing error:', jsonError);
+        setIsLoading(false);
+        setError(`Server returned invalid JSON. This usually means the server is down or not properly connected to the database. Status: ${response.status}`);
+        return;
+      }
 
       if (!response.ok) {
         if (data.error === 'User not found, Sign Up first') {
@@ -198,70 +232,53 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="login-form">
             {!isLogin && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="username" className="form-label">
-                    User Name
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="form-input"
-                    required={!isLogin}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="form-input"
-                    required={!isLogin}
-                  />
-                </div>
-              </>
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  User Name
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="form-input"
+                  required={!isLogin}
+                />
+              </div>
             )}
             
             {isLogin && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="username" className="form-label">
-                    User Name
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="form-input"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="form-input"
-                    required
-                  />
-                </div>
-              </>
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  User Name
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="form-input"
+                  required
+                />
+              </div>
             )}
+            
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-input"
+                required
+              />
+            </div>
             
             <div className="form-group">
               <label htmlFor="password" className="form-label">

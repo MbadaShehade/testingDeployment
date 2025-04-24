@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import './hiveDetails.css';
 import Header from '../components/ClientComponents/Header/Header';
 import { useRouter } from 'next/navigation';
-import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
+import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle, Send, Download, RefreshCw, MessageSquare } from 'lucide-react';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
 import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
 import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
@@ -21,9 +21,11 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from 'chart.js';
-
+import { Chart } from 'chart.js/auto';
+import { MQTT_URL } from '../lib/mqtt-config';
 
 // Register ChartJS components
 ChartJS.register(
@@ -72,6 +74,7 @@ const HiveDetails = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const hiveId = searchParams.get('id');
+  const email = searchParams.get('email');
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [hiveData, setHiveData] = useState({
@@ -80,7 +83,624 @@ const HiveDetails = () => {
     humidity: null
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [telegramChatId, setTelegramChatId] = useState(null);
   
+  // Add state for cached light mode images for PDF export
+  const [cachedLightModeImages, setCachedLightModeImages] = useState({
+    temperature: null,
+    humidity: null
+  });
+
+  // Add state for scheduled reports
+  const [isScheduleActive, setIsScheduleActive] = useState(false);
+  const [isLoadingSchedule, setIsLoadingSchedule] = useState(true);
+  const [scheduleError, setScheduleError] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [scheduleInterval, setScheduleInterval] = useState('15s'); // Default to 15 seconds
+  const [isTestMode, setIsTestMode] = useState(true); // Default checked
+  
+  const intervalOptions = [
+    { value: '15s', label: '15 Seconds' },
+    { value: '1h', label: '1 Hour' },
+    { value: '24h', label: '24 Hours' }
+  ];
+
+  // Format interval text for display
+  const formatIntervalText = (intervalValue) => {
+    switch (intervalValue) {
+      case '15s': return '15 seconds';
+      case '1h': return 'hour';
+      case '24h': return '24 hours';
+      default: return 'hour';
+    }
+  };
+  
+  // Handle scheduled report interval change
+  const handleIntervalChange = (e) => {
+    const newInterval = e.target.value;
+    setScheduleInterval(newInterval);
+    setIsTestMode(newInterval === '15s');
+  };
+  
+  // Handle test mode checkbox change
+  const handleTestModeChange = (e) => {
+    const isChecked = e.target.checked;
+    setIsTestMode(isChecked);
+    if (isChecked) {
+      setScheduleInterval('15s');
+    } else if (scheduleInterval === '15s') {
+      setScheduleInterval('1h');
+    }
+  };
+
+  // Check scheduler status
+  const checkSchedulerStatus = async () => {
+    if (!telegramChatId) return;
+    
+    setIsLoadingSchedule(true);
+    setScheduleError(null);
+    
+    try {
+      const response = await fetch(`/api/scheduler?hiveId=${hiveId}&chatId=${telegramChatId}&action=status`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setIsScheduleActive(data.status === 'running');
+        if (data.status === 'running') {
+          const currentInterval = data.interval || '15s';
+          setScheduleInterval(currentInterval);
+          setIsTestMode(currentInterval === '15s');
+          setStatusMessage(`Reports scheduled every ${formatIntervalText(currentInterval)}`);
+        } else {
+          setStatusMessage('');
+        }
+      } else {
+        setScheduleError(data.error || 'Failed to check scheduler status');
+      }
+    } catch (error) {
+      console.error('Error checking scheduler status:', error);
+      setScheduleError('Failed to connect to scheduler service');
+    } finally {
+      setIsLoadingSchedule(false);
+    }
+  };
+
+  // Start or stop scheduled reports
+  const handleScheduleToggle = async () => {
+    if (!telegramChatId) return;
+    
+    setIsLoadingSchedule(true);
+    setScheduleError(null);
+    
+    try {
+      // If already active, stop it
+      if (isScheduleActive) {
+        const response = await fetch('/api/scheduler', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'stop',
+            hiveId,
+            chatId: telegramChatId
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          setIsScheduleActive(false);
+          setStatusMessage('');
+        } else {
+          setScheduleError(data.error || 'Failed to stop scheduler');
+        }
+      } else {
+        // Start the scheduler with current settings
+        const response = await fetch('/api/scheduler', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'start',
+            hiveId,
+            chatId: telegramChatId,
+            username: searchParams.get('username') || 'User',
+            reportTime: '08:00',
+            interval: scheduleInterval
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          setIsScheduleActive(true);
+          setStatusMessage(`Reports scheduled every ${formatIntervalText(scheduleInterval)}`);
+        } else {
+          setScheduleError(data.error || 'Failed to start scheduler');
+        }
+      }
+    } catch (error) {
+      console.error(`Error ${isScheduleActive ? 'stopping' : 'starting'} scheduler:`, error);
+      setScheduleError('Failed to connect to scheduler service');
+    } finally {
+      setIsLoadingSchedule(false);
+    }
+  };
+
+  // Fetch user's Telegram chat ID when component mounts
+  useEffect(() => {
+    const fetchTelegramChatId = async () => {
+      if (!email) return;
+      
+      try {
+        const response = await fetch(`/api/auth/telegram?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+        if (data.telegramChatId) {
+          setTelegramChatId(data.telegramChatId);
+        }
+      } catch (error) {
+        console.error('Error fetching Telegram chat ID:', error);
+      }
+    };
+    
+    fetchTelegramChatId();
+  }, [email]);
+
+  // Check scheduler status when telegramChatId is available
+  useEffect(() => {
+    if (telegramChatId) {
+      checkSchedulerStatus();
+    }
+  }, [telegramChatId, hiveId]);
+
+  // Add this function to allow users to enter their Telegram chat ID
+  const handleSetupTelegram = () => {
+    const chatId = prompt('Please enter your Telegram chat ID. To get your ID, contact @userinfobot on Telegram.');
+    if (!chatId) return;
+    
+    // Validate chat ID (should be a number)
+    if (!/^-?\d+$/.test(chatId)) {
+      alert('Telegram chat ID must be a number. Please try again.');
+      return;
+    }
+    
+    // Save to database
+    fetch('/api/auth/telegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        telegramChatId: chatId
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        setTelegramChatId(chatId);
+        alert('Telegram chat ID saved successfully!');
+      } else {
+        alert('Failed to save Telegram chat ID: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(error => {
+      console.error('Error saving Telegram chat ID:', error);
+      alert('Error saving Telegram chat ID');
+    });
+  };
+
+  // Add function to update cached light mode images
+  const updateCachedChartImages = useCallback(() => {
+    // Only proceed if we have charts to capture
+    const tempCanvas = document.querySelector('#temperature-chart canvas');
+    const humidityCanvas = document.querySelector('#humidity-chart canvas');
+    
+    if (!tempCanvas || !humidityCanvas) return;
+    
+    // Store the current theme
+    const currentTheme = theme;
+    
+    // Get chart instances
+    const tempChart = Chart.getChart(tempCanvas);
+    const humidityChart = Chart.getChart(humidityCanvas);
+    
+    if (!tempChart || !humidityChart) return;
+    
+    // Store original settings
+    const originalSettings = {
+      temperature: {
+        yTicksColor: tempChart.options.scales.y.ticks.color,
+        xTicksColor: tempChart.options.scales.x.ticks.color,
+        yGridColor: tempChart.options.scales.y.grid.color,
+        xGridColor: tempChart.options.scales.x.grid.color,
+        legendColor: tempChart.options.plugins.legend.labels.color
+      },
+      humidity: {
+        yTicksColor: humidityChart.options.scales.y.ticks.color,
+        xTicksColor: humidityChart.options.scales.x.ticks.color,
+        yGridColor: humidityChart.options.scales.y.grid.color,
+        xGridColor: humidityChart.options.scales.x.grid.color,
+        legendColor: humidityChart.options.plugins.legend.labels.color
+      }
+    };
+    
+    // Apply light mode settings temporarily
+    tempChart.options.scales.y.ticks.color = '#000000';
+    tempChart.options.scales.x.ticks.color = '#000000';
+    tempChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
+    tempChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
+    tempChart.options.plugins.legend.labels.color = '#000000';
+    tempChart.update();
+    
+    humidityChart.options.scales.y.ticks.color = '#000000';
+    humidityChart.options.scales.x.ticks.color = '#000000';
+    humidityChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
+    humidityChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
+    humidityChart.options.plugins.legend.labels.color = '#000000';
+    humidityChart.update();
+    
+    // Capture the images
+    const temperatureImage = tempCanvas.toDataURL('image/png');
+    const humidityImage = humidityCanvas.toDataURL('image/png');
+    
+    // Update the cached images
+    setCachedLightModeImages({
+      temperature: temperatureImage,
+      humidity: humidityImage
+    });
+    
+    // Restore original settings
+    tempChart.options.scales.y.ticks.color = originalSettings.temperature.yTicksColor;
+    tempChart.options.scales.x.ticks.color = originalSettings.temperature.xTicksColor;
+    tempChart.options.scales.y.grid.color = originalSettings.temperature.yGridColor;
+    tempChart.options.scales.x.grid.color = originalSettings.temperature.xGridColor;
+    tempChart.options.plugins.legend.labels.color = originalSettings.temperature.legendColor;
+    tempChart.update();
+    
+    humidityChart.options.scales.y.ticks.color = originalSettings.humidity.yTicksColor;
+    humidityChart.options.scales.x.ticks.color = originalSettings.humidity.xTicksColor;
+    humidityChart.options.scales.y.grid.color = originalSettings.humidity.yGridColor;
+    humidityChart.options.scales.x.grid.color = originalSettings.humidity.xGridColor;
+    humidityChart.options.plugins.legend.labels.color = originalSettings.humidity.legendColor;
+    humidityChart.update();
+  }, [theme]);
+  
+  // Update the cached images whenever chart data changes
+  useEffect(() => {
+    if (mounted && hiveData.temperature !== null && hiveData.humidity !== null) {
+      // Short delay to ensure charts are fully rendered
+      const timer = setTimeout(() => {
+        updateCachedChartImages();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, hiveData.temperature, hiveData.humidity, updateCachedChartImages]);
+
+  // Modify handleSendTelegram to also include sending a report now functionality
+  const handleSendTelegram = async () => {
+    if (!telegramChatId) {
+      if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
+        handleSetupTelegram();
+      }
+      return;
+    }
+
+    setSending(true);
+    try {
+      // Save current data to a JSON file on the server for persistence
+      await fetch('/api/save-hive-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hiveId: hiveId,
+          temperature: hiveData.temperature,
+          humidity: hiveData.humidity
+        }),
+      });
+      
+      // Create PDF-ready chart images with guaranteed readability
+      const temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
+      const humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
+      
+      // Log image data for debugging
+      console.log("Temperature image length: ", temperatureImage ? temperatureImage.length : 0);
+      console.log("Humidity image length: ", humidityImage ? humidityImage.length : 0);
+      console.log("Sending real data - Temperature:", hiveData.temperature, "Humidity:", hiveData.humidity);
+      
+      // Verify we have both images
+      if (!temperatureImage || !humidityImage) {
+        alert('Failed to generate chart images. Please try again.');
+        setSending(false);
+        return;
+      }
+      
+      // Get username from URL parameters
+      const username = searchParams.get('username') || 'User';
+      
+      const response = await fetch('/api/send-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hiveId: hiveId,
+          temperature: hiveData.temperature,
+          humidity: hiveData.humidity,
+          chatId: telegramChatId,
+          temperature_image: temperatureImage,
+          humidity_image: humidityImage,
+          username: username
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Hive report PDF sent to your Telegram successfully!');
+      } else {
+        alert('Failed to send Telegram message. Please check your chat ID and try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error sending Telegram message. Please try again later.');
+    }
+    setSending(false);
+  };
+
+  // Function to send a report immediately
+  const handleSendReportNow = async () => {
+    if (!telegramChatId) {
+      if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
+        handleSetupTelegram();
+      }
+      return;
+    }
+    
+    setSending(true);
+    setScheduleError(null);
+    
+    try {
+      // First save the current hive data to file
+      await fetch('/api/save-hive-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hiveId: hiveId,
+          temperature: hiveData.temperature,
+          humidity: hiveData.humidity
+        }),
+      });
+      
+      // Create chart images
+      const temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
+      const humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
+      
+      const username = searchParams.get('username') || 'User';
+      
+      const response = await fetch('/api/send-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hiveId: hiveId,
+          temperature: hiveData.temperature,
+          humidity: hiveData.humidity,
+          chatId: telegramChatId,
+          temperature_image: temperatureImage,
+          humidity_image: humidityImage,
+          username: username,
+          sendNow: true
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setStatusMessage('Report sent successfully!');
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          if (statusMessage === 'Report sent successfully!') {
+            setStatusMessage(isScheduleActive 
+              ? `Reports scheduled every ${formatIntervalText(scheduleInterval)}` 
+              : '');
+          }
+        }, 3000);
+      } else {
+        setScheduleError(data.error || 'Failed to send report');
+      }
+    } catch (error) {
+      console.error('Error sending report:', error);
+      setScheduleError('Failed to send report. Please try again later.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Function to create readable chart images for PDF
+  const createReadableChartImage = async (type, chartData, currentValue) => {
+    return new Promise((resolve) => {
+      // Create a temporary container div
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.width = '800px';  // Increase width for better quality
+      tempContainer.style.height = '400px';  // Increase height for better quality
+      tempContainer.style.backgroundColor = '#FFFFFF';
+      document.body.appendChild(tempContainer);
+      
+      // Create a new canvas inside the temp container
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;  // Increase canvas width
+      canvas.height = 400;  // Increase canvas height
+      tempContainer.appendChild(canvas);
+      
+      // Create a new Chart instance explicitly for the PDF with light mode styling
+      const ctx = canvas.getContext('2d');
+      
+      // Get data range for proper axis scaling
+      const dataValues = [...chartData.datasets[0].data].filter(val => val !== null && val !== undefined);
+      const dataMin = dataValues.length > 0 ? Math.min(...dataValues) : 0;
+      const dataMax = dataValues.length > 0 ? Math.max(...dataValues) : 100;
+      
+      // Calculate y-axis range with padding
+      let yMin, yMax;
+      if (type === 'temperature') {
+        // Calculate min and max with better padding
+        yMin = Math.max(dataMin - Math.max(0.5, dataMin * 0.05), 0);
+        yMax = dataMax + Math.max(0.5, dataMax * 0.05);
+        
+        // Ensure the current value is in the visible range with extra padding
+        if (currentValue !== null && currentValue !== undefined) {
+          yMin = Math.min(yMin, currentValue - Math.max(0.5, currentValue * 0.05));
+          yMax = Math.max(yMax, currentValue + Math.max(0.5, currentValue * 0.05));
+        }
+      } else {
+        // For humidity, ensure range is reasonable (0-100%) with better padding
+        yMin = Math.max(dataMin - Math.max(1, dataMin * 0.05), 0);
+        yMax = Math.min(dataMax + Math.max(1, dataMax * 0.05), 100);
+        
+        // Ensure the current value is in the visible range with extra padding
+        if (currentValue !== null && currentValue !== undefined) {
+          yMin = Math.min(yMin, Math.max(currentValue - Math.max(1, currentValue * 0.05), 0));
+          yMax = Math.max(yMax, Math.min(currentValue + Math.max(1, currentValue * 0.05), 100));
+        }
+      }
+      
+      // Configure data for the chart
+      const pdfChartData = {
+        labels: [...chartData.labels],
+        datasets: [{
+          label: type === 'temperature' ? 'Temperature (°C)' : 'Humidity (%)',
+          data: [...chartData.datasets[0].data],
+          borderColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
+          backgroundColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
+          tension: 0.4,
+          pointRadius: 5,
+          borderWidth: 3,
+          fill: false
+        }]
+      };
+      
+      // Configure options for guaranteed readability
+      const pdfChartOptions = {
+        responsive: false,
+        maintainAspectRatio: false,
+        animation: false,
+        parsing: {
+          xAxisKey: 'x',
+          yAxisKey: 'y'
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#000000',
+              font: {
+                size: 16,  // Increase font size
+                weight: 'bold',
+                family: 'Arial'
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: type === 'temperature' ? 'Current temperature: ' + (currentValue?.toFixed(2) || '--') + '°C' : 
+                                         'Current humidity: ' + (currentValue?.toFixed(2) || '--') + '%',
+            color: '#000000',
+            font: {
+              size: 18,
+              weight: 'bold',
+              family: 'Arial'
+            },
+            position: 'top',
+            padding: {
+              top: 10,
+              bottom: 10
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            min: yMin,  // Use calculated min
+            max: yMax,  // Use calculated max
+            ticks: {
+              color: '#000000',
+              font: {
+                size: 14,  // Increase font size
+                weight: 'bold',
+                family: 'Arial'
+              },
+              precision: 2, // Exact precision for tick values
+              callback: function(value) {
+                return value.toFixed(2);
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.2)'
+            }
+          },
+          x: {
+            ticks: {
+              color: '#000000',
+              font: {
+                size: 14,  // Increase font size 
+                weight: 'bold',
+                family: 'Arial'
+              },
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.2)'
+            }
+          }
+        },
+        layout: {
+          padding: {
+            top: 10,
+            right: 25,
+            bottom: 30,  // More padding at bottom
+            left: 25
+          }
+        }
+      };
+      
+      // Create a new Chart instance with guaranteed readability settings
+      const newChart = new Chart(ctx, {
+        type: 'line',
+        data: pdfChartData,
+        options: pdfChartOptions
+      });
+      
+      // Give the chart time to render
+      setTimeout(() => {
+        try {
+          // Get chart as image
+          const imageUrl = canvas.toDataURL('image/jpeg', 1.0);  // Use JPEG with max quality
+          
+          // Clean up
+          newChart.destroy();
+          document.body.removeChild(tempContainer);
+          
+          resolve(imageUrl);
+        } catch (error) {
+          console.error('Error creating chart image:', error);
+          document.body.removeChild(tempContainer);
+          resolve(null);
+        }
+      }, 500);  // Increase timeout to ensure rendering completes
+    });
+  };
+
   // Replace single dateRange with separate states for each component
   const [summaryDateRange, setSummaryDateRange] = useState('lastWeek');
   const [historicalDateRange, setHistoricalDateRange] = useState('lastWeek');
@@ -293,9 +913,27 @@ const HiveDetails = () => {
         },
         ticks: {
           color: theme === 'dark' ? '#fff' : '#000',
+          precision: 2, // Set precision to ensure consistent decimal places
           callback: function(value) {
             return value.toFixed(2);
           }
+        },
+        // Improve y-axis scaling to better reflect data
+        suggestedMin: function(context) {
+          if (!context.chart.data.datasets[0].data || context.chart.data.datasets[0].data.length === 0) {
+            return 0;
+          }
+          const dataMin = Math.min(...context.chart.data.datasets[0].data.filter(v => v !== null && v !== undefined));
+          // Ensure min is below the data minimum
+          return dataMin - Math.max(0.5, dataMin * 0.03);
+        },
+        suggestedMax: function(context) {
+          if (!context.chart.data.datasets[0].data || context.chart.data.datasets[0].data.length === 0) {
+            return 100;
+          }
+          const dataMax = Math.max(...context.chart.data.datasets[0].data.filter(v => v !== null && v !== undefined));
+          // Ensure max is above the data maximum
+          return dataMax + Math.max(0.5, dataMax * 0.03);
         }
       },
       x: {
@@ -699,13 +1337,28 @@ const HiveDetails = () => {
         },
         ticks: {
           color: theme === 'dark' ? '#fff' : '#000',
+          precision: 2, // Set precision to ensure consistent decimal places
           callback: function(value) {
             return value.toFixed(1);
           }
         },
-        min: 20,
-        max: 40,
-        beginAtZero: false
+        // Remove fixed min and max to allow autoScaling
+        beginAtZero: false,
+        // Improve y-axis scaling for temperature
+        suggestedMin: function(context) {
+          const validData = context.chart.data.datasets.find(d => d.label.includes('Temperature'))?.data.filter(v => v !== null && v !== undefined) || [];
+          if (validData.length === 0) return undefined;
+          
+          const dataMin = Math.min(...validData);
+          return dataMin - Math.max(0.5, dataMin * 0.03); // At least 0.5 units or 3% padding below min value
+        },
+        suggestedMax: function(context) {
+          const validData = context.chart.data.datasets.find(d => d.label.includes('Temperature'))?.data.filter(v => v !== null && v !== undefined) || [];
+          if (validData.length === 0) return undefined;
+          
+          const dataMax = Math.max(...validData);
+          return dataMax + Math.max(0.5, dataMax * 0.03); // At least 0.5 units or 3% padding above max value
+        }
       },
       y2: {
         type: 'linear',
@@ -722,13 +1375,30 @@ const HiveDetails = () => {
         },
         ticks: {
           color: theme === 'dark' ? '#fff' : '#000',
+          precision: 2, // Set precision to ensure consistent decimal places
           callback: function(value) {
             return value.toFixed(1);
           }
         },
-        min: 0,
-        max: 100,
-        beginAtZero: false
+        // Remove fixed min and max to allow autoScaling
+        beginAtZero: false,
+        // Improve y-axis scaling for humidity
+        suggestedMin: function(context) {
+          const validData = context.chart.data.datasets.find(d => d.label.includes('Humidity'))?.data.filter(v => v !== null && v !== undefined) || [];
+          if (validData.length === 0) return undefined;
+          
+          const dataMin = Math.min(...validData);
+          // Ensure at least 1% padding below min value but not less than 0
+          return Math.max(dataMin - Math.max(1, dataMin * 0.03), 0);
+        },
+        suggestedMax: function(context) {
+          const validData = context.chart.data.datasets.find(d => d.label.includes('Humidity'))?.data.filter(v => v !== null && v !== undefined) || [];
+          if (validData.length === 0) return undefined;
+          
+          const dataMax = Math.max(...validData);
+          // Ensure at least 1% padding above max value but not more than 100
+          return Math.min(dataMax + Math.max(1, dataMax * 0.03), 100);
+        }
       },
       x: {
         grid: {
@@ -783,7 +1453,7 @@ const HiveDetails = () => {
     const humidityTopic = `${userPassword}/moldPrevention/hive${hiveId}/humidity`;
 
     // MQTT client setup with WebSocket
-    const client = mqtt.connect('ws://test.mosquitto.org:8080', {
+    const client = mqtt.connect(MQTT_URL, {
         clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
         clean: true,
         reconnectPeriod: 1000,
@@ -1196,6 +1866,46 @@ const HiveDetails = () => {
     }
   }, [activeDropdown]);
 
+  // Add fix for exact positioning of data points in charts
+  useEffect(() => {
+    if (mounted) {
+      // Force chart re-render with exact positioning for data points
+      const fixChartScaling = () => {
+        // Find all chart canvases
+        const chartCanvas = document.querySelectorAll('canvas');
+        
+        // For each canvas, update the associated Chart if it exists
+        chartCanvas.forEach(canvas => {
+          const chart = Chart.getChart(canvas);
+          if (chart) {
+            // When updating charts, ensure they use exact data values, not rounded ones
+            chart.options.parsing = {
+              xAxisKey: 'x',
+              yAxisKey: 'y'
+            };
+            
+            // Add more precise tick configuration
+            if (chart.options.scales && chart.options.scales.y) {
+              chart.options.scales.y.ticks.precision = 2;
+            }
+            
+            // Same for y2 if it exists (humidity axis)
+            if (chart.options.scales && chart.options.scales.y2) {
+              chart.options.scales.y2.ticks.precision = 2;
+            }
+            
+            // Update the chart with the fixed configuration
+            chart.update();
+          }
+        });
+      };
+      
+      // Run the fix after a short delay to ensure charts are fully initialized
+      const timer = setTimeout(fixChartScaling, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, hiveData.temperature, hiveData.humidity]);
+
   if (!mounted) return null;
 
   return (
@@ -1225,6 +1935,7 @@ const HiveDetails = () => {
           <h2 className='real-time-data-title' style={{marginLeft: '0', textAlign: 'left'}}>
             Real-time temperature and humidity data inside the hive
           </h2>
+          
         </div>
 
         <div className="real-time-data">
@@ -1277,6 +1988,77 @@ const HiveDetails = () => {
           </div>
         </div>
 
+        {/* Integrated Scheduled Reports Section */}
+        <div className={`exact-screenshot-style ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
+          <h2>Scheduled Reports</h2>
+          
+          {scheduleError && (
+            <div className="status-message error">
+              <span>{scheduleError}</span>
+            </div>
+          )}
+          
+          {statusMessage && !scheduleError && (
+            <div className="status-message success">
+              <Send size={18} /> {statusMessage}
+            </div>
+          )}
+          
+          <div className="control-layout">
+            <div className="interval-row">
+              <label>Report Interval:</label>
+              <div className="dropdown-wrapper">
+                <select 
+                  value={scheduleInterval}
+                  onChange={handleIntervalChange}
+                  disabled={isLoadingSchedule}
+                  className="interval-select"
+                >
+                  {intervalOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            <div className="buttons-row">
+              <button
+                className="send-report-button"
+                onClick={handleSendReportNow}
+                disabled={sending}
+              >
+                {sending ? (
+                  <>
+                    <RefreshCw size={18} className="spinner" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Image 
+                      src={"/telegramIcon.png"} 
+                      alt="Telegram"
+                      width={18}
+                      height={18}
+                      style={{ marginRight: '1px', borderRadius: '100%' }}
+                    />
+                    Send Report Now via Telegram
+                  </>
+                )}
+              </button>
+              
+              <button
+                className="toggle-button"
+                onClick={handleScheduleToggle}
+                disabled={isLoadingSchedule}
+              >
+                {isLoadingSchedule ? 'Loading...' : (isScheduleActive ? 'Stop Scheduled Reports' : 'Start Scheduled Reports')}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="charts-container">
           <RealTimeTemperatureGraph 
             theme={theme}
@@ -1315,138 +2097,6 @@ const HiveDetails = () => {
             setActiveDropdown={setActiveDropdown}
             handleExport={handleExport}
           />
-
-          <div className="condition-summary">
-            <h1 className={`summary-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-              Hive Condition Summary
-            </h1>
-            <div className="summary-date">
-              Generated Summary for {(() => {
-                const now = new Date();
-                let startDate = new Date();
-                
-                switch (summaryDateRange) {
-                  case 'lastWeek':
-                    startDate.setDate(now.getDate() - 7);
-                    break;
-                  case 'lastMonth':
-                    startDate.setMonth(now.getMonth() - 1);
-                    break;
-                  case 'lastYear':
-                    startDate.setFullYear(now.getFullYear() - 1);
-                    break;
-                  case 'custom':
-                    return `${formatDate(new Date(customStartDate || Date.now() - 7 * 24 * 60 * 60 * 1000))} to ${formatDate(new Date(customEndDate || Date.now()))}`;
-                  default:
-                    startDate.setDate(now.getDate() - 7);
-                }
-                
-                return `${formatDate(startDate)} to ${formatDate(now)}`;
-              })()}
-            </div>
-            <div className="date-controls">
-              <button 
-                className={`date-range-button ${summaryDateRange === 'lastWeek' ? 'active' : ''}`}
-                onClick={() => {
-                  updateHistoricalData('lastWeek', null, null, 'summary');
-                }}
-              >
-                Last Week
-              </button>
-              <button 
-                className={`date-range-button ${summaryDateRange === 'lastMonth' ? 'active' : ''}`}
-                onClick={() => {
-                  updateHistoricalData('lastMonth', null, null, 'summary');
-                }}
-              >
-                Last Month
-              </button>
-              <button 
-                className={`date-range-button ${summaryDateRange === 'lastYear' ? 'active' : ''}`}
-                onClick={() => {
-                  updateHistoricalData('lastYear', null, null, 'summary');
-                }}
-              >
-                Last Year
-              </button>
-            </div>
-            <table className="metrics-table">
-              <thead>
-                <tr>
-                  <th>Metric</th>
-                  <th>Minimum</th>
-                  <th>Maximum</th>
-                  <th>Average</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Temperature (°C)</td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.temperature.min !== null ? `${dailyStats.temperature.min.toFixed(1)}°C` : '--°C'}
-                      <AlertTriangle className={`status-icon ${dailyStats.temperature.min < 30 ? 'critical' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.temperature.max !== null ? `${dailyStats.temperature.max.toFixed(1)}°C` : '--°C'}
-                      <AlertCircle className={`status-icon ${dailyStats.temperature.max > 35 ? 'critical' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.temperature.avg !== null ? `${dailyStats.temperature.avg.toFixed(1)}°C` : '--°C'}
-                      <CheckCircle className={`status-icon ${dailyStats.temperature.avg >= 32 && dailyStats.temperature.avg <= 35 ? 'optimal' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td className={dailyStats.temperature.avg >= 32 && dailyStats.temperature.avg <= 35 ? 'status-optimal' : 'status-warning'}>
-                    {dailyStats.temperature.avg !== null ? (dailyStats.temperature.avg >= 32 && dailyStats.temperature.avg <= 35 ? 'Optimal' : 'Warning') : '--'}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Humidity (%)</td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.humidity.min !== null ? `${dailyStats.humidity.min.toFixed(1)}%` : '--%'}
-                      <AlertTriangle className={`status-icon ${dailyStats.humidity.min < 45 ? 'critical' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.humidity.max !== null ? `${dailyStats.humidity.max.toFixed(1)}%` : '--%'}
-                      <AlertCircle className={`status-icon ${dailyStats.humidity.max > 65 ? 'critical' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="metric-value-container">
-                      {dailyStats.humidity.avg !== null ? `${dailyStats.humidity.avg.toFixed(1)}%` : '--%'}
-                      <CheckCircle className={`status-icon ${dailyStats.humidity.avg >= 50 && dailyStats.humidity.avg <= 65 ? 'optimal' : 'warning'}`} size={16} />
-                    </div>
-                  </td>
-                  <td className={dailyStats.humidity.avg >= 50 && dailyStats.humidity.avg <= 65 ? 'status-optimal' : 'status-warning'}>
-                    {dailyStats.humidity.avg !== null ? (dailyStats.humidity.avg >= 50 && dailyStats.humidity.avg <= 65 ? 'Optimal' : 'Warning') : '--'}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="condition-analysis">
-              <p>
-                {dailyStats.temperature.avg !== null && dailyStats.humidity.avg !== null ? (
-                  `During today, the hive maintained an average temperature of ${dailyStats.temperature.avg.toFixed(1)}°C, 
-                  with ${dailyStats.temperature.min < 30 ? 'concerning' : 'stable'} low temperatures of ${dailyStats.temperature.min.toFixed(1)}°C. 
-                  Humidity levels averaged ${dailyStats.humidity.avg.toFixed(1)}%, with ${dailyStats.humidity.min < 45 ? 'periods of dryness' : 'periods of high humidity'} 
-                  (${dailyStats.humidity.min < 45 ? dailyStats.humidity.min.toFixed(1) : dailyStats.humidity.max.toFixed(1)}%) 
-                  that could affect brood development. Overall, the hive conditions are 
-                  ${dailyStats.temperature.avg >= 32 && dailyStats.temperature.avg <= 35 && 
-                    dailyStats.humidity.avg >= 50 && dailyStats.humidity.avg <= 65 
-                    ? 'excellent' 
-                    : 'concerning'} for colony health and honey production.`
-                ) : 'Waiting for data...'}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

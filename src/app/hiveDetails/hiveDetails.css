@@ -293,7 +293,28 @@
     z-index: 10;
   }
   
-  
+  .notification-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 20px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.notification-button:hover {
+    background-color: #45a049;
+}
+
+.notification-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
   .return-button::before {
     content: "";
     position: absolute;
@@ -995,5 +1016,340 @@
 
 .theme-dark .status-icon.critical {
   color: #f87171;
+}
+
+.telegram-notification {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.telegram-button {
+  background-color: #0088cc; /* Telegram blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.telegram-button::before {
+  content: "📄"; /* PDF document emoji */
+  margin-right: 8px;
+}
+
+.telegram-button:hover {
+  background-color: #0077b5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.telegram-button:active {
+  transform: translateY(0);
+}
+
+.telegram-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.telegram-setup-button {
+  background-color: #34495e; /* Different color for setup button */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.telegram-setup-button::before {
+  content: "🔔"; /* Bell emoji */
+  margin-right: 8px;
+}
+
+.telegram-setup-button:hover {
+  background-color: #2c3e50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.telegram-setup-button:active {
+  transform: translateY(0);
+}
+
+/* Scheduled Reports CSS */
+.exact-screenshot-style {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #14213D;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.exact-screenshot-style.theme-light {
+  background-color: #ffffff;
+  color: #14213D;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exact-screenshot-style h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.exact-screenshot-style.theme-light h2 {
+  color: #14213D;
+}
+
+.status-message {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background-color: #1E293B;
+  color: #94A3B8;
+  font-size: 0.95rem;
+}
+
+.exact-screenshot-style.theme-light .status-message {
+  background-color: #F1F5F9;
+  color: #475569;
+}
+
+.status-message svg {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.status-message.success {
+  background-color: #0F172A;
+  color: #4ADE80;
+  border-left: 4px solid #4ADE80;
+}
+
+.exact-screenshot-style.theme-light .status-message.success {
+  background-color: #F0FDF4;
+  color: #166534;
+  border-left: 4px solid #16A34A;
+}
+
+.status-message.error {
+  background-color: #0F172A;
+  color: #F87171;
+  border-left: 4px solid #EF4444;
+}
+
+.exact-screenshot-style.theme-light .status-message.error {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+  border-left: 4px solid #DC2626;
+}
+
+.control-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.interval-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.interval-row label {
+  font-size: 0.95rem;
+  color: #E2E8F0;
+  min-width: 120px;
+}
+
+.exact-screenshot-style.theme-light .interval-row label {
+  color: #000000;
+  font-weight: 500;
+}
+
+.dropdown-wrapper {
+  position: relative;
+  min-width: 160px;
+}
+
+.interval-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  background-color: #1E293B;
+  color: #E2E8F0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  cursor: pointer;
+  appearance: none;
+}
+
+.exact-screenshot-style.theme-light .interval-select {
+  background-color: #F8FAFC;
+  color: #334155;
+  border: 1px solid #CBD5E1;
+}
+
+.dropdown-wrapper::after {
+  content: '▼';
+  font-size: 0.7rem;
+  color: #94A3B8;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.exact-screenshot-style.theme-light .dropdown-wrapper::after {
+  color: #64748B;
+}
+
+.checkbox-row {
+  margin-top: 4px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 28px;
+  font-size: 0.95rem;
+  color: #E2E8F0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 4px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #334155;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #0EA5E9;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.buttons-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.send-report-button, 
+.toggle-button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+}
+
+.send-report-button {
+  background-color: #0EA5E9;
+  color: white;
+  flex: 1;
+}
+
+.send-report-button:hover {
+  background-color: #0284C7;
+}
+
+.send-report-button:disabled {
+  background-color: #0EA5E9;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-button {
+  background-color: #4B5563;
+  color: white;
+  flex: 1.5;
+}
+
+.toggle-button:hover {
+  background-color: #374151;
+}
+
+.toggle-button:disabled {
+  background-color: #4B5563;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
