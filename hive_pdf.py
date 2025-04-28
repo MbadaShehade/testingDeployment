@@ -100,6 +100,12 @@ def create_placeholder_chart(chart_type, value=None):
     plt.figure(figsize=(8, 3))
     plt.style.use('ggplot')
     
+    # Set the figure and axes background to white
+    fig = plt.gcf()
+    fig.patch.set_facecolor('white')
+    ax = plt.gca()
+    ax.set_facecolor('white')
+    
     # Create time series x-axis
     x = np.arange(10)
     
@@ -108,22 +114,24 @@ def create_placeholder_chart(chart_type, value=None):
         # Default temperature around 33°C with some variation
         if value is None:
             value = 33.0
-        y = np.array([value - 0.4, value - 0.2, value - 0.1, value, value + 0.1, 
-                      value + 0.2, value + 0.1, value, value - 0.1, value - 0.3])
+        # Add more variation to the data
+        y = np.array([value - 0.8, value - 0.5, value - 0.3, value + 0.2, value + 0.5, 
+                      value + 0.7, value + 0.3, value - 0.1, value - 0.4, value - 0.7])
         plt.plot(x, y, 'o-', color='#ba6719', linewidth=2)
-        plt.ylabel('Temperature (°C)')
-        plt.title(f'Temperature Data: Current {value}°C')
-        plt.ylim(value - 1, value + 1)
+        plt.ylabel('Temperature (°C)', color='black')
+        plt.title(f'Temperature Data: Current {value}°C', color='black')
+        plt.ylim(value - 1.5, value + 1.5)  # Wider range
     else:
         # Default humidity around 60% with some variation
         if value is None:
             value = 60.0
-        y = np.array([value - 2, value - 1, value - 0.5, value, value + 1, 
-                      value + 0.5, value - 0.5, value, value + 1, value - 1])
+        # Add more variation to the data
+        y = np.array([value - 4, value - 2, value - 1, value + 2, value + 5, 
+                      value + 3, value - 1, value - 3, value + 1, value - 2])
         plt.plot(x, y, 'o-', color='#0EA5E9', linewidth=2)
-        plt.ylabel('Humidity (%)')
-        plt.title(f'Humidity Data: Current {value}%')
-        plt.ylim(value - 5, value + 5)
+        plt.ylabel('Humidity (%)', color='black')
+        plt.title(f'Humidity Data: Current {value}%', color='black')
+        plt.ylim(value - 7, value + 7)  # Wider range
     
     # Generate real timestamps based on current time
     now = datetime.datetime.now()
@@ -133,13 +141,21 @@ def create_placeholder_chart(chart_type, value=None):
         time_point = now - datetime.timedelta(seconds=(9-i)*3)  # 3-second intervals
         timestamps.append(time_point.strftime('%H:%M:%S'))
     
-    plt.xticks(x, timestamps, rotation=45)
-    plt.xlabel('Time')
+    plt.xticks(x, timestamps, rotation=45, color='black')
+    plt.xlabel('Time', color='black')
+    
+    # Set grid to light gray for better contrast
+    ax.grid(color='lightgray', linestyle='-', linewidth=0.5)
+    
+    # Set tick colors to black
+    ax.tick_params(axis='x', colors='black')
+    ax.tick_params(axis='y', colors='black')
+    
     plt.tight_layout()
     
     # Convert to base64 encoded image
     buffer = BytesIO()
-    plt.savefig(buffer, format='png', dpi=100)
+    plt.savefig(buffer, format='png', dpi=100, facecolor='white')
     buffer.seek(0)
     image_png = buffer.getvalue()
     buffer.close()
@@ -147,7 +163,7 @@ def create_placeholder_chart(chart_type, value=None):
     
     return base64.b64encode(image_png).decode('utf-8')
 
-def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None):
+def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None):
     """
     Create a PDF report with the current temperature and humidity data from a beehive.
     
@@ -159,6 +175,8 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         temperature_image (str): Base64 encoded temperature graph image
         humidity_image (str): Base64 encoded humidity graph image
         username (str): Name of the user generating the report
+        force_white_background (bool): If True, always generate new placeholder charts with white backgrounds
+        report_type (str): Type of report (Automatic, Manual, etc.)
     
     Returns:
         str: Path to the created PDF file
@@ -187,20 +205,20 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
     # Log the values being used for the PDF
     print(f"Creating PDF with temperature={temperature}°C, humidity={humidity}%")
     
-    # Create placeholder images if needed
-    if not temperature_image:
+    # Create placeholder images if needed or if force_white_background is True
+    if not temperature_image or force_white_background:
         try:
             temperature_value = float(temperature) if temperature != "--" else None
             temperature_image = create_placeholder_chart('temperature', temperature_value)
-            print("Created placeholder temperature chart")
+            print("Created placeholder temperature chart with white background")
         except Exception as e:
             print(f"Failed to create placeholder temperature chart: {e}")
     
-    if not humidity_image:
+    if not humidity_image or force_white_background:
         try:
             humidity_value = float(humidity) if humidity != "--" else None
             humidity_image = create_placeholder_chart('humidity', humidity_value)
-            print("Created placeholder humidity chart")
+            print("Created placeholder humidity chart with white background")
         except Exception as e:
             print(f"Failed to create placeholder humidity chart: {e}")
     
@@ -240,6 +258,14 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
     # Add date (left-aligned)
     date_text = Paragraph(f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}", normal_style)
     story.append(date_text)
+    
+    # Add report type if provided
+    if report_type:
+        report_type_style = user_style.clone('ReportType')
+        report_type_style.textColor = colors.blue
+        report_type_text = Paragraph(f"Report type: {report_type}", report_type_style)
+        story.append(report_type_text)
+    
     story.append(Spacer(1, 15))
     
     # Add current readings
@@ -354,5 +380,5 @@ def get_humidity_status(humidity):
         return "Unknown"
 
 if __name__ == "__main__":
-    # For testing, generate a report with sample data
-    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="John Doe") 
+    
+    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="") 

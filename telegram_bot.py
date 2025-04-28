@@ -32,7 +32,7 @@ def send_telegram_message(message, user_chat_id=None):
         print(f"An error occurred: {e}")
 
 
-def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_id=None, temperature_image=None, humidity_image=None, username=None, send_now=False):
+def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_id=None, temperature_image=None, humidity_image=None, username=None, send_now=False, force_white_background=False, report_type=None):
     bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
     # Use provided chat_id or fall back to default from .env
     chat_id = user_chat_id or os.getenv('TELEGRAM_CHAT_ID')
@@ -100,6 +100,16 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
             print(f"Humidity image validation failed: {e}")
             humidity_image = None
     
+    # If force_white_background is True and we have images, process them to ensure they have white backgrounds
+    if force_white_background:
+        print("Forcing white background for chart images")
+        if temperature_image is None or humidity_image is None:
+            print("Cannot force white background - one or more images missing")
+        else:
+            # We will fall back to generating placeholder charts with known white backgrounds
+            temperature_image = None
+            humidity_image = None
+    
     # Generate the PDF file with actual hive data
     pdf_path = create_hive_report_pdf(
         hive_id=hive_id, 
@@ -107,7 +117,9 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
         humidity=humidity,
         temperature_image=temperature_image,
         humidity_image=humidity_image,
-        username=username
+        username=username,
+        force_white_background=force_white_background,
+        report_type=report_type
     )
     
     # Send the PDF
@@ -145,6 +157,8 @@ if __name__ == "__main__":
     humidity_image = None
     username = None
     send_now = False
+    force_white_background = False
+    report_type = None
     
     # If we have a command line argument, try to parse it as JSON data
     if len(sys.argv) > 1:
@@ -158,6 +172,8 @@ if __name__ == "__main__":
             humidity_image = data.get('humidity_image')
             username = data.get('username')
             send_now = data.get('sendNow', False)
+            force_white_background = data.get('forceWhiteBackground', False)
+            report_type = data.get('reportType')
         except Exception as e:
             print(f"Error parsing JSON data: {e}")
     
@@ -170,5 +186,7 @@ if __name__ == "__main__":
         temperature_image=temperature_image,
         humidity_image=humidity_image,
         username=username,
-        send_now=send_now
+        send_now=send_now,
+        force_white_background=force_white_background,
+        report_type=report_type
     )

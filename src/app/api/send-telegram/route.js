@@ -13,7 +13,8 @@ export async function POST(request) {
       temperature_image, 
       humidity_image, 
       username,
-      sendNow 
+      sendNow,
+      reportType
     } = data;
     
     // If sendNow flag is set, use a different approach to get the latest data
@@ -27,7 +28,8 @@ export async function POST(request) {
         hiveId: hiveId || null, 
         chatId: chatId || null,
         username: username || null,
-        sendNow: true
+        sendNow: true,
+        reportType: reportType || "Immediate Report"
       });
       
       // Execute a Python script to generate and send a PDF with the most recent data
@@ -68,7 +70,9 @@ export async function POST(request) {
       chatId: chatId || null,
       temperature_image: temperature_image || null,
       humidity_image: humidity_image || null,
-      username: username || null
+      username: username || null,
+      forceWhiteBackground: data.forceWhiteBackground || false,
+      reportType: reportType || "Standard Report"
     });
     
     // Execute the Python script to send a PDF with the data
