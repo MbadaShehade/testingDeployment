@@ -1,80 +1,93 @@
 import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 const execAsync = promisify(exec);
 
 // Flask API URL (should be in environment variables in a real app)
 const SCHEDULER_API_URL = process.env.SCHEDULER_API_URL || 'http://localhost:5000/api/scheduler';
 
+// Store active schedulers
+const activeSchedulers = new Map();
+
 /**
  * Handler for POST requests to start or stop the scheduler
  */
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { action, hiveId, chatId, username, testMode, reportTime, interval } = body;
+    const { action, hiveId, chatId, username, interval } = await request.json();
 
-    if (!action) {
-      return NextResponse.json({ error: 'Missing action parameter' }, { status: 400 });
-    }
+    if (action === 'start') {
+      // Check if scheduler is already running for this hive
+      if (activeSchedulers.has(hiveId)) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Scheduler already running' 
+        });
+      }
 
-    if (!hiveId || !chatId) {
-      return NextResponse.json({ error: 'Missing hiveId or chatId parameter' }, { status: 400 });
-    }
+      // Start the scheduler process
+      const schedulerPath = path.join(process.cwd(), 'telegram_scheduler.py');
+      const scheduler = spawn('python3', [
+        schedulerPath,
+        '--hive_id', hiveId,
+        '--chat_id', chatId,
+        '--username', username || 'User'
+      ]);
 
-    // Determine which API endpoint to call based on action
-    let endpoint = '';
-    let payload = {};
+      // Store the process
+      activeSchedulers.set(hiveId, scheduler);
 
-    switch (action) {
-      case 'start':
-        endpoint = `${SCHEDULER_API_URL}/start`;
-        payload = {
-          hive_id: hiveId,
-          chat_id: chatId,
-          username: username || 'User',
-          test_mode: testMode || false,
-          report_time: reportTime || '08:00',
-          interval: interval || '24h'
-        };
-        break;
-      case 'stop':
-        endpoint = `${SCHEDULER_API_URL}/stop`;
-        payload = {
-          hive_id: hiveId,
-          chat_id: chatId
-        };
-        break;
-      default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-    }
-
-    // If the Flask API is running, use it
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      // Handle process events
+      scheduler.on('error', (err) => {
+        console.error('Scheduler error:', err);
+        activeSchedulers.delete(hiveId);
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return NextResponse.json(data);
-      } else {
-        // If API call fails, fall back to direct command execution
-        return await executeSchedulerCommand(action, hiveId, chatId, username, testMode, reportTime, interval);
+      scheduler.on('exit', (code) => {
+        console.log(`Scheduler exited with code ${code}`);
+        activeSchedulers.delete(hiveId);
+      });
+
+      return NextResponse.json({ success: true });
+
+    } else if (action === 'stop') {
+      // Stop the scheduler for this hive
+      const scheduler = activeSchedulers.get(hiveId);
+      if (scheduler) {
+        scheduler.kill();
+        activeSchedulers.delete(hiveId);
+        return NextResponse.json({ success: true });
       }
-    } catch (error) {
-      // If API is not available, fall back to direct command execution
-      console.error('Error calling scheduler API:', error);
-      return await executeSchedulerCommand(action, hiveId, chatId, username, testMode, reportTime, interval);
+      return NextResponse.json({ 
+        success: false, 
+        error: 'No active scheduler found' 
+      });
+
+    } else if (action === 'status') {
+      // Check if scheduler is running for this hive
+      const isRunning = activeSchedulers.has(hiveId);
+      return NextResponse.json({ 
+        success: true, 
+        status: isRunning ? 'running' : 'stopped' 
+      });
+
+    } else {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Invalid action' 
+      });
     }
+
   } catch (error) {
-    console.error('Error in scheduler API route:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error('Scheduler API error:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    });
   }
 }
 
@@ -82,77 +95,23 @@ export async function POST(request) {
  * Handler for GET requests to check scheduler status
  */
 export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const hiveId = searchParams.get('hiveId');
-    const chatId = searchParams.get('chatId');
-    const action = searchParams.get('action') || 'status';
+  const { searchParams } = new URL(request.url);
+  const hiveId = searchParams.get('hiveId');
+  const chatId = searchParams.get('chatId');
+  const action = searchParams.get('action');
 
-    if (!hiveId || !chatId) {
-      return NextResponse.json({ error: 'Missing hiveId or chatId parameter' }, { status: 400 });
-    }
-
-    let endpoint = '';
-    switch (action) {
-      case 'status':
-        endpoint = `${SCHEDULER_API_URL}/status?hive_id=${hiveId}&chat_id=${chatId}`;
-        break;
-      case 'list':
-        endpoint = `${SCHEDULER_API_URL}/list`;
-        break;
-      default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-    }
-
-    try {
-      const response = await fetch(endpoint);
-      if (response.ok) {
-        const data = await response.json();
-        return NextResponse.json(data);
-      } else {
-        // For demonstration purposes, we'll simulate a successful status response
-        // In a real application, you'd want to have a more robust status tracking system
-        if (action === 'status') {
-          // Check local storage or filesystem if a job is running for this hive/chat combo
-          // This is a simplified version for demonstration
-          try {
-            const { stdout } = await execAsync(`ps aux | grep "telegram_scheduler.py.*hive_id ${hiveId}.*chat_id ${chatId}" | grep -v grep`);
-            
-            if (stdout.trim()) {
-              // Extract interval from the running process if possible
-              const intervalMatch = stdout.match(/--interval\s+["']?(\w+)["']?/);
-              const interval = intervalMatch ? intervalMatch[1] : '24h';
-              
-              return NextResponse.json({ 
-                status: 'running',
-                interval: interval,
-                message: 'Scheduler is running via command line'
-              });
-            } else {
-              return NextResponse.json({ 
-                status: 'stopped',
-                message: 'No scheduler found for this hive'
-              });
-            }
-          } catch (err) {
-            // If grep returns no results, it exits with code 1, which throws an error
-            return NextResponse.json({ 
-              status: 'stopped',
-              message: 'No scheduler found for this hive'
-            });
-          }
-        }
-        
-        return NextResponse.json({ error: 'Failed to get scheduler status' }, { status: response.status });
-      }
-    } catch (error) {
-      console.error('Error calling scheduler API:', error);
-      return NextResponse.json({ status: 'unknown', error: error.message }, { status: 500 });
-    }
-  } catch (error) {
-    console.error('Error in scheduler API route:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  if (action === 'status') {
+    const isRunning = activeSchedulers.has(hiveId);
+    return NextResponse.json({ 
+      success: true, 
+      status: isRunning ? 'running' : 'stopped' 
+    });
   }
+
+  return NextResponse.json({ 
+    success: false, 
+    error: 'Invalid action' 
+  });
 }
 
 /**
@@ -226,6 +185,44 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
           status: 'already_stopped',
           message: 'No scheduler was running for this hive'
         });
+      }
+    } else if (action === 'update') {
+      // For updating interval, we need to stop the current scheduler and start a new one
+      try {
+        // First, stop the current scheduler
+        await execAsync(`pkill -f "telegram_scheduler.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
+        
+        // Then start a new one with the updated interval
+        let command = `python telegram_scheduler.py --hive_id "${hiveId}" --chat_id "${chatId}"`;
+        
+        if (username) {
+          command += ` --username "${username}"`;
+        }
+        
+        if (reportTime) {
+          command += ` --time "${reportTime}"`;
+        }
+        
+        // Add the new interval parameter
+        if (interval) {
+          command += ` --interval "${interval}"`;
+        }
+        
+        // Start the command in the background
+        command += ' &';
+        
+        await execAsync(command);
+        return NextResponse.json({ 
+          status: 'updated', 
+          interval: interval || '24h',
+          message: 'Scheduler updated via command line' 
+        });
+      } catch (err) {
+        console.error('Error updating scheduler:', err);
+        return NextResponse.json({ 
+          error: 'Failed to update scheduler',
+          details: err.message 
+        }, { status: 500 });
       }
     }
   } catch (error) {

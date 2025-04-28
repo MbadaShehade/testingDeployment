@@ -23,6 +23,18 @@ export async function POST(request) {
         );
       }
 
+      // Check if password is already used by another user
+      const allUsers = await users.find({}).toArray();
+      for (const user of allUsers) {
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (passwordMatch) {
+          return NextResponse.json(
+            { error: 'This password is already in use. Please choose a different password.' },
+            { status: 400 }
+          );
+        }
+      }
+
       // Hash the password
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);

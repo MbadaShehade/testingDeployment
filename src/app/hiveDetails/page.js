@@ -92,6 +92,15 @@ const HiveDetails = () => {
     humidity: null
   });
 
+  
+
+  // Add state for showing success message
+  const [successMessage, setSuccessMessage] = useState('');
+  
+  // Add state for automatic reporting
+  const [autoReporting, setAutoReporting] = useState(false);
+  const [reportingInterval, setReportingInterval] = useState(null);
+  
   // Add state for scheduled reports
   const [isScheduleActive, setIsScheduleActive] = useState(false);
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(true);
@@ -116,13 +125,65 @@ const HiveDetails = () => {
     }
   };
   
+  // Function to update scheduler interval on the server
+  const updateSchedulerInterval = async (newInterval) => {
+    if (!telegramChatId || !isScheduleActive) return;
+    
+    setIsLoadingSchedule(true);
+    setScheduleError(null);
+    
+    // Add a timeout to ensure the loading state doesn't get stuck
+    const loadingTimeout = setTimeout(() => {
+      setIsLoadingSchedule(false);
+      setScheduleError('Request timed out. Please try again.');
+    }, 5000);
+    
+    try {
+      const response = await fetch('/api/scheduler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update',
+          hiveId,
+          chatId: telegramChatId,
+          username: searchParams.get('username') || 'User',
+          interval: newInterval
+        }),
+      });
+      
+      clearTimeout(loadingTimeout);
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setStatusMessage(`Reports scheduled every ${formatIntervalText(newInterval)}`);
+      } else {
+        setScheduleError(data.error || 'Failed to update scheduler interval');
+      }
+    } catch (error) {
+      clearTimeout(loadingTimeout);
+      console.error('Error updating scheduler interval:', error);
+      setScheduleError('Failed to update scheduler interval');
+    } finally {
+      clearTimeout(loadingTimeout);
+      setIsLoadingSchedule(false);
+    }
+  };
+  
   // Handle scheduled report interval change
   const handleIntervalChange = (e) => {
     const newInterval = e.target.value;
     setScheduleInterval(newInterval);
     setIsTestMode(newInterval === '15s');
+    
+    // If the scheduler is active, update the interval on the server
+    if (isScheduleActive) {
+      updateSchedulerInterval(newInterval);
+    }
   };
-  
+
   // Handle test mode checkbox change
   const handleTestModeChange = (e) => {
     const isChecked = e.target.checked;
@@ -141,8 +202,17 @@ const HiveDetails = () => {
     setIsLoadingSchedule(true);
     setScheduleError(null);
     
+    // Add a timeout to ensure loading state doesn't get stuck
+    const loadingTimeout = setTimeout(() => {
+      setIsLoadingSchedule(false);
+      setScheduleError('Status check timed out. Please refresh.');
+    }, 5000);
+    
     try {
       const response = await fetch(`/api/scheduler?hiveId=${hiveId}&chatId=${telegramChatId}&action=status`);
+      
+      clearTimeout(loadingTimeout);
+      
       const data = await response.json();
       
       if (response.ok) {
@@ -159,9 +229,11 @@ const HiveDetails = () => {
         setScheduleError(data.error || 'Failed to check scheduler status');
       }
     } catch (error) {
+      clearTimeout(loadingTimeout);
       console.error('Error checking scheduler status:', error);
       setScheduleError('Failed to connect to scheduler service');
     } finally {
+      clearTimeout(loadingTimeout);
       setIsLoadingSchedule(false);
     }
   };
@@ -172,6 +244,12 @@ const HiveDetails = () => {
     
     setIsLoadingSchedule(true);
     setScheduleError(null);
+    
+    // Add a timeout to ensure the loading state doesn't get stuck
+    const loadingTimeout = setTimeout(() => {
+      setIsLoadingSchedule(false);
+      setScheduleError('Request timed out. Please try again.');
+    }, 5000);
     
     try {
       // If already active, stop it
@@ -187,6 +265,8 @@ const HiveDetails = () => {
             chatId: telegramChatId
           }),
         });
+        
+        clearTimeout(loadingTimeout);
         
         const data = await response.json();
         
@@ -213,6 +293,8 @@ const HiveDetails = () => {
           }),
         });
         
+        clearTimeout(loadingTimeout);
+        
         const data = await response.json();
         
         if (response.ok) {
@@ -223,9 +305,11 @@ const HiveDetails = () => {
         }
       }
     } catch (error) {
+      clearTimeout(loadingTimeout);
       console.error(`Error ${isScheduleActive ? 'stopping' : 'starting'} scheduler:`, error);
       setScheduleError('Failed to connect to scheduler service');
     } finally {
+      clearTimeout(loadingTimeout);
       setIsLoadingSchedule(false);
     }
   };
@@ -240,6 +324,47 @@ const HiveDetails = () => {
         const data = await response.json();
         if (data.telegramChatId) {
           setTelegramChatId(data.telegramChatId);
+          
+          // First check if scheduler is already running
+          const statusResponse = await fetch(`/api/scheduler?hiveId=${hiveId}&chatId=${data.telegramChatId}&action=status`);
+          const statusData = await statusResponse.json();
+          
+          if (statusData.success && statusData.status === 'running') {
+            // Scheduler is already running, set UI state accordingly
+            setIsScheduleActive(true);
+            setStatusMessage('Reports are being sent automatically every minute');
+            setAutoReporting(true);
+            return; // Exit early - no need to start scheduler
+          }
+          
+          // Start the scheduler with automatic reporting
+          const response = await fetch('/api/scheduler', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'start',
+              hiveId,
+              chatId: data.telegramChatId,
+              username: searchParams.get('username') || 'User',
+              interval: '1m'  // Set to 1 minute interval
+            }),
+          });
+          
+          const schedulerData = await response.json();
+          if (schedulerData.success) {
+            setIsScheduleActive(true);
+            setStatusMessage('Reports are being sent automatically every minute');
+            setAutoReporting(true);
+          } else if (schedulerData.error === 'Scheduler already running') {
+            // This is actually a successful state - the scheduler is already running
+            setIsScheduleActive(true);
+            setStatusMessage('Reports are being sent automatically every minute');
+            setAutoReporting(true);
+          } else {
+            console.error('Failed to start automatic reporting:', schedulerData.error);
+          }
         }
       } catch (error) {
         console.error('Error fetching Telegram chat ID:', error);
@@ -247,7 +372,7 @@ const HiveDetails = () => {
     };
     
     fetchTelegramChatId();
-  }, [email]);
+  }, [email, hiveId]);
 
   // Check scheduler status when telegramChatId is available
   useEffect(() => {
@@ -381,15 +506,87 @@ const HiveDetails = () => {
     }
   }, [mounted, hiveData.temperature, hiveData.humidity, updateCachedChartImages]);
 
-  // Modify handleSendTelegram to also include sending a report now functionality
-  const handleSendTelegram = async () => {
+  // Function to start automatic reporting every minute
+  const startAutomaticReporting = async () => {
+    if (autoReporting) return; // Already running
     if (!telegramChatId) {
       if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
         handleSetupTelegram();
       }
       return;
     }
+    
+    try {
+      const response = await fetch('/api/scheduler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'start',
+          hiveId,
+          chatId: telegramChatId,
+          username: searchParams.get('username') || 'User'
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setAutoReporting(true);
+        setSuccessMessage('Automatic reporting started. You will receive PDF reports every minute.');
+      } else {
+        alert('Failed to start automatic reporting: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error starting automatic reporting:', error);
+      alert('Failed to start automatic reporting. Please try again later.');
+    }
+  };
+  
+  // Function to stop automatic reporting
+  const stopAutomaticReporting = async () => {
+    if (!autoReporting) return; // Not running
+    
+    try {
+      const response = await fetch('/api/scheduler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'stop',
+          hiveId
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setAutoReporting(false);
+        setSuccessMessage('Automatic reporting stopped.');
+      } else {
+        alert('Failed to stop automatic reporting: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error stopping automatic reporting:', error);
+      alert('Failed to stop automatic reporting. Please try again later.');
+    }
+  };
 
+  // Clean up interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (reportingInterval) {
+        clearInterval(reportingInterval);
+      }
+    };
+  }, [reportingInterval]);
+
+  // Extract the report sending logic to a separate function
+  const sendReport = async () => {
+    if (!telegramChatId) return;
+    
     setSending(true);
     try {
       // Save current data to a JSON file on the server for persistence
@@ -405,21 +602,39 @@ const HiveDetails = () => {
         }),
       });
       
-      // Create PDF-ready chart images with guaranteed readability
-      const temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
-      const humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
+      // Force update of cached chart images with light mode
+      await updateCachedChartImages();
       
-      // Log image data for debugging
-      console.log("Temperature image length: ", temperatureImage ? temperatureImage.length : 0);
-      console.log("Humidity image length: ", humidityImage ? humidityImage.length : 0);
-      console.log("Sending real data - Temperature:", hiveData.temperature, "Humidity:", hiveData.humidity);
+      // Use the cached light mode images instead of creating new ones
+      let temperatureImage = cachedLightModeImages.temperature;
+      let humidityImage = cachedLightModeImages.humidity;
+      
+      // If cached images aren't available, create them with white background
+      if (!temperatureImage || !humidityImage) {
+        // Create PDF-ready chart images with guaranteed readability and white background
+        temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
+        humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
+      }
       
       // Verify we have both images
       if (!temperatureImage || !humidityImage) {
-        alert('Failed to generate chart images. Please try again.');
+        console.error('Failed to generate chart images');
         setSending(false);
         return;
       }
+      
+      // SAVE CHART IMAGES TO SERVER so the scheduler can use them
+      await fetch('/api/save-chart-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hiveId: hiveId,
+          temperature_image: temperatureImage,
+          humidity_image: humidityImage
+        }),
+      });
       
       // Get username from URL parameters
       const username = searchParams.get('username') || 'User';
@@ -436,24 +651,40 @@ const HiveDetails = () => {
           chatId: telegramChatId,
           temperature_image: temperatureImage,
           humidity_image: humidityImage,
-          username: username
+          username: username,
+          autoReport: autoReporting,
+          forceWhiteBackground: true,  // Add a flag to indicate white background is needed
+          reportType: autoReporting ? "Automatic In-App Report" : "Manual User Requested Report"  // Indicate report type
         }),
       });
       const data = await response.json();
       if (data.success) {
-        alert('Hive report PDF sent to your Telegram successfully!');
+        // Only show success message for manual sends
+        if (!autoReporting) {
+          setSuccessMessage('Hive report PDF sent to your Telegram successfully!');
+          // Hide the message after 5 seconds
+          setTimeout(() => {
+            if (successMessage === 'Hive report PDF sent to your Telegram successfully!') {
+              setSuccessMessage('');
+            }
+          }, 5000);
+        }
       } else {
-        alert('Failed to send Telegram message. Please check your chat ID and try again.');
+        if (!autoReporting) {
+          alert('Failed to send Telegram message. Please check your chat ID and try again.');
+        }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error sending Telegram message. Please try again later.');
+      if (!autoReporting) {
+        alert('Error sending Telegram message. Please try again later.');
+      }
     }
     setSending(false);
   };
 
-  // Function to send a report immediately
-  const handleSendReportNow = async () => {
+  // Modify handleSendTelegram to use the sendReport function
+  const handleSendTelegram = () => {
     if (!telegramChatId) {
       if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
         handleSetupTelegram();
@@ -461,245 +692,12 @@ const HiveDetails = () => {
       return;
     }
     
-    setSending(true);
-    setScheduleError(null);
-    
-    try {
-      // First save the current hive data to file
-      await fetch('/api/save-hive-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          hiveId: hiveId,
-          temperature: hiveData.temperature,
-          humidity: hiveData.humidity
-        }),
-      });
-      
-      // Create chart images
-      const temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
-      const humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
-      
-      const username = searchParams.get('username') || 'User';
-      
-      const response = await fetch('/api/send-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          hiveId: hiveId,
-          temperature: hiveData.temperature,
-          humidity: hiveData.humidity,
-          chatId: telegramChatId,
-          temperature_image: temperatureImage,
-          humidity_image: humidityImage,
-          username: username,
-          sendNow: true
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setStatusMessage('Report sent successfully!');
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          if (statusMessage === 'Report sent successfully!') {
-            setStatusMessage(isScheduleActive 
-              ? `Reports scheduled every ${formatIntervalText(scheduleInterval)}` 
-              : '');
-          }
-        }, 3000);
-      } else {
-        setScheduleError(data.error || 'Failed to send report');
-      }
-    } catch (error) {
-      console.error('Error sending report:', error);
-      setScheduleError('Failed to send report. Please try again later.');
-    } finally {
-      setSending(false);
-    }
+    sendReport();
   };
 
-  // Function to create readable chart images for PDF
-  const createReadableChartImage = async (type, chartData, currentValue) => {
-    return new Promise((resolve) => {
-      // Create a temporary container div
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.width = '800px';  // Increase width for better quality
-      tempContainer.style.height = '400px';  // Increase height for better quality
-      tempContainer.style.backgroundColor = '#FFFFFF';
-      document.body.appendChild(tempContainer);
-      
-      // Create a new canvas inside the temp container
-      const canvas = document.createElement('canvas');
-      canvas.width = 800;  // Increase canvas width
-      canvas.height = 400;  // Increase canvas height
-      tempContainer.appendChild(canvas);
-      
-      // Create a new Chart instance explicitly for the PDF with light mode styling
-      const ctx = canvas.getContext('2d');
-      
-      // Get data range for proper axis scaling
-      const dataValues = [...chartData.datasets[0].data].filter(val => val !== null && val !== undefined);
-      const dataMin = dataValues.length > 0 ? Math.min(...dataValues) : 0;
-      const dataMax = dataValues.length > 0 ? Math.max(...dataValues) : 100;
-      
-      // Calculate y-axis range with padding
-      let yMin, yMax;
-      if (type === 'temperature') {
-        // Calculate min and max with better padding
-        yMin = Math.max(dataMin - Math.max(0.5, dataMin * 0.05), 0);
-        yMax = dataMax + Math.max(0.5, dataMax * 0.05);
-        
-        // Ensure the current value is in the visible range with extra padding
-        if (currentValue !== null && currentValue !== undefined) {
-          yMin = Math.min(yMin, currentValue - Math.max(0.5, currentValue * 0.05));
-          yMax = Math.max(yMax, currentValue + Math.max(0.5, currentValue * 0.05));
-        }
-      } else {
-        // For humidity, ensure range is reasonable (0-100%) with better padding
-        yMin = Math.max(dataMin - Math.max(1, dataMin * 0.05), 0);
-        yMax = Math.min(dataMax + Math.max(1, dataMax * 0.05), 100);
-        
-        // Ensure the current value is in the visible range with extra padding
-        if (currentValue !== null && currentValue !== undefined) {
-          yMin = Math.min(yMin, Math.max(currentValue - Math.max(1, currentValue * 0.05), 0));
-          yMax = Math.max(yMax, Math.min(currentValue + Math.max(1, currentValue * 0.05), 100));
-        }
-      }
-      
-      // Configure data for the chart
-      const pdfChartData = {
-        labels: [...chartData.labels],
-        datasets: [{
-          label: type === 'temperature' ? 'Temperature (°C)' : 'Humidity (%)',
-          data: [...chartData.datasets[0].data],
-          borderColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
-          backgroundColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
-          tension: 0.4,
-          pointRadius: 5,
-          borderWidth: 3,
-          fill: false
-        }]
-      };
-      
-      // Configure options for guaranteed readability
-      const pdfChartOptions = {
-        responsive: false,
-        maintainAspectRatio: false,
-        animation: false,
-        parsing: {
-          xAxisKey: 'x',
-          yAxisKey: 'y'
-        },
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              color: '#000000',
-              font: {
-                size: 16,  // Increase font size
-                weight: 'bold',
-                family: 'Arial'
-              }
-            }
-          },
-          title: {
-            display: true,
-            text: type === 'temperature' ? 'Current temperature: ' + (currentValue?.toFixed(2) || '--') + '°C' : 
-                                         'Current humidity: ' + (currentValue?.toFixed(2) || '--') + '%',
-            color: '#000000',
-            font: {
-              size: 18,
-              weight: 'bold',
-              family: 'Arial'
-            },
-            position: 'top',
-            padding: {
-              top: 10,
-              bottom: 10
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: yMin,  // Use calculated min
-            max: yMax,  // Use calculated max
-            ticks: {
-              color: '#000000',
-              font: {
-                size: 14,  // Increase font size
-                weight: 'bold',
-                family: 'Arial'
-              },
-              precision: 2, // Exact precision for tick values
-              callback: function(value) {
-                return value.toFixed(2);
-              }
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.2)'
-            }
-          },
-          x: {
-            ticks: {
-              color: '#000000',
-              font: {
-                size: 14,  // Increase font size 
-                weight: 'bold',
-                family: 'Arial'
-              },
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.2)'
-            }
-          }
-        },
-        layout: {
-          padding: {
-            top: 10,
-            right: 25,
-            bottom: 30,  // More padding at bottom
-            left: 25
-          }
-        }
-      };
-      
-      // Create a new Chart instance with guaranteed readability settings
-      const newChart = new Chart(ctx, {
-        type: 'line',
-        data: pdfChartData,
-        options: pdfChartOptions
-      });
-      
-      // Give the chart time to render
-      setTimeout(() => {
-        try {
-          // Get chart as image
-          const imageUrl = canvas.toDataURL('image/jpeg', 1.0);  // Use JPEG with max quality
-          
-          // Clean up
-          newChart.destroy();
-          document.body.removeChild(tempContainer);
-          
-          resolve(imageUrl);
-        } catch (error) {
-          console.error('Error creating chart image:', error);
-          document.body.removeChild(tempContainer);
-          resolve(null);
-        }
-      }, 500);  // Increase timeout to ensure rendering completes
-    });
-  };
+
+  
+
 
   // Replace single dateRange with separate states for each component
   const [summaryDateRange, setSummaryDateRange] = useState('lastWeek');
@@ -1847,6 +1845,11 @@ const HiveDetails = () => {
     setActiveDropdown(null);
   };
 
+  // Function to reset loading state
+  const resetLoadingState = () => {
+    setIsLoadingSchedule(false);
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -1905,6 +1908,191 @@ const HiveDetails = () => {
       return () => clearTimeout(timer);
     }
   }, [mounted, hiveData.temperature, hiveData.humidity]);
+
+  // Function to create readable chart images for PDF
+  const createReadableChartImage = async (type, chartData, currentValue) => {
+    return new Promise((resolve) => {
+      // Create a temporary container div
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.width = '800px';  // Increase width for better quality
+      tempContainer.style.height = '400px';  // Increase height for better quality
+      tempContainer.style.backgroundColor = '#FFFFFF';
+      document.body.appendChild(tempContainer);
+      
+      // Create a new canvas inside the temp container
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;  // Increase canvas width
+      canvas.height = 400;  // Increase canvas height
+      tempContainer.appendChild(canvas);
+      
+      // Create a new Chart instance explicitly for the PDF with light mode styling
+      const ctx = canvas.getContext('2d');
+      
+      // Fill the background with white to ensure proper contrast in PDF
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Get data range for proper axis scaling
+      const dataValues = [...chartData.datasets[0].data].filter(val => val !== null && val !== undefined);
+      const dataMin = dataValues.length > 0 ? Math.min(...dataValues) : 0;
+      const dataMax = dataValues.length > 0 ? Math.max(...dataValues) : 100;
+      
+      // Calculate y-axis range with padding and ensure some minimum range for better visualization
+      let yMin, yMax;
+      if (type === 'temperature') {
+        // Add more range to temperature chart
+        const tempRange = Math.max(1.5, (dataMax - dataMin) * 1.5);  // At least 1.5 degrees range or 150% of data range
+        const midPoint = (dataMax + dataMin) / 2;
+        yMin = midPoint - tempRange / 2;
+        yMax = midPoint + tempRange / 2;
+        
+        // Ensure the current value is in the visible range with extra padding
+        if (currentValue !== null && currentValue !== undefined) {
+          yMin = Math.min(yMin, currentValue - 1);
+          yMax = Math.max(yMax, currentValue + 1);
+        }
+      } else {
+        // Add more range to humidity chart
+        const humRange = Math.max(10, (dataMax - dataMin) * 1.5);  // At least 10% range or 150% of data range
+        const midPoint = (dataMax + dataMin) / 2;
+        yMin = Math.max(midPoint - humRange / 2, 0);
+        yMax = Math.min(midPoint + humRange / 2, 100);
+        
+        // Ensure the current value is in the visible range with extra padding
+        if (currentValue !== null && currentValue !== undefined) {
+          yMin = Math.min(yMin, Math.max(currentValue - 5, 0));
+          yMax = Math.max(yMax, Math.min(currentValue + 5, 100));
+        }
+      }
+      
+      // Configure data for the chart with more vibrant colors
+      const pdfChartData = {
+        labels: [...chartData.labels],
+        datasets: [{
+          label: type === 'temperature' ? 'Temperature (°C)' : 'Humidity (%)',
+          data: [...chartData.datasets[0].data],
+          borderColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
+          backgroundColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
+          tension: 0.4,
+          pointRadius: 5,
+          borderWidth: 3,
+          fill: false
+        }]
+      };
+      
+      // Configure options for guaranteed readability with white background
+      const pdfChartOptions = {
+        responsive: false,
+        maintainAspectRatio: false,
+        animation: false,
+        parsing: {
+          xAxisKey: 'x',
+          yAxisKey: 'y'
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#000000',
+              font: {
+                size: 16,  // Increase font size
+                weight: 'bold',
+                family: 'Arial'
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: type === 'temperature' ? 'Current temperature: ' + (currentValue?.toFixed(2) || '--') + '°C' : 
+                                        'Current humidity: ' + (currentValue?.toFixed(2) || '--') + '%',
+            color: '#000000',
+            font: {
+              size: 18,
+              weight: 'bold',
+              family: 'Arial'
+            },
+            position: 'top',
+            padding: {
+              top: 10,
+              bottom: 10
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            min: yMin,  // Use calculated min
+            max: yMax,  // Use calculated max
+            ticks: {
+              color: '#000000',
+              font: {
+                size: 14,  // Increase font size
+                weight: 'bold',
+                family: 'Arial'
+              },
+              precision: 2, // Exact precision for tick values
+              callback: function(value) {
+                return value.toFixed(2);
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.2)'
+            }
+          },
+          x: {
+            ticks: {
+              color: '#000000',
+              font: {
+                size: 14,  // Increase font size 
+                weight: 'bold',
+                family: 'Arial'
+              },
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.2)'
+            }
+          }
+        },
+        layout: {
+          padding: {
+            top: 10,
+            right: 25,
+            bottom: 30,  // More padding at bottom
+            left: 25
+          }
+        }
+      };
+      
+      // Create a new Chart instance with guaranteed readability settings
+      const newChart = new Chart(ctx, {
+        type: 'line',
+        data: pdfChartData,
+        options: pdfChartOptions
+      });
+      
+      // Give the chart time to render
+      setTimeout(() => {
+        try {
+          // Get chart as image
+          const imageUrl = canvas.toDataURL('image/jpeg', 1.0);  // Use JPEG with max quality
+          
+          // Clean up
+          newChart.destroy();
+          document.body.removeChild(tempContainer);
+          
+          resolve(imageUrl);
+        } catch (error) {
+          console.error('Error creating chart image:', error);
+          document.body.removeChild(tempContainer);
+          resolve(null);
+        }
+      }, 500);  // Increase timeout to ensure rendering completes
+    });
+  };
 
   if (!mounted) return null;
 
@@ -1988,74 +2176,53 @@ const HiveDetails = () => {
           </div>
         </div>
 
-        {/* Integrated Scheduled Reports Section */}
+        {/* Report Section */}
         <div className={`exact-screenshot-style ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
-          <h2>Scheduled Reports</h2>
+          <h2>PDF Report</h2>
           
-          {scheduleError && (
-            <div className="status-message error">
-              <span>{scheduleError}</span>
+          {successMessage && (
+            <div className="status-message success" style={{ 
+                backgroundColor: '#4ade80', 
+                color: '#052e16', 
+                padding: '12px', 
+                borderRadius: '6px',
+                marginBottom: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px' 
+              }}>
+              <CheckCircle size={18} />
+              <span>{successMessage}</span>
             </div>
           )}
           
-          {statusMessage && !scheduleError && (
-            <div className="status-message success">
-              <Send size={18} /> {statusMessage}
-            </div>
-          )}
-          
-          <div className="control-layout">
-            <div className="interval-row">
-              <label>Report Interval:</label>
-              <div className="dropdown-wrapper">
-                <select 
-                  value={scheduleInterval}
-                  onChange={handleIntervalChange}
-                  disabled={isLoadingSchedule}
-                  className="interval-select"
-                >
-                  {intervalOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="buttons-row" style={{ justifyContent: 'center', padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <button
+              className="send-report-button"
+              onClick={handleSendTelegram}
+              disabled={sending}
+              style={{ width: '100%', maxWidth: '400px', alignSelf: 'center' }}
+            >
+              {sending ? (
+                <>
+                  <RefreshCw size={18} className="spinner" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Image 
+                    src={"/telegramIcon.png"} 
+                    alt="Telegram"
+                    width={18}
+                    height={18}
+                    style={{ marginRight: '1px', borderRadius: '100%' }}
+                  />
+                  Get Report Now via Telegram
+                </>
+              )}
+            </button>
             
-            <div className="buttons-row">
-              <button
-                className="send-report-button"
-                onClick={handleSendReportNow}
-                disabled={sending}
-              >
-                {sending ? (
-                  <>
-                    <RefreshCw size={18} className="spinner" />
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    <Image 
-                      src={"/telegramIcon.png"} 
-                      alt="Telegram"
-                      width={18}
-                      height={18}
-                      style={{ marginRight: '1px', borderRadius: '100%' }}
-                    />
-                    Send Report Now via Telegram
-                  </>
-                )}
-              </button>
-              
-              <button
-                className="toggle-button"
-                onClick={handleScheduleToggle}
-                disabled={isLoadingSchedule}
-              >
-                {isLoadingSchedule ? 'Loading...' : (isScheduleActive ? 'Stop Scheduled Reports' : 'Start Scheduled Reports')}
-              </button>
-            </div>
+            {/* The automatic reporting button has been removed as reports are sent automatically every minute */}
           </div>
         </div>
 
