@@ -80,7 +80,8 @@ const HiveDetails = () => {
   const [hiveData, setHiveData] = useState({
     name: `Hive ${hiveId}`,
     temperature: null,
-    humidity: null
+    humidity: null,
+    airPump: "OFF" // Add airPump property with default OFF
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [sending, setSending] = useState(false);
@@ -332,7 +333,7 @@ const HiveDetails = () => {
           if (statusData.success && statusData.status === 'running') {
             // Scheduler is already running, set UI state accordingly
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
             return; // Exit early - no need to start scheduler
           }
@@ -348,19 +349,19 @@ const HiveDetails = () => {
               hiveId,
               chatId: data.telegramChatId,
               username: searchParams.get('username') || 'User',
-              interval: '1m'  // Set to 1 minute interval
+              interval: '24h'  // Set to 24 hours interval
             }),
           });
           
           const schedulerData = await response.json();
           if (schedulerData.success) {
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
           } else if (schedulerData.error === 'Scheduler already running') {
             // This is actually a successful state - the scheduler is already running
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
           } else {
             console.error('Failed to start automatic reporting:', schedulerData.error);
@@ -526,7 +527,8 @@ const HiveDetails = () => {
           action: 'start',
           hiveId,
           chatId: telegramChatId,
-          username: searchParams.get('username') || 'User'
+          username: searchParams.get('username') || 'User',
+          interval: '24h' // Set to 24 hours interval
         }),
       });
       
@@ -534,7 +536,7 @@ const HiveDetails = () => {
       
       if (data.success) {
         setAutoReporting(true);
-        setSuccessMessage('Automatic reporting started. You will receive PDF reports every minute.');
+        setSuccessMessage('Automatic reporting started. You will receive PDF reports every 24 hours.');
       } else {
         alert('Failed to start automatic reporting: ' + (data.error || 'Unknown error'));
       }
@@ -1449,6 +1451,7 @@ const HiveDetails = () => {
     // Define topics before MQTT setup
     const tempTopic = `${userPassword}/moldPrevention/hive${hiveId}/temp`;
     const humidityTopic = `${userPassword}/moldPrevention/hive${hiveId}/humidity`;
+    const airPumpTopic = `${userPassword}/moldPrevention/hive${hiveId}/airPump`; // Add air pump topic
 
     // MQTT client setup with WebSocket
     const client = mqtt.connect(MQTT_URL, {
@@ -1465,9 +1468,9 @@ const HiveDetails = () => {
         isConnected = true;
         
         // Subscribe to topics using the user's password as namespace
-        client.subscribe([tempTopic, humidityTopic], (err) => {
+        client.subscribe([tempTopic, humidityTopic, airPumpTopic], (err) => { // Add airPump subscription
             if (!err) {
-                console.log('Subscribed to topics:', tempTopic, humidityTopic);
+                console.log('Subscribed to topics:', tempTopic, humidityTopic, airPumpTopic);
             } else {
                 console.error('Failed to subscribe to topics:', err);
             }
@@ -1480,15 +1483,23 @@ const HiveDetails = () => {
         console.log('Received message on topic:', topic);
         console.log('Message content:', message.toString());
         
+        const now = new Date();
+        const currentTime = formatTime(now);
+        const currentDate = formatDate(now);
+
+        // Handle air pump status messages
+        if (topic === airPumpTopic) {
+            console.log('Updating air pump status:', message.toString());
+            setHiveData(prev => ({ ...prev, airPump: message.toString() }));
+            return;
+        }
+        
+        // For temperature and humidity, parse as float
         const value = parseFloat(message.toString());
         if (isNaN(value)) {
             console.error('Received invalid numeric value:', message.toString());
             return;
         }
-
-        const now = new Date();
-        const currentTime = formatTime(now);
-        const currentDate = formatDate(now);
 
         // Now tempTopic and humidityTopic are in scope
         if (topic === tempTopic) {
@@ -2141,9 +2152,9 @@ const HiveDetails = () => {
                       : '--°C'
                     }
                   </div>
-                  <div className="metric-status optimal">
+                  <div className={`metric-status ${hiveData.temperature !== null && hiveData.temperature >= 26 && hiveData.temperature <= 38 ? 'optimal' : 'warning'}`}>
                     {hiveData.temperature !== null
-                      ? (hiveData.temperature >= 25 && hiveData.temperature <= 35 ? 'Optimal' : 'Warning')
+                      ? (hiveData.temperature >= 26 && hiveData.temperature <= 38 ? 'Optimal' : 'Warning')
                       : '--'
                     }
                   </div>
@@ -2164,11 +2175,36 @@ const HiveDetails = () => {
                       : '--%'
                     }
                   </div>
-                  <div className="metric-status optimal">
+                  <div className={`metric-status ${hiveData.humidity !== null && hiveData.humidity >= 76.5 && hiveData.humidity <= 85.6 ? 'optimal' : 'warning'}`}>
                     {hiveData.humidity !== null
-                      ? (hiveData.humidity >= 40 && hiveData.humidity <= 60 ? 'Optimal' : 'Warning')
+                      ? (hiveData.humidity >= 76.5 && hiveData.humidity <= 85.6 ? 'Optimal' : 'Warning')
                       : '--'
                     }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* New Air Pump Metric Circle */}
+            <div className="metric-card air-pump">
+              <div className="metric-circle">
+                <div className="metric-icon-air-pump">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#B2BEC9"/>
+                    <path d="M12 5C13.5 5 14.5 6 14.5 7.5C14.5 9 13.5 10 12 10C10.5 10 9.5 9 9.5 7.5C9.5 6 10.5 5 12 5Z" fill="white"/>
+                    <path d="M12 14C13.5 14 14.5 15 14.5 16.5C14.5 18 13.5 19 12 19C10.5 19 9.5 18 9.5 16.5C9.5 15 10.5 14 12 14Z" fill="white"/>
+                    <path d="M5 12C5 10.5 6 9.5 7.5 9.5C9 9.5 10 10.5 10 12C10 13.5 9 14.5 7.5 14.5C6 14.5 5 13.5 5 12Z" fill="white"/>
+                    <path d="M14 12C14 10.5 15 9.5 16.5 9.5C18 9.5 19 10.5 19 12C19 13.5 18 14.5 16.5 14.5C15 14.5 14 13.5 14 12Z" fill="white"/>
+                    <circle cx="12" cy="12" r="2" fill="white"/>
+                  </svg>
+                </div>
+                <div className="metric-content">
+                  <h3>Air Pump</h3>
+                  <div className="metric-value air-pump-value">
+                    {hiveData.airPump || 'OFF'}
+                  </div>
+                  <div className={`metric-status ${hiveData.airPump === 'ON' ? 'optimal' : 'warning'}`}>
+                    {hiveData.airPump === 'ON' ? 'Active' : 'Inactive'}
                   </div>
                 </div>
               </div>

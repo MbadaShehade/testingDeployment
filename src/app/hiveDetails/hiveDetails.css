@@ -142,6 +142,7 @@
 .metric-card.temperature .metric-circle {
   box-shadow: 0 4px 6px rgba(171, 25, 6, 0.2);  /* Temperature color shadow */
   transition: box-shadow 0.3s ease;
+  border: 2px solid #ab1906;  /* Add red border color */
 }
 
 .metric-card.temperature .metric-circle:hover {
@@ -151,10 +152,21 @@
 .metric-card.humidity .metric-circle {
   box-shadow: 0 4px 6px rgba(0, 115, 255, 0.2);  /* Humidity color shadow */
   transition: box-shadow 0.3s ease;
+  border: 2px solid #0073ff;  /* Add blue border color */
 }
 
 .metric-card.humidity .metric-circle:hover {
   box-shadow: 0 4px 16px rgba(0, 115, 255, 0.2);  /* Stronger humidity shadow on hover */
+}
+
+.metric-card.air-pump .metric-circle {
+  box-shadow: 0 4px 6px rgba(14, 165, 147, 0.2);  /* Air pump color shadow (teal) */
+  transition: box-shadow 0.3s ease;
+  border: 2px solid #06B6A5;  /* Add teal border color */
+}
+
+.metric-card.air-pump .metric-circle:hover {
+  box-shadow: 0 4px 16px rgba(14, 165, 147, 0.2);  /* Stronger air pump shadow on hover */
 }
 
 /* Remove the general shadow from metric-circle since we're using specific ones */
@@ -181,6 +193,11 @@
   margin-bottom: 0.5rem;
 }
 
+.metric-icon-air-pump {
+  color: #06b6d4;  /* Cyan color for air pump */
+  margin-bottom: 0.5rem;
+}
+
 .metric-content {
   text-align: center;
 }
@@ -194,6 +211,14 @@
 }
 
 .metric-value {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #1F2937;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value.air-pump-value {
   font-size: 2.5rem;
   font-weight: 600;
   color: #1F2937;
@@ -229,6 +254,10 @@
 }
 
 .theme-dark .metric-value {
+  color: #F1F5F9;
+}
+
+.theme-dark .metric-value.air-pump-value {
   color: #F1F5F9;
 }
 

@@ -146,11 +146,26 @@ def send_report(hive_id, chat_id, username=None):
         logger.error(f"Error sending report: {e}")
         return False
 
-def run_scheduler(hive_id, chat_id, password, username=None):
+def run_scheduler(hive_id, chat_id, password, username=None, interval='24h'):
     global should_stop, data_received
     
+    # Parse interval
+    if interval == '15s':
+        sleep_seconds = 15
+        interval_text = "15 seconds"
+    elif interval == '1h':
+        sleep_seconds = 3600  # 1 hour in seconds
+        interval_text = "1 hour"
+    elif interval == '24h':
+        sleep_seconds = 86400  # 24 hours in seconds
+        interval_text = "24 hours"
+    else:
+        # Default to 24 hours if interval not recognized
+        sleep_seconds = 86400
+        interval_text = "24 hours (default)"
+    
     logger.info(f"Starting scheduler for hive {hive_id}")
-    logger.info(f"Settings: Sending reports every 1 minute")
+    logger.info(f"Settings: Sending reports every {interval_text}")
     
     # Initialize MQTT data collector
     mqtt_collector = MQTTDataCollector(password, hive_id)
@@ -158,19 +173,16 @@ def run_scheduler(hive_id, chat_id, password, username=None):
         logger.error("Failed to start MQTT data collector")
         return
     
-    # Fixed 1-minute interval (60 seconds)
-    sleep_seconds = 60
-    
     try:
         # Main loop
         while not should_stop:
-            logger.info(f"Waiting {sleep_seconds} seconds until next report...")
+            logger.info(f"Waiting {interval_text} until next report...")
             
             # Sleep in small increments to check for stop signal
             remaining = sleep_seconds
             while remaining > 0 and not should_stop:
-                time.sleep(min(1, remaining))
-                remaining -= 1
+                time.sleep(min(10, remaining))  # Sleep in 10-second chunks for better responsiveness
+                remaining -= 10
                 
             if should_stop:
                 break
@@ -192,6 +204,8 @@ def main():
     parser.add_argument('--chat_id', required=True, help='Telegram chat ID to send reports to')
     parser.add_argument('--password', required=True, help='Password for MQTT topics')
     parser.add_argument('--username', help='Username to include in the report')
+    parser.add_argument('--interval', default='24h', choices=['15s', '1h', '24h'], 
+                        help='Interval between reports: 15s (15 seconds), 1h (1 hour), or 24h (24 hours, default)')
     
     args = parser.parse_args()
     
@@ -209,7 +223,8 @@ def main():
             args.hive_id, 
             args.chat_id,
             args.password,
-            username=args.username
+            username=args.username,
+            interval=args.interval
         )
     except Exception as e:
         logger.error(f"Unhandled exception: {e}", exc_info=True)

@@ -407,7 +407,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
           <ul className="instructions-list">
             <li>Click on a hexagon to add a new hive or view existing hive details</li>
             <li>When a group is full, a new group can be added</li>
-            <li>Red-bordered hexagons with &ldquo;!&rdquo; indicate alerts that need attention</li>
             <li>Total hives: {hiveGroups.reduce((sum, group) => sum + group.hives.length, 0)}</li>
           </ul>
         </div>
