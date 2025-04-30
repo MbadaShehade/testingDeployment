@@ -21,4 +21,18 @@ if (process.env.NODE_ENV === 'development') {
   clientPromise = client.connect();
 }
 
+// Add the connectToDatabase function for API routes
+export async function connectToDatabase() {
+  try {
+    const client = await clientPromise;
+    const dbName = process.env.MONGODB_DB || 'MoldInBeehives';
+    const db = client.db(dbName);
+    console.log(`MongoDB connection successful to database: ${dbName}`);
+    return db;
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    throw error;
+  }
+}
+
 export default clientPromise; 

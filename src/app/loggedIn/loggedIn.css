@@ -331,27 +331,22 @@
 }
 
 
-.compare-hives-title{
-  font-size: 2rem;
-  font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719 34%, #5b5142 66%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  margin-top: 15rem;
 
+
+.scroll-down-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 32px 0 32px 0;
+  animation: arrow-bounce 2s infinite;
 }
-  
-.compare-hives-title.dark {
-  font-size: 2rem;
-  font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719 34%, #ffffff 66%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  margin-top: 15rem;
+
+@keyframes arrow-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(20px);
+  }
 }
+

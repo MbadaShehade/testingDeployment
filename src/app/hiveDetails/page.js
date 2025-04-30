@@ -26,6 +26,10 @@ import {
 } from 'chart.js';
 import { Chart } from 'chart.js/auto';
 import { MQTT_URL } from '../lib/mqtt-config';
+// Import the MQTT monitoring status checker
+import { checkMQTTMonitorStatus } from '@/app/lib/mqtt-helpers';
+// Import the timer storage utilities
+import { saveTimerState, loadTimerState, clearTimerState } from '@/app/lib/timerStorage';
 
 // Register ChartJS components
 ChartJS.register(
@@ -77,10 +81,14 @@ const HiveDetails = () => {
   const email = searchParams.get('email');
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+  const [airPumpDate, setAirPumpDate] = useState(null);
+  const [airPumpDuration, setAirPumpDuration] = useState(0);
+
   const [hiveData, setHiveData] = useState({
     name: `Hive ${hiveId}`,
     temperature: null,
-    humidity: null
+    humidity: null,
+    airPump: "OFF" // Add airPump property with default OFF
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [sending, setSending] = useState(false);
@@ -92,7 +100,313 @@ const HiveDetails = () => {
     humidity: null
   });
 
+
+  const [isAirPumpActive, setIsAirPumpActive] = useState(false);
+  const startTime = useRef(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const intervalIdRef = useRef(null);
+  const [airPumpActivations, setAirPumpActivations] = useState(() => {
+    // Try to load from localStorage as fallback
+    if (typeof window !== 'undefined') {
+      try {
+        const savedActivations = localStorage.getItem(`airPumpActivations_${hiveId}`);
+        if (savedActivations) {
+          return JSON.parse(savedActivations);
+        }
+      } catch (e) {
+        console.error('Error loading activations from localStorage:', e);
+      }
+    }
+    return [];
+  });
   
+  // Save activations to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && airPumpActivations.length > 0) {
+      try {
+        localStorage.setItem(`airPumpActivations_${hiveId}`, JSON.stringify(airPumpActivations));
+      } catch (e) {
+        console.error('Error saving activations to localStorage:', e);
+      }
+    }
+  }, [airPumpActivations, hiveId]);
+  
+  // Effect to monitor changes in airPump status from MQTT
+  useEffect(() => {
+    console.log(`Pump status change - isActive: ${isAirPumpActive}, pumpStatus: ${hiveData.airPump}`);
+    
+    if (hiveData.airPump === "ON" && !isAirPumpActive) {
+      console.log("Air pump turned ON - starting timer");
+      startTimer();
+    } else if (hiveData.airPump === "OFF" && isAirPumpActive) {
+      console.log("Air pump turned OFF - stopping timer");
+      stopTimer();
+    }
+  }, [hiveData.airPump, isAirPumpActive]);
+  
+  useEffect(() => {
+    // Fetch existing air pump activations on component mount
+    const fetchAirPumpActivations = async () => {
+      try {
+        console.log(`Fetching air pump activations for hiveId: ${hiveId}, email: ${encodeURIComponent(email)}`);
+        const response = await fetch(`/api/airpump?hiveId=${hiveId}&email=${encodeURIComponent(email)}`);
+        
+        console.log("API response status:", response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched air pump activations:", data);
+          if (data.activations && Array.isArray(data.activations)) {
+            console.log(`Retrieved ${data.activations.length} activations`);
+            setAirPumpActivations(data.activations);
+          } else {
+            console.warn("Invalid activations data:", data);
+            // Initialize with empty array if data is invalid
+            setAirPumpActivations([]);
+          }
+        } else {
+          try {
+            const errorText = await response.text();
+            console.error(`Error fetching activations: ${response.status} ${errorText}`);
+          } catch (textError) {
+            console.error(`Error reading error response: ${textError}`);
+          }
+          // Initialize with empty array on error
+          setAirPumpActivations([]);
+        }
+      } catch (error) {
+        console.error('Error fetching air pump activations:', error);
+        // Initialize with empty array on error
+        setAirPumpActivations([]);
+      }
+    };
+    
+    if (hiveId && email) {
+      fetchAirPumpActivations();
+    } else {
+      console.warn("Missing hiveId or email for activations fetch:", { hiveId, email });
+    }
+  }, [hiveId, email]);
+
+  // When component mounts, load saved timer state
+  useEffect(() => {
+    if (mounted && hiveId) {
+      const savedState = loadTimerState(hiveId);
+      
+      if (savedState && savedState.isActive) {
+        console.log("Restoring saved timer state:", savedState);
+        startTime.current = savedState.startTime;
+        setIsAirPumpActive(true);
+        setElapsedTime(savedState.elapsedTime);
+        setAirPumpDate(new Date(savedState.startTime));
+      }
+    }
+  }, [mounted, hiveId]);
+
+  // Modified startTimer function to save state
+  const startTimer = () => {
+    console.log("Starting air pump timer");
+    setIsAirPumpActive(true);
+    const now = new Date();
+    const startTimeMs = now.getTime();
+    startTime.current = startTimeMs;
+    setElapsedTime(0);
+    setAirPumpDate(now); // Save the activation start date
+    
+    // Save timer state to localStorage
+    saveTimerState(hiveId, true, startTimeMs, "ON");
+    
+    console.log("Timer started at:", now.toISOString());
+  }
+
+  // Modified stopTimer function to clear state
+  const stopTimer = () => {
+    console.log("Stopping air pump timer");
+    if (!isAirPumpActive) {
+      console.log("Timer not active, nothing to stop");
+      return;
+    }
+    
+    setIsAirPumpActive(false);
+    
+    // Get the stored airPumpDate or use a fallback
+    const startDate = airPumpDate || new Date(startTime.current);
+    console.log("Using start date:", startDate.toISOString());
+    
+    // Calculate final duration
+    const duration = Date.now() - startTime.current;
+    console.log("Timer duration:", duration, "ms");
+    setElapsedTime(duration);
+    
+    // Format for display and save to MongoDB
+    const formattedDuration = formatTimerOutput(duration);
+    const formattedDate = formatActivationDate(startDate);
+    
+    console.log("Saving activation with date:", formattedDate, "duration:", formattedDuration);
+    
+    // Clear timer state in localStorage
+    clearTimerState(hiveId);
+    
+    // Save to MongoDB
+    saveAirPumpActivation(formattedDate, formattedDuration);
+  }
+
+  const resetTimer = () => {
+    setIsAirPumpActive(false);
+    setElapsedTime(0);
+  }
+
+  const formatTimerOutput = (timeInMs) => {
+    let hours = Math.floor(timeInMs / (1000 * 60 * 60));
+    let minutes = Math.floor(timeInMs / (1000 * 60) % 60);
+    let seconds = Math.floor(timeInMs / (1000) % 60);
+
+    hours = hours.toString().padStart(2, '0');
+    minutes = minutes.toString().padStart(2, '0');
+    seconds = seconds.toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  }
+  
+  const formatActivationDate = (date) => {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+  
+  // Add back the formatTime function for displaying the current timer
+  const formatTime = () => {
+    let hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+    let minutes = Math.floor(elapsedTime / (1000 * 60) % 60);
+    let seconds = Math.floor(elapsedTime / (1000) % 60);
+
+    hours = hours.toString().padStart(2, '0');
+    minutes = minutes.toString().padStart(2, '0');
+    seconds = seconds.toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  }
+  
+  // Update the table display to handle the new activation format
+  const formatActivationForDisplay = (activation) => {
+    // Extract date and time for display
+    let dateOnly = '';
+    let timeOnly = '';
+    
+    if (activation.date) {
+      const dateParts = activation.date.split(' ');
+      dateOnly = dateParts[0];
+      timeOnly = dateParts.length > 1 ? dateParts[1] : '';
+    }
+    
+    return {
+      date: dateOnly,
+      time: timeOnly,
+      duration: activation.duration
+    };
+  };
+  
+  const saveAirPumpActivation = async (date, duration) => {
+    console.log("Saving air pump activation");
+    
+    if (!date || !duration) {
+      console.error("Missing required data for air pump activation:", { date, duration });
+      return;
+    }
+    
+    // Create the activation record
+    const activation = {
+      date,
+      duration,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Immediately update local state with the new activation
+    setAirPumpActivations(prev => [activation, ...prev]);
+    
+    // Save to localStorage for persistence
+    try {
+      const localActivations = [activation, ...airPumpActivations];
+      localStorage.setItem(`airPumpActivations_${hiveId}`, JSON.stringify(localActivations));
+    } catch (storageError) {
+      console.error("Error saving to localStorage:", storageError);
+    }
+    
+    // Only attempt to save to MongoDB if we have the required data
+    if (!hiveId || !email) {
+      console.error("Missing hiveId or email for MongoDB save:", { hiveId, email });
+      return;
+    }
+    
+    try {
+      const payload = {
+        hiveId: hiveId,
+        email: email,
+        username: searchParams.get('username'),
+        date: date,
+        duration: duration
+      };
+      
+      console.log("Sending payload to MongoDB:", payload);
+      
+      const response = await fetch('/api/airpump', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      console.log("Received response status:", response.status);
+      
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          console.log("Air pump activation saved to MongoDB:", data);
+        } catch (jsonError) {
+          console.error("Error parsing JSON response:", jsonError);
+        }
+      } else {
+        try {
+          const errorText = await response.text();
+          console.error("Server error saving air pump activation. Status:", response.status, "Error:", errorText);
+          try {
+            // Try to parse as JSON if possible
+            const errorData = JSON.parse(errorText);
+            console.error("Parsed error data:", errorData);
+          } catch (jsonError) {
+            // Not JSON, just log the text
+            console.error("Raw error response:", errorText);
+          }
+        } catch (textError) {
+          console.error("Could not read error response:", textError);
+        }
+      }
+    } catch (error) {
+      console.error('Network error saving air pump activation:', error);
+    }
+  }
+
+  // Update timer state when active status changes
+  useEffect(() => {
+    if (isAirPumpActive) {
+      intervalIdRef.current = setInterval(() => {
+        const currentElapsed = Date.now() - startTime.current;
+        setElapsedTime(currentElapsed);
+        
+        // Periodically update saved timer state (every 30 seconds)
+        if (currentElapsed % 30000 < 100) {
+          saveTimerState(hiveId, true, startTime.current, "ON");
+        }
+      }, 10);
+    } else {
+      clearInterval(intervalIdRef.current);
+    }
+    return () => clearInterval(intervalIdRef.current);
+  }, [isAirPumpActive, hiveId]);
 
   // Add state for showing success message
   const [successMessage, setSuccessMessage] = useState('');
@@ -332,7 +646,7 @@ const HiveDetails = () => {
           if (statusData.success && statusData.status === 'running') {
             // Scheduler is already running, set UI state accordingly
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
             return; // Exit early - no need to start scheduler
           }
@@ -348,19 +662,19 @@ const HiveDetails = () => {
               hiveId,
               chatId: data.telegramChatId,
               username: searchParams.get('username') || 'User',
-              interval: '1m'  // Set to 1 minute interval
+              interval: '24h'  // Set to 24 hours interval
             }),
           });
           
           const schedulerData = await response.json();
           if (schedulerData.success) {
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
           } else if (schedulerData.error === 'Scheduler already running') {
             // This is actually a successful state - the scheduler is already running
             setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every minute');
+            setStatusMessage('Reports are being sent automatically every 24 hours');
             setAutoReporting(true);
           } else {
             console.error('Failed to start automatic reporting:', schedulerData.error);
@@ -526,7 +840,8 @@ const HiveDetails = () => {
           action: 'start',
           hiveId,
           chatId: telegramChatId,
-          username: searchParams.get('username') || 'User'
+          username: searchParams.get('username') || 'User',
+          interval: '24h' // Set to 24 hours interval
         }),
       });
       
@@ -534,7 +849,7 @@ const HiveDetails = () => {
       
       if (data.success) {
         setAutoReporting(true);
-        setSuccessMessage('Automatic reporting started. You will receive PDF reports every minute.');
+        setSuccessMessage('Automatic reporting started. You will receive PDF reports every 24 hours.');
       } else {
         alert('Failed to start automatic reporting: ' + (data.error || 'Unknown error'));
       }
@@ -1449,6 +1764,7 @@ const HiveDetails = () => {
     // Define topics before MQTT setup
     const tempTopic = `${userPassword}/moldPrevention/hive${hiveId}/temp`;
     const humidityTopic = `${userPassword}/moldPrevention/hive${hiveId}/humidity`;
+    const airPumpTopic = `${userPassword}/moldPrevention/hive${hiveId}/airPump`; // Add air pump topic
 
     // MQTT client setup with WebSocket
     const client = mqtt.connect(MQTT_URL, {
@@ -1465,9 +1781,9 @@ const HiveDetails = () => {
         isConnected = true;
         
         // Subscribe to topics using the user's password as namespace
-        client.subscribe([tempTopic, humidityTopic], (err) => {
+        client.subscribe([tempTopic, humidityTopic, airPumpTopic], (err) => { // Add airPump subscription
             if (!err) {
-                console.log('Subscribed to topics:', tempTopic, humidityTopic);
+                console.log('Subscribed to topics:', tempTopic, humidityTopic, airPumpTopic);
             } else {
                 console.error('Failed to subscribe to topics:', err);
             }
@@ -1480,15 +1796,42 @@ const HiveDetails = () => {
         console.log('Received message on topic:', topic);
         console.log('Message content:', message.toString());
         
+        const now = new Date();
+        const currentTime = formatTime(now);
+        const currentDate = formatDate(now);
+
+        // Handle air pump status messages
+        if (topic === airPumpTopic) {
+            const status = message.toString();
+            console.log('Updating air pump status:', status);
+            
+            setHiveData(prev => ({ ...prev, airPump: status }));
+            
+            // Update timer state in localStorage
+            if (status === "ON") {
+                if (!isAirPumpActive) {
+                    // Don't override existing timer if already running
+                    // The useEffect will handle starting the timer
+                } else {
+                    // Update status for existing timer
+                    saveTimerState(hiveId, true, startTime.current, "ON");
+                }
+            } else {
+                // Status is OFF, timer will be cleared in the useEffect
+            }
+            
+            return;
+        }
+
+        
+
+        
+        // For temperature and humidity, parse as float
         const value = parseFloat(message.toString());
         if (isNaN(value)) {
             console.error('Received invalid numeric value:', message.toString());
             return;
         }
-
-        const now = new Date();
-        const currentTime = formatTime(now);
-        const currentDate = formatDate(now);
 
         // Now tempTopic and humidityTopic are in scope
         if (topic === tempTopic) {
@@ -2094,6 +2437,25 @@ const HiveDetails = () => {
     });
   };
 
+  // Add state for MQTT monitor status
+  const [monitorStatus, setMonitorStatus] = useState('checking');
+  
+  // Check MQTT monitor status when component mounts
+  useEffect(() => {
+    const checkMonitorStatus = async () => {
+      try {
+        const status = await checkMQTTMonitorStatus();
+        setMonitorStatus(status.status);
+        console.log('MQTT monitor status:', status);
+      } catch (error) {
+        console.error('Error checking MQTT monitor status:', error);
+        setMonitorStatus('error');
+      }
+    };
+    
+    checkMonitorStatus();
+  }, []);
+
   if (!mounted) return null;
 
   return (
@@ -2141,9 +2503,9 @@ const HiveDetails = () => {
                       : '--°C'
                     }
                   </div>
-                  <div className="metric-status optimal">
+                  <div className={`metric-status ${hiveData.temperature !== null && hiveData.temperature >= 26 && hiveData.temperature <= 38 ? 'optimal' : 'warning'}`}>
                     {hiveData.temperature !== null
-                      ? (hiveData.temperature >= 25 && hiveData.temperature <= 35 ? 'Optimal' : 'Warning')
+                      ? (hiveData.temperature >= 26 && hiveData.temperature <= 38 ? 'Optimal' : 'Warning')
                       : '--'
                     }
                   </div>
@@ -2164,12 +2526,42 @@ const HiveDetails = () => {
                       : '--%'
                     }
                   </div>
-                  <div className="metric-status optimal">
+                  <div className={`metric-status ${hiveData.humidity !== null && hiveData.humidity >= 76.5 && hiveData.humidity <= 85.6 ? 'optimal' : 'warning'}`}>
                     {hiveData.humidity !== null
-                      ? (hiveData.humidity >= 40 && hiveData.humidity <= 60 ? 'Optimal' : 'Warning')
+                      ? (hiveData.humidity >= 76.5 && hiveData.humidity <= 85.6 ? 'Optimal' : 'Warning')
                       : '--'
                     }
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* New Air Pump Metric Circle */}
+            <div className="metric-card air-pump">
+              <div className="metric-circle">
+                <div className="metric-icon-air-pump">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#B2BEC9"/>
+                    <path d="M12 5C13.5 5 14.5 6 14.5 7.5C14.5 9 13.5 10 12 10C10.5 10 9.5 9 9.5 7.5C9.5 6 10.5 5 12 5Z" fill="white"/>
+                    <path d="M12 14C13.5 14 14.5 15 14.5 16.5C14.5 18 13.5 19 12 19C10.5 19 9.5 18 9.5 16.5C9.5 15 10.5 14 12 14Z" fill="white"/>
+                    <path d="M5 12C5 10.5 6 9.5 7.5 9.5C9 9.5 10 10.5 10 12C10 13.5 9 14.5 7.5 14.5C6 14.5 5 13.5 5 12Z" fill="white"/>
+                    <path d="M14 12C14 10.5 15 9.5 16.5 9.5C18 9.5 19 10.5 19 12C19 13.5 18 14.5 16.5 14.5C15 14.5 14 13.5 14 12Z" fill="white"/>
+                    <circle cx="12" cy="12" r="2" fill="white"/>
+                  </svg>
+                </div>
+                <div className="metric-content">
+                  <h3>Air Pump</h3>
+                  <div className="metric-value air-pump-value">
+                    {hiveData.airPump || 'OFF'}
+                  </div>
+                  <div className={`metric-status ${hiveData.airPump === 'ON' ? 'optimal' : 'warning'}`}>
+                    {hiveData.airPump === 'ON' ? 'Active' : 'Inactive'}
+                  </div>
+                  {isAirPumpActive && (
+                    <div className="timer-display">
+                      Duration: {formatTime()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2264,6 +2656,49 @@ const HiveDetails = () => {
             setActiveDropdown={setActiveDropdown}
             handleExport={handleExport}
           />
+
+          {/* Air Pump Activations Table */}
+          <div className="air-pump-activations">
+            <h2 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Check last air pump activations</h2>
+            
+            {/* Remove the entire MQTT monitor status badge */}
+            
+            <div className="activation-table-container">
+              <table className="activation-log-table" style={{ padding: 0, margin: 0, borderSpacing: 0 }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'center' }}>Date</th>
+                    <th style={{ textAlign: 'center' }}>Time</th>
+                    <th style={{ textAlign: 'center' }}>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {airPumpActivations.length > 0 ? (
+                    airPumpActivations.map((activation, index) => {
+                      // Split date and time for display
+                      const dateParts = activation.date.split(' ');
+                      const dateOnly = dateParts[0];
+                      const timeOnly = dateParts.length > 1 ? dateParts[1] : '';
+                      
+                      return (
+                        <tr key={index}>
+                          <td style={{ textAlign: 'center' }}>{dateOnly}</td>
+                          <td style={{ textAlign: 'center' }}>{timeOnly}</td>
+                          <td style={{ textAlign: 'center' }}>{activation.duration}</td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={3} style={{ textAlign: 'center' }}>
+                        No air pump activations yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

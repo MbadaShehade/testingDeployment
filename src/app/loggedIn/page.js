@@ -7,7 +7,6 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import BeehiveManagement from '../components/ClientComponents/BeeHiveManagement/BeehiveManagement';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
-import HiveRankingSystem from '../components/ClientComponents/HiveRankingSystem/HiveRankingSystem';
 import './loggedIn.css';
 
 export default function LoggedInPage() {
@@ -197,6 +196,7 @@ export default function LoggedInPage() {
         setHiveGroups={setHiveGroups} 
       />
       
+      
       {showLogoutConfirm && (
         <div className="logout-modal-overlay" onClick={handleOverlayClick}>
           <div className="logout-modal">
@@ -227,9 +227,6 @@ export default function LoggedInPage() {
           </div>
         </div>
       )}
-
-      <h1 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Compare Your Hives: Insights & Analysis</h1>
-      <HiveRankingSystem hiveGroups={hiveGroups} />
     </div>
   );
 }

@@ -29,10 +29,11 @@
 .contact-item {
   display: flex;
   align-items: center;
+  margin-right: 1.5rem;
   gap: 8px;
   color: #000000;
   font-family: FreeMono, monospace;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
 }
 
 .contact-icon {

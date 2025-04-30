@@ -25,12 +25,21 @@ export default function SideFlowers({pathname}) {
                         <Image src={leftSideFlower} className="leftSideFlowerLogin" alt="leftSideFlower" draggable={false} />
                     </>
                 )} 
-                {(pathname === '/loggedIn' || pathname === '/hiveDetails') && (
+                {pathname === '/loggedIn' && (
                     <>
                         <Image src={leftSideFlower} className="leftSideFlowerLoggedIn" alt="leftSideFlower" draggable={false} />
                         <Image src={rightSideFlower} className="rightSideFlowerLoggedIn" alt="rightSideFlower" draggable={false} />
-                        <Image src={leftSideFlower} className="leftSideFlowerLoggedIn2" alt="leftSideFlower" draggable={false} />
-                        <Image src={rightSideFlower} className="rightSideFlowerLoggedIn2" alt="rightSideFlower" draggable={false} />
+                    </>
+                )}
+
+                {pathname === '/hiveDetails' && (
+                    <>
+                        <Image src={leftSideFlower} className="leftSideFlowerHiveDetails" alt="leftSideFlower" draggable={false} />
+                        <Image src={rightSideFlower} className="rightSideFlowerHiveDetails" alt="rightSideFlower" draggable={false} />
+                        <Image src={leftSideFlower} className="leftSideFlowerHiveDetails2" alt="leftSideFlower" draggable={false} />
+                        <Image src={rightSideFlower} className="rightSideFlowerHiveDetails2" alt="rightSideFlower" draggable={false} />
+                        <Image src={leftSideFlower} className="leftSideFlowerHiveDetails3" alt="leftSideFlower" draggable={false} />
+
                     </>
                 )}
             </div>

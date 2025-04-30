@@ -76,7 +76,7 @@
     .rightSideFlowerLoggedIn {
       position: absolute;
       right: 0;
-      top: 850px;
+      top: 995px;
       width: 100px;
       height: 300px;
       z-index: 5;
@@ -90,20 +90,41 @@
       z-index: 5;
     }
 
-    .rightSideFlowerLoggedIn2 {
+    .leftSideFlowerHiveDetails {
+      position: absolute;
+      left: 0;
+      top: 200px;
+      width: 100px;
+      height: 300px;
+    }
+    .rightSideFlowerHiveDetails {
       position: absolute;
       right: 0;
-      top: 2200px; 
+      top: 995px;
       width: 100px;
       height: 300px;
       z-index: 5;
     }
-    .leftSideFlowerLoggedIn2 {
+
+    .leftSideFlowerHiveDetails2 {
       position: absolute;
       left: 0;
-      top: 1600px;
+      top: 1690px;
       width: 100px;
       height: 300px;
-      z-index: 5;
-    } 
+    }
+    .rightSideFlowerHiveDetails2 {
+      position: absolute;
+      right: 0;
+      top: 2500px;
+      width: 100px;
+      height: 300px;
+    }
+    .leftSideFlowerHiveDetails3 {
+      position: absolute;
+      left: 0;
+      top: 2870px;
+      width: 100px;
+      height: 300px;
+    }
 }  

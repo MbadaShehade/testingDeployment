@@ -405,9 +405,9 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         <div className="instructions-card">
           <h2 className="instructions-title">How to use:</h2>
           <ul className="instructions-list">
+            <li>You need to set up sensors in your hive to view temperature and humidity data</li>
             <li>Click on a hexagon to add a new hive or view existing hive details</li>
             <li>When a group is full, a new group can be added</li>
-            <li>Red-bordered hexagons with &ldquo;!&rdquo; indicate alerts that need attention</li>
             <li>Total hives: {hiveGroups.reduce((sum, group) => sum + group.hives.length, 0)}</li>
           </ul>
         </div>

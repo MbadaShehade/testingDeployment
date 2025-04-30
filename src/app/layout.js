@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Footer from "./components/ServerComponents/Footer/Footer";
+import { fetchServerMQTTMonitor } from './lib/mqtt-helpers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,9 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // Initialize MQTT monitoring service on server
+  fetchServerMQTTMonitor();
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
