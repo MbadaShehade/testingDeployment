@@ -142,7 +142,7 @@
 .metric-card.temperature .metric-circle {
   box-shadow: 0 4px 6px rgba(171, 25, 6, 0.2);  /* Temperature color shadow */
   transition: box-shadow 0.3s ease;
-  border: 2px solid #ab1906;  /* Add red border color */
+  border: 2px solid #902017;  /* Add red border color */
 }
 
 .metric-card.temperature .metric-circle:hover {
@@ -152,7 +152,7 @@
 .metric-card.humidity .metric-circle {
   box-shadow: 0 4px 6px rgba(0, 115, 255, 0.2);  /* Humidity color shadow */
   transition: box-shadow 0.3s ease;
-  border: 2px solid #0073ff;  /* Add blue border color */
+  border: 2px solid #0CA7E8;  /* Add blue border color */
 }
 
 .metric-card.humidity .metric-circle:hover {
@@ -200,6 +200,10 @@
 
 .metric-content {
   text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .metric-content h3 {
@@ -1411,8 +1415,294 @@
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Activation Log Table Styles */
+.activation-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.activation-log-table th {
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activation-log-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.theme-dark .activation-log-table th {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.activation-log-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.theme-dark .activation-log-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Remove bottom border from last row */
+.activation-log-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Fix header positioning */
+.activation-log-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Fix table container spacing */
+.air-pump-activations {
+  width: 100%;
+  padding: 20px 20px 10px 20px;
+  margin-bottom: 24px;
+}
+
+.activation-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Keep these air pump activation styles */
+.air-pump-activations {
+  width: 100%;
+  margin-top: 30px;
+  padding: 0 20px;
+  margin-bottom: 40px;
+}
+
+.air-pump-activations .compare-hives-title {
+  font-size: 2rem;
+  font-family: FreeMono, monospace;
+  background: linear-gradient(to right, #ba6719 34%, #5b5142 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.air-pump-activations .compare-hives-title.dark {
+  background: linear-gradient(to right, #ba6719 34%, #ffffff 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.air-pump-activations .activation-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  margin-bottom: 30px;
+}
+
+.air-pump-activations .activation-log-table th,
+.air-pump-activations .activation-log-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  color: #333333;
+}
+
+.air-pump-activations .activation-log-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.theme-dark .air-pump-activations .activation-log-table {
+  background-color: #1E293B;
+}
+
+.theme-dark .air-pump-activations .activation-log-table th {
+  background-color: #334155;
+  color: #f3f4f6;
+}
+
+.theme-dark .air-pump-activations .activation-log-table td {
+  color: #f3f4f6;
+  border-bottom: 1px solid #4b5563;
+}
+
+.air-pump-activations .activation-log-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.air-pump-activations .activation-log-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+.theme-dark .air-pump-activations .activation-log-table tbody tr:hover {
+  background-color: #2d3748;
+}
+
+/* Add styles for the sensor setup notification */
+.sensor-setup-notification {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  margin: 20px 0;
+  border-radius: 8px;
+  background-color: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+  font-family: FreeMono, monospace;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-dark .sensor-setup-notification {
+  background-color: #292524;
+  border-left: 4px solid #f59e0b;
+  color: #fbbf24;
+}
+
+.timer-display {
+  margin-top: 10px;
+  padding: 6px 0;
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #06B6A5;
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.theme-dark .timer-display {
+  color: #4fd1c5;
+}
+
+/* Styling for the air pump activations table with scrolling */
+.air-pump-activations {
+  width: 100%;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.activation-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+/* Add a container for the scrollable table */
+.activation-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  position: relative;
+}
+
+/* Make the table header sticky */
+.activation-log-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+}
+
+/* Make table fill the entire container */
+.activation-log-table thead th,
+.activation-log-table tbody td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  margin: 0;
+}
+
+/* Remove bottom border from last row */
+.activation-log-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Improved scrollbar styling for the table container */
+.activation-table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.activation-table-container::-webkit-scrollbar-track {
+  background: rgba(241, 241, 241, 0.1);
+  border-radius: 10px;
+  margin: 5px 0;
+}
+
+.activation-table-container::-webkit-scrollbar-thumb {
+  background: #ba6719;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.3s;
+}
+
+.activation-table-container::-webkit-scrollbar-thumb:hover {
+  background: #ce8644;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.theme-dark .activation-table-container::-webkit-scrollbar-track {
+  background: rgba(29, 38, 54, 0.4);
+}
+
+.theme-dark .activation-table-container::-webkit-scrollbar-thumb {
+  background: #ba6719;
+}
+
+.theme-dark .activation-table-container::-webkit-scrollbar-thumb:hover {
+  background: #ce8644;
+}
+
+/* Firefox scrollbar styling */
+.activation-table-container {
+  scrollbar-width: thin;
+  scrollbar-color: #ba6719 transparent;
+}
+
+/* Improve activation table styling */
+.activation-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  position: relative;
+}
+
+.theme-dark .activation-table-container {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 

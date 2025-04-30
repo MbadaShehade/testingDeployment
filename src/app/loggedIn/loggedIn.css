@@ -331,30 +331,7 @@
 }
 
 
-.compare-hives-title{
-  font-size: 2rem;
-  font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719 34%, #5b5142 66%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  margin-top: 15rem;
 
-}
-  
-.compare-hives-title.dark {
-  font-size: 2rem;
-  font-family: FreeMono, monospace;
-  background: linear-gradient(to right, #ba6719 34%, #ffffff 66%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  margin-top: 15rem;
-}
 
 .scroll-down-arrow {
   display: flex;
@@ -373,45 +350,3 @@
   }
 }
 
-/* Activation Log Table Styles */
-.activation-log-table {
-  width: 80%;
-  margin: 32px auto 0 auto;
-  border-collapse: collapse;
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-.activation-log-table th, .activation-log-table td {
-  padding: 12px 18px;
-  text-align: left;
-}
-.activation-log-table th {
-  background: #ce8644;
-  color: #fff;
-  font-weight: 600;
-  font-size: 1.1em;
-}
-.activation-log-table tr {
-  border-bottom: 1px solid #333;
-}
-.activation-log-table tr:nth-child(even) {
-  background: rgba(206,134,68,0.07);
-}
-.activation-log-table td {
-  color: #f3e9d2;
-  font-size: 1em;
-}
-
-/* Light theme overrides */
-.light .activation-log-table th {
-  background: #f3e9d2;
-  color: #ce8644;
-}
-.light .activation-log-table td {
-  color: #333;
-}
-.light .activation-log-table tr:nth-child(even) {
-  background: #fff7ed;
-}

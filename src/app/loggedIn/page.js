@@ -196,11 +196,6 @@ export default function LoggedInPage() {
         setHiveGroups={setHiveGroups} 
       />
       
-      <div className="scroll-down-arrow">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14m0 0l-6-6m6 6l6-6" stroke="#ce8644" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </div>
       
       {showLogoutConfirm && (
         <div className="logout-modal-overlay" onClick={handleOverlayClick}>
@@ -232,25 +227,6 @@ export default function LoggedInPage() {
           </div>
         </div>
       )}
-
-      <h1 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Check last air pump activations</h1>
-
-      <table className="activation-log-table">
-        <thead>
-          <tr>
-            <th>Hive</th>
-            <th>Activation Time</th>
-            <th>Duration (seconds)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colSpan={3} style={{ textAlign: 'center', color: '#aaa' }}>
-              No air pump activations yet.
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   );
 }
