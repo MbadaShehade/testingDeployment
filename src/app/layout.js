@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Footer from "./components/ServerComponents/Footer/Footer";
-import { fetchServerMQTTMonitor } from './lib/mqtt-helpers';
+import { fetchServerMQTTMonitor } from './_lib/mqtt-helpers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

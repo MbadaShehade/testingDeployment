@@ -6,10 +6,24 @@ from dotenv import load_dotenv
 from hive_pdf import create_hive_report_pdf
 import base64
 import datetime
+from pymongo import MongoClient
 
 # Load environment variables
 load_dotenv('.env.local')
 
+# MongoDB connection
+MONGODB_URI = os.getenv('MONGODB_URI')
+DB_NAME = 'MoldInBeehives'
+
+# Connect to MongoDB
+def get_mongodb_connection():
+    try:
+        client = MongoClient(MONGODB_URI)
+        db = client[DB_NAME]
+        return db
+    except Exception as e:
+        print(f"MongoDB connection error: {e}")
+        return None
 
 def send_telegram_message(message, user_chat_id=None):
     bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -37,34 +51,61 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
     # Use provided chat_id or fall back to default from .env
     chat_id = user_chat_id or os.getenv('TELEGRAM_CHAT_ID')
     
-    # If send_now is True, we need to fetch the latest data
+    # If send_now is True or temperature/humidity not provided, we need to fetch the latest data
     if send_now or temperature is None or humidity is None:
         print(f"Getting real-time data for hive {hive_id}...")
-        # Try to read from a locally stored JSON file (if it exists)
+        
+        # Try to get data from MongoDB first
         try:
-            with open(f'hive_data_{hive_id}.json', 'r') as f:
-                hive_data = json.load(f)
-                # Only use file data if the direct parameters aren't set
+            db = get_mongodb_connection()
+            if db:
+                # Find the most recent data for this hive
+                hive_data_collection = db['hive_data']
+                latest_data = hive_data_collection.find_one(
+                    {"hiveId": hive_id},
+                    sort=[("timestamp", -1)]
+                )
+                
+                if latest_data:
+                    # Only use database data if direct parameters aren't set
+                    if temperature is None:
+                        temperature = latest_data.get('temperature', 33.8)
+                        print(f"Loaded temperature from database: {temperature}°C")
+                    if humidity is None:
+                        humidity = latest_data.get('humidity', 58.2)
+                        print(f"Loaded humidity from database: {humidity}%")
+                else:
+                    print("No data found in MongoDB for this hive")
+            else:
+                print("Could not connect to MongoDB")
+        except Exception as e:
+            print(f"Error fetching data from MongoDB: {e}")
+            
+            # Fallback to JSON file if MongoDB fails
+            try:
+                with open(f'hive_data_{hive_id}.json', 'r') as f:
+                    hive_data = json.load(f)
+                    # Only use file data if the direct parameters aren't set
+                    if temperature is None:
+                        temperature = hive_data.get('temperature', 33.8)
+                        print(f"Loaded temperature from file: {temperature}°C")
+                    if humidity is None:
+                        humidity = hive_data.get('humidity', 58.2)
+                        print(f"Loaded humidity from file: {humidity}%")
+            except FileNotFoundError:
+                # Fall back to default values only if parameters weren't passed in
                 if temperature is None:
-                    temperature = hive_data.get('temperature', 33.8)
-                    print(f"Loaded temperature from file: {temperature}°C")
+                    temperature = 24.9  # Better default matching real data
+                    print(f"Using default temperature: {temperature}°C")
                 if humidity is None:
-                    humidity = hive_data.get('humidity', 58.2)
-                    print(f"Loaded humidity from file: {humidity}%")
-        except FileNotFoundError:
-            # Fall back to default values only if parameters weren't passed in
-            if temperature is None:
-                temperature = 24.9  # Better default matching real data
-                print(f"Using default temperature: {temperature}°C")
-            if humidity is None:
-                humidity = 77.6  # Better default matching real data
-                print(f"Using default humidity: {humidity}%")
-        except json.JSONDecodeError as e:
-            print(f"Error parsing hive data file: {e}")
-            if temperature is None:
-                temperature = 24.9
-            if humidity is None:
-                humidity = 77.6
+                    humidity = 77.6  # Better default matching real data
+                    print(f"Using default humidity: {humidity}%")
+            except json.JSONDecodeError as e:
+                print(f"Error parsing hive data file: {e}")
+                if temperature is None:
+                    temperature = 24.9
+                if humidity is None:
+                    humidity = 77.6
     
     # Log values being used for debugging
     print(f"Final values for PDF - Temperature: {temperature}°C, Humidity: {humidity}%")
@@ -110,8 +151,13 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
             temperature_image = None
             humidity_image = None
     
+    # Generate a unique filename based on hive ID and timestamp to avoid conflicts
+    timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    pdf_filename = f"hive_report_{hive_id}_{timestamp}.pdf"
+    
     # Generate the PDF file with actual hive data
     pdf_path = create_hive_report_pdf(
+        filename=pdf_filename,
         hive_id=hive_id, 
         temperature=temperature, 
         humidity=humidity,
@@ -124,6 +170,7 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
     
     # Send the PDF
     url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+    success = False
     
     try:
         with open(pdf_path, 'rb') as pdf_file:
@@ -137,14 +184,22 @@ def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_i
             
             if response.status_code == 200:
                 print("PDF sent successfully!")
-                return True
+                success = True
             else:
                 print(f"Failed to send PDF. Status code: {response.status_code}")
                 print(f"Response: {response.text}")
-                return False
     except Exception as e:
         print(f"An error occurred while sending PDF: {e}")
-        return False
+    
+    # Clean up - delete the PDF file now that it's been sent
+    try:
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+            print(f"Deleted temporary PDF file: {pdf_path}")
+    except Exception as e:
+        print(f"Failed to delete PDF file: {e}")
+    
+    return success
 
 
 if __name__ == "__main__":

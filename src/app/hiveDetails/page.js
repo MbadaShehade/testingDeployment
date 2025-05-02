@@ -25,11 +25,11 @@ import {
   Filler
 } from 'chart.js';
 import { Chart } from 'chart.js/auto';
-import { MQTT_URL } from '../lib/mqtt-config';
+import { MQTT_URL } from '../_lib/mqtt-config';
 // Import the MQTT monitoring status checker
-import { checkMQTTMonitorStatus } from '@/app/lib/mqtt-helpers';
+import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
 // Import the timer storage utilities
-import { saveTimerState, loadTimerState, clearTimerState } from '@/app/lib/timerStorage';
+import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
 
 // Register ChartJS components
 ChartJS.register(
@@ -912,7 +912,8 @@ const HiveDetails = () => {
         body: JSON.stringify({
           hiveId: hiveId,
           temperature: hiveData.temperature,
-          humidity: hiveData.humidity
+          humidity: hiveData.humidity,
+          email: email // Add email to associate with the user
         }),
       });
       
@@ -936,19 +937,6 @@ const HiveDetails = () => {
         setSending(false);
         return;
       }
-      
-      // SAVE CHART IMAGES TO SERVER so the scheduler can use them
-      await fetch('/api/save-chart-images', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          hiveId: hiveId,
-          temperature_image: temperatureImage,
-          humidity_image: humidityImage
-        }),
-      });
       
       // Get username from URL parameters
       const username = searchParams.get('username') || 'User';
@@ -990,11 +978,11 @@ const HiveDetails = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      if (!autoReporting) {
-        alert('Error sending Telegram message. Please try again later.');
-      }
+      setSending(false);
+      alert('Failed to send report. Please try again later.');
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   // Modify handleSendTelegram to use the sendReport function
@@ -2106,34 +2094,6 @@ const HiveDetails = () => {
       }
     };
   }, [hiveId, searchParams]);
-
-  // Function to fetch fresh hive data
-  const fetchHiveData = async () => {
-    try {
-      const response = await fetch('/api/beehive/fetchHiveData', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          hiveId: hiveId,
-          email: searchParams.get('email')
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch hive data');
-      }
-
-      const data = await response.json();
-      setHiveData(data);
-      setHistoricalData(data.historicalData || historicalData);
-      setSummaryData(data.summaryData || summaryData);
-      setAnalysisData(data.analysisData || analysisData);
-    } catch (error) {
-      console.error('Error fetching hive data:', error);
-    }
-  };
 
   // Add effect to update displays when historicalMaximums changes
   useEffect(() => {

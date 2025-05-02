@@ -2,7 +2,6 @@
 import './Navigation.css';
 import { useState, useEffect, useRef } from 'react';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
-import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import { useRouter, usePathname } from 'next/navigation';
 
 export default function Navigation({ isLoggedIn, hiveDetails }) {
@@ -51,52 +50,29 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       }
     };
 
-    //event listener to close menu when clicking outside
     document.addEventListener('mousedown', handleClickOutside);
-
+    
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [menuOpen]);
-
-  const handleSmoothScroll = async (e, targetId) => {
-    e.preventDefault();
-    
-    // If we're not on the home page, navigate to home page with hash
-    if (pathname !== '/') {
-      // Store the target section in sessionStorage
-      sessionStorage.setItem('scrollTarget', targetId);
-      await router.push('/');
-      
-      // After navigation, check for stored target and scroll
-      const element = document.getElementById(targetId);
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
-          // Clear the stored target
-          sessionStorage.removeItem('scrollTarget');
-        }, 350);
-      }
-      
-      if (menuOpen) {
-        setMenuOpen(false);
-      }
-      return;
-    }
-    
-    // If we're already on the home page, just scroll to the element
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      if (menuOpen) {
-        setMenuOpen(false);
-      }
-    }
-  };
+  }, [menuOpen, router, pathname]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const handleSmoothScroll = (e, id) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    
+    const targetElement = document.getElementById(id);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
+      
+      // Update URL without page reload, for bookmarking
+      window.history.pushState(null, '', `#${id}`);
+    }
   };
 
   return (
@@ -106,14 +82,12 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
           {windowWidth <= 700 ? (
             <>
               <div className="mobile-header-controls">
-                <LanguageSelector />
                 <ThemeToggle />
               </div>
             </>
           ) : (
             <>
               <div className="header-controls">
-                <LanguageSelector />
                 <ThemeToggle />
               </div>
             </>
@@ -140,7 +114,6 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
                     </ul>
                   </nav>
                   <div className="mobile-header-controls">
-                    <LanguageSelector />
                     <ThemeToggle />
                   </div>
                 </div>
@@ -155,7 +128,6 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
                 </ul>
               </nav>
               <div className="header-controls">
-                <LanguageSelector />
                 <ThemeToggle />
               </div>
             </>

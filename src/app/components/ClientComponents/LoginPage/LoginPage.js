@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -21,9 +20,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [resetStep, setResetStep] = useState(1); 
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [resetError, setResetError] = useState('');
   const modalRef = useRef(null);
   const router = useRouter();
-  
   const { theme } = useTheme();
 
   // Only show the UI after mounting to avoid hydration mismatch
@@ -37,9 +39,7 @@ export default function LoginPage() {
       if (showForgotPassword && 
           modalRef.current && 
           !modalRef.current.contains(event.target)) {
-        setShowForgotPassword(false);
-        setResetEmailSent(false);
-        setResetEmail('');
+        resetPasswordModal();
       }
     };
 
@@ -49,19 +49,16 @@ export default function LoginPage() {
     };
   }, [showForgotPassword]);
 
-  // Function to determine if input is email or phone
-  const detectInputType = (value) => {
-    // Simple regex for email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (emailRegex.test(value)) {
-      setLoginMethod('email');
-      setEmail(value);
-    } else {
-      // Still updating the contact info, but not setting a specific type yet
-      setLoginMethod('');
-      setEmail('');
-    }
+  // Reset password modal to initial state
+  const resetPasswordModal = () => {
+    setShowForgotPassword(false);
+    setResetEmailSent(false);
+    setResetEmail('');
+    setResetStep(1);
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setResetError('');
+    setIsLoading(false);
   };
 
   const handleSubmit = async (e) => {
@@ -143,22 +140,90 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log('Sign in with Google clicked');
-    // TO DO: Google OAuth authentication implementation
+  const verifyEmail = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setIsLoading(true);
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(resetEmail)) {
+      setResetError('Please enter a valid email address');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'verifyEmail',
+          email: resetEmail,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Email verification failed');
+      }
+
+      setIsLoading(false);
+      // Move to next step
+      setResetStep(2);
+    } catch (err) {
+      setIsLoading(false);
+      setResetError(err.message || 'Email not found in our database');
+    }
   };
 
-  const handleForgotPassword = (e) => {
+  const handlePasswordReset = async (e) => {
     e.preventDefault();
-    console.log('Password reset requested for:', resetEmail);
-    // TO DO: call an API to send a password reset email
-    setResetEmailSent(true);
-    // Reset the form after 3 seconds and close the modal
-    setTimeout(() => {
-      setResetEmailSent(false);
-      setShowForgotPassword(false);
-      setResetEmail('');
-    }, 3000);
+    setResetError('');
+    setIsLoading(true);
+
+    if (newPassword !== confirmNewPassword) {
+      setResetError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password
+    // Removed password length validation as requested
+
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'resetPassword',
+          email: resetEmail,
+          newPassword: newPassword,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Password reset failed');
+      }
+
+      setIsLoading(false);
+      setResetEmailSent(true);
+      
+      // Reset the form after 3 seconds and close the modal
+      setTimeout(() => {
+        resetPasswordModal();
+      }, 3000);
+    } catch (err) {
+      setIsLoading(false);
+      setResetError(err.message);
+    }
   };
 
   if (!mounted) return null;
@@ -193,27 +258,6 @@ export default function LoginPage() {
           <h1 className="login-title">Account Access</h1>
           
           {error && <div className="error-message">{error}</div>}
-          
-          {/* Google Sign In Button */}
-          <button 
-            type="button" 
-            className="google-sign-in-button"
-            onClick={handleGoogleSignIn}
-          >
-            <div className="google-icon-wrapper">
-              <svg className="google-icon" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-            </div>
-            <span className="google-button-text">Sign in with Google</span>
-          </button>
-          
-          <div className="separator">
-            <span>or</span>
-          </div>
           
           <div className="login-tabs">
             <button 
@@ -368,21 +412,23 @@ export default function LoginPage() {
           <div className="modal-content" ref={modalRef}>
             <button 
               className="modal-close"
-              onClick={() => {
-                setShowForgotPassword(false);
-                setResetEmailSent(false);
-                setResetEmail('');
-              }}
+              onClick={resetPasswordModal}
             >
               &times;
             </button>
             <h2 className="modal-title">Reset Password</h2>
             
-            {!resetEmailSent ? (
-              <form onSubmit={handleForgotPassword} className="reset-form">
+            {resetEmailSent ? (
+              <div className="success-message">
+                <p>Password successfully updated!</p>
+                <p className="small-text">You can now login with your new password.</p>
+              </div>
+            ) : resetStep === 1 ? (
+              <form onSubmit={verifyEmail} className="reset-form">
                 <p className="modal-description">
                   Enter your email address and we&apos;ll send you instructions to reset your password.
                 </p>
+                {resetError && <div className="error-message">{resetError}</div>}
                 <div className="form-group">
                   <label htmlFor="resetEmail" className="form-label">
                     Email
@@ -398,14 +444,47 @@ export default function LoginPage() {
                   />
                 </div>
                 <button type="submit" className="submit-button">
-                  Send Reset Link
+                  Continue
                 </button>
               </form>
             ) : (
-              <div className="success-message">
-                <p>Password reset link has been sent to your email!</p>
-                <p className="small-text">Please check your inbox and follow the instructions.</p>
-              </div>
+              <form onSubmit={handlePasswordReset} className="reset-form">
+                <p className="modal-description">
+                  Enter your new password.
+                </p>
+                {resetError && <div className="error-message">{resetError}</div>}
+                <div className="form-group">
+                  <label htmlFor="newPassword" className="form-label">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="confirmNewPassword" className="form-label">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmNewPassword"
+                    placeholder="Confirm new password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </div>
+                <button type="submit" className="submit-button">
+                  Update Password
+                </button>
+              </form>
             )}
           </div>
         </div>

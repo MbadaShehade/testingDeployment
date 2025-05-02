@@ -1,3 +1,82 @@
-.next/
-node_modules/
-.env.local
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Hive data files
+hive_data_*.json
+
+# PDF reports
+hive_report*.pdf
+
+# Chart files
+*_chart_*.b64
+
+# Process ID files
+*.pid
+scheduler_*.pid
+
+# Log files
+*.log
+*_scheduler.log
+*_scheduler_mqtt.log
+scheduler_manager.log
+telegram_scheduler.log
+
+# Runtime artifacts
+nohup.out

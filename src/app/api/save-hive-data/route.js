@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { exec } from 'child_process';
+import { connectToDatabase } from '@/app/_lib/mongodb';
 
 export async function POST(request) {
   try {
     // Get data from request body
     const data = await request.json();
-    const { hiveId, temperature, humidity } = data;
+    const { hiveId, temperature, humidity, email } = data;
     
     if (!hiveId) {
       return NextResponse.json({ 
@@ -18,45 +16,29 @@ export async function POST(request) {
     
     // Create data object to save
     const hiveData = {
+      hiveId,
       temperature: temperature || null,
       humidity: humidity || null,
-      timestamp: new Date().toISOString()
+      email: email || null,
+      timestamp: new Date()
     };
     
-    // Convert to JSON string
-    const jsonData = JSON.stringify(hiveData, null, 2);
+    // Connect to MongoDB
+    const db = await connectToDatabase();
+    const hiveDataCollection = db.collection('hive_data');
     
-    // Define the file path - we need to save it to the root directory
-    // where the Python script will look for it
-    const filePath = `hive_data_${hiveId}.json`;
+    // Update or insert data for this hive
+    await hiveDataCollection.updateOne(
+      { hiveId: hiveId }, 
+      { $set: hiveData },
+      { upsert: true }
+    );
     
-    // Use a simple shell command to write the file to the root directory
-    // since Next.js API routes run in a different context
-    const escapedJson = jsonData.replace(/'/g, "\\'");
-    const cmd = `echo '${escapedJson}' > ${filePath}`;
+    console.log(`Hive data saved to MongoDB for hive ${hiveId}`);
     
-    return new Promise((resolve) => {
-      exec(cmd, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error saving hive data: ${error.message}`);
-          resolve(NextResponse.json({ 
-            success: false, 
-            message: `Failed to save hive data: ${error.message}` 
-          }, { status: 500 }));
-          return;
-        }
-        
-        if (stderr) {
-          console.error(`Error output: ${stderr}`);
-        }
-        
-        console.log(`Hive data saved to ${filePath}`);
-        
-        resolve(NextResponse.json({ 
-          success: true, 
-          message: 'Hive data saved successfully' 
-        }));
-      });
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Hive data saved successfully to database' 
     });
     
   } catch (error) {

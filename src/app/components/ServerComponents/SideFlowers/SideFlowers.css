@@ -57,7 +57,7 @@
     .rightSideFlowerLogin {
       position: absolute;
       right: 0;
-      top: 580px;
+      top: 530px;
       width: 100px;
       height: 300px;
       z-index: 5;
@@ -66,7 +66,7 @@
     .leftSideFlowerLogin {
       position: absolute;
       left: 0;
-      top: 130px;
+      top: 140px;
       width: 100px;
       height: 300px;
       z-index: 5;

@@ -1,3 +1,0 @@
-This is a test file to confirm Git push is working correctly.
-Repository: MbadaShehade/testingDeployment
-Date: June 2024 

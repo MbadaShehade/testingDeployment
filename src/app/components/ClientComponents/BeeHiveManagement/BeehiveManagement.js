@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import  './BeehiveManagement.css';
@@ -27,7 +26,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     setMounted(true);
   }, []);
 
-  // Function to add a new hive
   const addHive = async (groupId, hexIndex) => {
     // Check if this position already has a hive in the current state
     const existingHive = hiveGroups.find(g => g.id === groupId)?.hives.find(h => h.position === hexIndex);
@@ -40,21 +38,16 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     setShowAddHiveConfirm(true);
   };
 
-  // Function to handle confirmed hive addition
   const handleConfirmAddHive = async () => {
     const { groupId, hexIndex } = pendingHiveAdd;
     
     // Calculate total hives across all groups for unique ID and naming
     const totalHives = hiveGroups.reduce((sum, g) => sum + g.hives.length, 0);
     
-    // Create a new hive
     const newHive = {
       id: totalHives + 1,
       name: `Hive ${totalHives + 1}`,
       position: hexIndex,
-      hasAlert: false,
-      temperature: null,
-      humidity: null,
     };
     
     try {
@@ -100,7 +93,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     }
   };
 
-  // Function to handle canceling hive addition
   const handleCancelAddHive = () => {
     setShowAddHiveConfirm(false);
     setPendingHiveAdd(null);
@@ -177,14 +169,13 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         if (isNaN(value)) return;
 
         if (topic.endsWith('/temp')) {
-          tempValue = value;  // Store temperature value
+          tempValue = value;  
           initialDataReceived.temperature = true;
         } else if (topic.endsWith('/humidity')) {
-          humidityValue = value;  // Store humidity value
+          humidityValue = value;  
           initialDataReceived.humidity = true;
         }
 
-        // If we have both temperature and humidity data
         if (initialDataReceived.temperature && initialDataReceived.humidity) {
           clearTimeout(timeout);
           client.end();
@@ -192,14 +183,13 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
           // Store the initial data with correct values
           localStorage.setItem(`hiveData_${hive.id}`, JSON.stringify({
             data: {
-              temperature: tempValue,    // Use stored temperature
-              humidity: humidityValue,   // Use stored humidity
+              temperature: tempValue,    
+              humidity: humidityValue,   
               name: `Hive ${hive.id}`
             },
             timestamp: Date.now()
           }));
 
-          // Navigate to hive details
           router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(userPassword)}`);
         }
       });
@@ -221,23 +211,15 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     }
   };
     
-  // Check if a group is full (all positions have hives)
   const isGroupFull = (group) => {
-    return group.hives.length >= 7; // 7 hexagons per group
-  };
-  
-  // Get total alerts count
-  const getTotalAlerts = () => {
-    return hiveGroups.reduce((sum, group) => {
-      return sum + group.hives.filter(hive => hive.hasAlert).length;
-    }, 0);
+    return group.hives.length >= 7; 
   };
   
   // Don't render until client-side to avoid hydration mismatch
   if (!mounted) return null;
   
-  // Create a hexagon SVG with hive name and alert icon if needed
-  const Hexagon = ({ filled, label, hasAlert, onClick }) => {
+  // Create a hexagon SVG with hive name
+  const Hexagon = ({ filled, label, onClick }) => {
     const isDark = theme === 'dark';
     
     return (
@@ -245,37 +227,22 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         <svg viewBox="0 0 100 100" width="170" height="170">
           <polygon 
             points="50 3, 95 25, 95 75, 50 97, 5 75, 5 25" 
-            stroke={hasAlert ? "#e53e3e" : (isDark ? "#e5e7eb" : "black")}
-            strokeWidth={hasAlert ? "4" : "1.5"}
-            fill={filled ? (hasAlert ? "#fff5f5" : (isDark ? "#3a3a3a" : "#f0f0f0")) : (isDark ? "#2d2d2d" : "white")}
+            stroke={isDark ? "#e5e7eb" : "black"}
+            strokeWidth="1.5"
+            fill={filled ? (isDark ? "#3a3a3a" : "#f0f0f0") : (isDark ? "#2d2d2d" : "white")}
           />
           
           {filled ? (
             <>
               <text 
                 x="50" 
-                y={hasAlert ? "45" : "55"} 
+                y="55" 
                 textAnchor="middle" 
                 style={{ fontWeight: 510 , fontFamily: 'FreeMono, monospace'}}
-                fill={hasAlert ? "#e53e3e" : (isDark ? "#f9fafb" : "black")}
+                fill={isDark ? "#f9fafb" : "black"}
               >
                 {label}
               </text>
-              
-              {hasAlert && (
-                <g transform="translate(50, 70)">
-                  <circle cx="0" cy="0" r="13" fill="#e53e3e" />
-                  <text 
-                    x="0" 
-                    y="5" 
-                    textAnchor="middle" 
-                    fill="white" 
-                    style={{ fontWeight: 700, fontSize: '20px' }}
-                  >
-                    !
-                  </text>
-                </g>
-              )}
             </>
           ) : (
             <text 
@@ -311,16 +278,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
       <div className="content-wrapper">
         <div className="header">
           <h1 className={`main-titlez ${theme === 'dark' ? 'dark' : 'light'}`}>Beehive Management</h1>
-          
-          {/* Alert indicator in header */}
-          {getTotalAlerts() > 0 && (
-            <div className="header-alert">
-              <AlertTriangle className="header-alert-icon" size={18} />
-              <span className="header-alert-text">
-                {getTotalAlerts()} {getTotalAlerts() === 1 ? 'hive needs' : 'hives need'} attention
-              </span>
-            </div>
-          )}
         </div>
         
         {/* Hexagon groups */}
@@ -343,7 +300,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
                         <Hexagon 
                           filled={!!existingHive}
                           label={existingHive?.name || ''}
-                          hasAlert={existingHive?.hasAlert}
                           onClick={() => existingHive ? selectHive(existingHive) : addHive(group.id, hexIndex)}
                         />
                       );
@@ -373,7 +329,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
                           <Hexagon 
                             filled={!!existingHive}
                             label={existingHive?.name || ''}
-                            hasAlert={existingHive?.hasAlert}
                             onClick={() => existingHive ? selectHive(existingHive) : addHive(group.id, index)}
                           />
                         </div>

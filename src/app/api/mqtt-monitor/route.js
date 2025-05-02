@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/app/lib/mongodb';
+import { connectToDatabase } from '@/app/_lib/mongodb';
 import mqtt from 'mqtt';
 
 // Global variables to track air pump activations across all hives

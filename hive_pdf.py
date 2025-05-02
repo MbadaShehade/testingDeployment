@@ -10,6 +10,25 @@ import datetime
 import json
 import base64
 from io import BytesIO
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('.env.local')
+
+# MongoDB connection
+MONGODB_URI = os.getenv('MONGODB_URI')
+DB_NAME = 'MoldInBeehives'
+
+# Connect to MongoDB
+def get_mongodb_connection():
+    try:
+        client = MongoClient(MONGODB_URI)
+        db = client[DB_NAME]
+        return db
+    except Exception as e:
+        print(f"MongoDB connection error: {e}")
+        return None
 
 class PDFBorder(Flowable):
     """Custom Flowable to draw a decorative border around the page"""
@@ -181,22 +200,65 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
     Returns:
         str: Path to the created PDF file
     """
-    # Try to load data from JSON file if values are not provided
+    # Try to load data if values are not provided
     if (temperature is None or humidity is None) and hive_id is not None:
         try:
-            # Try to read from a locally stored JSON file (if it exists)
-            json_path = f'hive_data_{hive_id}.json'
-            if os.path.exists(json_path):
-                with open(json_path, 'r') as f:
-                    hive_data = json.load(f)
-                    temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
-                    humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
-                    print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+            # First try MongoDB
+            db = get_mongodb_connection()
+            if db:
+                # Find the most recent data for this hive
+                hive_data_collection = db['hive_data']
+                latest_data = hive_data_collection.find_one(
+                    {"hiveId": hive_id},
+                    sort=[("timestamp", -1)]
+                )
+                
+                if latest_data:
+                    temperature = temperature if temperature is not None else latest_data.get('temperature', 24.9)
+                    humidity = humidity if humidity is not None else latest_data.get('humidity', 77.6)
+                    print(f"Loaded data from MongoDB for PDF: temp={temperature}°C, humidity={humidity}%")
+                else:
+                    print("No data found in MongoDB for this hive")
+                    
+                    # Fallback to local file if no MongoDB data
+                    try:
+                        # Try to read from a locally stored JSON file (if it exists)
+                        json_path = f'hive_data_{hive_id}.json'
+                        if os.path.exists(json_path):
+                            with open(json_path, 'r') as f:
+                                hive_data = json.load(f)
+                                temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
+                                humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
+                                print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+                        else:
+                            # Use better defaults if no file exists
+                            temperature = temperature if temperature is not None else 24.9
+                            humidity = humidity if humidity is not None else 77.6
+                            print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                    except Exception as e:
+                        print(f"Error reading from file: {e}")
+                        temperature = temperature if temperature is not None else 24.9
+                        humidity = humidity if humidity is not None else 77.6
             else:
-                # Use better defaults if no file exists
-                temperature = temperature if temperature is not None else 24.9
-                humidity = humidity if humidity is not None else 77.6
-                print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                print("Could not connect to MongoDB, trying file fallback")
+                try:
+                    # Try to read from a locally stored JSON file (if it exists)
+                    json_path = f'hive_data_{hive_id}.json'
+                    if os.path.exists(json_path):
+                        with open(json_path, 'r') as f:
+                            hive_data = json.load(f)
+                            temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
+                            humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
+                            print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+                    else:
+                        # Use better defaults if no file exists
+                        temperature = temperature if temperature is not None else 24.9
+                        humidity = humidity if humidity is not None else 77.6
+                        print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                except Exception as e:
+                    print(f"Error reading from file: {e}")
+                    temperature = temperature if temperature is not None else 24.9
+                    humidity = humidity if humidity is not None else 77.6
         except Exception as e:
             print(f"Warning: Could not load hive data: {e}")
             temperature = temperature if temperature is not None else 24.9
