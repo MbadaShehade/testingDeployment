@@ -7,7 +7,7 @@ import Image from 'next/image';
 import './hiveDetails.css';
 import Header from '../components/ClientComponents/Header/Header';
 import { useRouter } from 'next/navigation';
-import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle, Send, Download, RefreshCw, MessageSquare } from 'lucide-react';
+import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle, Send, Download, RefreshCw, MessageSquare, Trash2 } from 'lucide-react';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
 import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
 import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
@@ -82,7 +82,6 @@ const HiveDetails = () => {
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [airPumpDate, setAirPumpDate] = useState(null);
-  const [airPumpDuration, setAirPumpDuration] = useState(0);
 
   const [hiveData, setHiveData] = useState({
     name: `Hive ${hiveId}`,
@@ -2456,6 +2455,35 @@ const HiveDetails = () => {
     checkMonitorStatus();
   }, []);
 
+  // Add function to clear air pump activations
+  const clearAirPumpActivations = async () => {
+    if (!hiveId || !email) {
+      console.error("Missing hiveId or email for clearing activations");
+      return;
+    }
+
+    try {
+      // Clear local state
+      setAirPumpActivations([]);
+      
+      // Clear from localStorage
+      localStorage.removeItem(`airPumpActivations_${hiveId}`);
+      
+      // Clear from database via API
+      const response = await fetch(`/api/airpump?hiveId=${hiveId}&email=${encodeURIComponent(email)}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        console.log("Successfully cleared air pump activations from database");
+      } else {
+        console.error("Failed to clear air pump activations from database:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error clearing air pump activations:", error);
+    }
+  };
+
   if (!mounted) return null;
 
   return (
@@ -2661,9 +2689,28 @@ const HiveDetails = () => {
           <div className="air-pump-activations">
             <h2 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Check last air pump activations</h2>
             
-            {/* Remove the entire MQTT monitor status badge */}
-            
             <div className="activation-table-container">
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                <button
+                  className="clear-activations-button"
+                  onClick={clearAirPumpActivations}
+                  style={{ 
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    backgroundColor: '#f87171',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <Trash2 size={16} />
+                  Clear History
+                </button>
+              </div>
               <table className="activation-log-table" style={{ padding: 0, margin: 0, borderSpacing: 0 }}>
                 <thead>
                   <tr>
@@ -2674,7 +2721,8 @@ const HiveDetails = () => {
                 </thead>
                 <tbody>
                   {airPumpActivations.length > 0 ? (
-                    airPumpActivations.map((activation, index) => {
+                    // Only show the last 10 activations
+                    airPumpActivations.slice(0, 10).map((activation, index) => {
                       // Split date and time for display
                       const dateParts = activation.date.split(' ');
                       const dateOnly = dateParts[0];

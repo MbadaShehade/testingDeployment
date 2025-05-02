@@ -38,8 +38,6 @@ export default function SideFlowers({pathname}) {
                         <Image src={rightSideFlower} className="rightSideFlowerHiveDetails" alt="rightSideFlower" draggable={false} />
                         <Image src={leftSideFlower} className="leftSideFlowerHiveDetails2" alt="leftSideFlower" draggable={false} />
                         <Image src={rightSideFlower} className="rightSideFlowerHiveDetails2" alt="rightSideFlower" draggable={false} />
-                        <Image src={leftSideFlower} className="leftSideFlowerHiveDetails3" alt="leftSideFlower" draggable={false} />
-
                     </>
                 )}
             </div>

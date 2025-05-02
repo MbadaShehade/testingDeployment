@@ -144,6 +144,10 @@ export async function GET(request) {
             return 0;
           }
         });
+        
+        // Limit to last 10 activations
+        activations = activations.slice(0, 10);
+        console.log(`Limited to last 10 activations: ${activations.length}`);
       } catch (sortError) {
         console.error("Error sorting activations:", sortError);
       }
@@ -259,6 +263,103 @@ export async function POST(request) {
     console.error('Error saving air pump activation:', error);
     return NextResponse.json({ 
       error: 'Failed to save activation',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
+  }
+}
+
+// DELETE handler to clear air pump activations for a specific hive
+export async function DELETE(request) {
+  const { searchParams } = new URL(request.url);
+  const hiveId = searchParams.get('hiveId');
+  const email = searchParams.get('email');
+  
+  console.log(`DELETE request for hiveId: ${hiveId}, email: ${email}`);
+  
+  if (!hiveId || !email) {
+    console.error("Missing required parameters:", { hiveId, email });
+    return NextResponse.json({ error: 'Missing hiveId or email parameter' }, { status: 400 });
+  }
+  
+  try {
+    console.log("Connecting to database");
+    const db = await connectToDatabase();
+    console.log("Connected to database successfully");
+    
+    let deletionResults = { 
+      dedicatedCollection: false,
+      userDocument: false
+    };
+    
+    // APPROACH 1: Delete from dedicated collection
+    console.log("Deleting from air_pump_activations collection");
+    const airPumpCollection = db.collection('air_pump_activations');
+    
+    try {
+      const deletedResult = await airPumpCollection.deleteMany({ hiveId, email });
+      console.log(`Deleted ${deletedResult.deletedCount} activations from dedicated collection`);
+      deletionResults.dedicatedCollection = deletedResult.deletedCount > 0;
+    } catch (dedicatedError) {
+      console.error("Error deleting from dedicated collection:", dedicatedError);
+    }
+    
+    // APPROACH 2: Clear activations from user document
+    console.log("Clearing activations from user document");
+    const usersCollection = db.collection('users');
+    
+    try {
+      // Update the beehive in the user document to clear activations
+      const updateResult = await usersCollection.updateOne(
+        { email, "beehives.id": hiveId },
+        { $set: { "beehives.$.airPumpActivations": [] } }
+      );
+      
+      console.log("User update result:", updateResult);
+      deletionResults.userDocument = updateResult.modifiedCount > 0;
+      
+      // Try to handle the nested hives structure if it exists
+      if (updateResult.modifiedCount === 0) {
+        console.log("Trying to clear activations from nested hives structure");
+        
+        // First find the user document to inspect
+        const user = await usersCollection.findOne({ email });
+        
+        if (user && user.beehives && Array.isArray(user.beehives)) {
+          // Find the matching beehive
+          const matchingBeehiveIndex = user.beehives.findIndex(beehive => beehive.id === hiveId);
+          
+          if (matchingBeehiveIndex !== -1 && user.beehives[matchingBeehiveIndex].hives) {
+            // Try to update the nested hive
+            const nestedHiveIndex = user.beehives[matchingBeehiveIndex].hives.findIndex(h => h.id === hiveId);
+            
+            if (nestedHiveIndex !== -1) {
+              const nestedUpdatePath = `beehives.${matchingBeehiveIndex}.hives.${nestedHiveIndex}.airPumpActivations`;
+              
+              const nestedUpdateResult = await usersCollection.updateOne(
+                { email },
+                { $set: { [nestedUpdatePath]: [] } }
+              );
+              
+              console.log("Nested hive update result:", nestedUpdateResult);
+              deletionResults.userDocument = nestedUpdateResult.modifiedCount > 0;
+            }
+          }
+        }
+      }
+    } catch (userError) {
+      console.error("Error clearing activations from user document:", userError);
+    }
+    
+    return NextResponse.json({ 
+      success: deletionResults.dedicatedCollection || deletionResults.userDocument,
+      message: 'Air pump activations cleared successfully',
+      details: deletionResults
+    });
+  } catch (error) {
+    console.error('Error clearing air pump activations:', error);
+    return NextResponse.json({ 
+      error: 'Failed to clear activations',
       message: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 });
