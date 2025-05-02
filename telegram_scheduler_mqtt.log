@@ -34639,3 +34639,97 @@
 2025-05-01 02:02:11,095 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
 2025-05-01 02:02:11,430 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
 2025-05-01 02:02:11,487 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:12,244 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:12,884 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,246 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,249 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,472 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,556 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,576 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:13,896 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 02:02:14,441 - telegram_scheduler_mqtt - INFO - Scheduler stopped.
+2025-05-01 11:56:31,253 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 49796
+2025-05-01 11:56:31,253 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 11:56:31,253 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 11:56:31,253 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 11:56:31,253 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 11:56:31,328 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 11:56:31,410 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 11:59:17,030 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 50017
+2025-05-01 11:59:17,030 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 11:59:17,030 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 11:59:17,030 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 11:59:17,030 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 11:59:17,109 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 11:59:17,345 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:00:20,869 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 50122
+2025-05-01 12:00:20,869 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:00:20,869 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:00:20,869 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:00:20,869 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:00:20,943 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:00:21,033 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:00:50,241 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 50165
+2025-05-01 12:00:50,241 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:00:50,241 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:00:50,241 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:00:50,241 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:00:50,336 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:00:50,464 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:02:09,068 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 50227
+2025-05-01 12:02:09,068 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:02:09,068 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:02:09,068 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:02:09,068 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:02:09,144 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:02:09,245 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:34:52,249 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 51937
+2025-05-01 12:34:52,252 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:34:52,252 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:34:52,252 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:34:52,252 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:34:52,336 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:34:52,408 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:44:15,282 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 52515
+2025-05-01 12:44:15,282 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:44:15,282 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:44:15,282 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:44:15,282 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:44:15,359 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:44:15,470 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 12:52:21,380 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 52812
+2025-05-01 12:52:21,380 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 12:52:21,380 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 12:52:21,380 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 12:52:21,380 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 12:52:21,448 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 12:52:21,539 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 13:19:58,016 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 53923
+2025-05-01 13:19:58,016 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 13:19:58,016 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 13:19:58,016 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 13:19:58,016 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 13:19:58,096 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 13:19:58,285 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 20:12:41,158 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 1377
+2025-05-01 20:12:41,158 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 20:12:41,158 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 20:12:41,158 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 20:12:41,158 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 20:12:41,238 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 20:12:41,330 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-01 21:00:26,628 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 2914
+2025-05-01 21:00:26,628 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-01 21:00:26,628 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-01 21:00:26,628 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-01 21:00:26,629 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-01 21:00:30,463 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-01 21:00:30,550 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-02 15:46:02,135 - telegram_scheduler_mqtt - INFO - Starting scheduler process with PID 5892
+2025-05-02 15:46:02,135 - telegram_scheduler_mqtt - INFO - Arguments: Namespace(hive_id='1', chat_id='1234204680', password='hivemonitor', username='test', interval='24h')
+2025-05-02 15:46:02,136 - telegram_scheduler_mqtt - INFO - Starting scheduler for hive 1
+2025-05-02 15:46:02,136 - telegram_scheduler_mqtt - INFO - Settings: Sending reports every 24 hours
+2025-05-02 15:46:02,136 - telegram_scheduler_mqtt - INFO - Connecting to test.mosquitto.org...
+2025-05-02 15:46:02,238 - telegram_scheduler_mqtt - INFO - Waiting 24 hours until next report...
+2025-05-02 15:46:02,892 - telegram_scheduler_mqtt - INFO - Connected to MQTT broker
+2025-05-02 15:47:18,217 - telegram_scheduler_mqtt - INFO - Received termination signal. Gracefully shutting down...

@@ -3,10 +3,9 @@ import { useEffect } from 'react';
 
 export default function ScrollHandler() {
   useEffect(() => {
-    // Check if there's a stored scroll target
     const scrollTarget = sessionStorage.getItem('scrollTarget');
     if (scrollTarget) {
-      // Function to attempt scrolling
+      
       const scrollToTarget = () => {
         const element = document.getElementById(scrollTarget);
         if (element) {
@@ -25,5 +24,5 @@ export default function ScrollHandler() {
     }
   }, []);
 
-  return null; // This component doesn't render anything
+  return null; 
 } 

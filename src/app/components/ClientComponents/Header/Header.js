@@ -9,10 +9,6 @@ import Navigation from '../Navigation/Navigation';
 export default function Header({ isLoggedIn , hiveDetails }) {
   const router = useRouter();
 
-  const handleLogoClick = () => {
-    router.push('/');
-  };
-
   return (
     <>
       <header id = "header" className="App-header">
