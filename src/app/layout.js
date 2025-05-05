@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata = {
   title: "HiveGuard - Protect Your Hive With IOT",
   description: "HiveGuard offers an innovative IoT-based monitoring system that prevents mold growth in beehives.",
