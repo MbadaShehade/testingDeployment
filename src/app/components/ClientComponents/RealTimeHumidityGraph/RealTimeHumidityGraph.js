@@ -40,8 +40,6 @@ const RealTimeHumidityGraph = ({
         >
           <div className="format-option" onClick={() => handleExport('humidity', 'png')}>PNG</div>
           <div className="format-option" onClick={() => handleExport('humidity', 'jpg')}>JPG</div>
-          <div className="format-option" onClick={() => handleExport('humidity', 'heic')}>HEIC</div>
-          <div className="format-option" onClick={() => handleExport('humidity', 'svg')}>SVG</div>
         </div>
       </div>
     </div>

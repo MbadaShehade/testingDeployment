@@ -1,6 +1,4 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
-
+/* Base styles and resets */
 html,body {
   height: 100vh;
   margin: 0;
@@ -375,7 +373,6 @@ html {
     margin-left: 0px;
   }
 
- 
 }
 
 

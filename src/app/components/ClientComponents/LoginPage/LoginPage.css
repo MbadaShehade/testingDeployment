@@ -146,16 +146,19 @@
   cursor: pointer;
   position: relative;
   font-weight: 500;
+  font-family: monospace, sans-serif;
 }
 
 .login-tab.active {
   color: #333;
   font-weight: 600;
+  
 }
 
 .login-tab.active.signup {
   color: #f0c14b;
   font-weight: 600;
+  
 }
 
 .login-tab.active::after {
@@ -186,11 +189,13 @@
   text-align: left;
 }
 
+
 .form-input {
   border-radius: 5px;
   padding: 10px 15px;
   font-size: 16px;
-  width: 100%;
+  width: 90%;
+  font-family: monospace, sans-serif;
 }
 
 .form-input:focus {
@@ -337,6 +342,7 @@
   align-self: flex-end;
   text-decoration: none;
   transition: color 0.2s;
+  font-family: monospace, sans-serif;
 }
 
 .forgot-password-link:hover {
@@ -497,7 +503,7 @@
 
 .error-message {
   background-color: rgba(255, 0, 0, 0.1);
-  color: #d8000c;
+  color: #900007;
   padding: 10px;
   border-radius: 5px;
   font-size: 16px;

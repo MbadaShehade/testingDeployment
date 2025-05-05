@@ -28,11 +28,12 @@ export async function POST(request) {
         reportType: reportType || "Immediate Report",
         // Always pass temperature and humidity directly if available
         temperature: temperature || null,
-        humidity: humidity || null
+        humidity: humidity || null,
+        airPumpStatus: data.airPumpStatus || "OFF"
       });
       
       // Execute a Python script to generate and send a PDF with the most recent data
-      const pythonProcess = exec(`python -B telegram_bot.py '${jsonData}'`);
+      const pythonProcess = exec(`python -B python/telegram_bot.py '${jsonData}'`);
       
       return new Promise((resolve) => {
         pythonProcess.stdout.on('data', (data) => {
@@ -71,11 +72,12 @@ export async function POST(request) {
       humidity_image: humidity_image || null,
       username: username || null,
       forceWhiteBackground: data.forceWhiteBackground || false,
-      reportType: reportType || "Standard Report"
+      reportType: reportType || "Standard Report",
+      airPumpStatus: data.airPumpStatus || "OFF"
     });
     
     // Execute the Python script to send a PDF with the data
-    const pythonProcess = exec(`python -B telegram_bot.py '${jsonData}'`);
+    const pythonProcess = exec(`python -B python/telegram_bot.py '${jsonData}'`);
     
     return new Promise((resolve) => {
       pythonProcess.stdout.on('data', (data) => {

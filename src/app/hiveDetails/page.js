@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import './hiveDetails.css';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import './hiveDetails.css';
 import Header from '../components/ClientComponents/Header/Header';
 import { useRouter } from 'next/navigation';
-import { Thermometer, Droplets, AlertTriangle, AlertCircle, CheckCircle, Send, Download, RefreshCw, MessageSquare, Trash2 } from 'lucide-react';
+import { Thermometer, Droplets, CheckCircle, RefreshCw, Trash2 } from 'lucide-react';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
 import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
 import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
 import HistoricalDataGraph from '../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph';
 import mqtt from 'mqtt';
+import { Chart } from 'chart.js/auto';
+import { MQTT_URL } from '../_lib/mqtt-config';
+import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
+import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,16 +26,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
 } from 'chart.js';
-import { Chart } from 'chart.js/auto';
-import { MQTT_URL } from '../_lib/mqtt-config';
-// Import the MQTT monitoring status checker
-import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
-// Import the timer storage utilities
-import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
 
-// Register ChartJS components
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -44,7 +41,6 @@ ChartJS.register(
 
 const MAX_DATA_POINTS = 10;
 
-// Function to format time only
 const formatTime = (date) => {
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -54,7 +50,6 @@ const formatTime = (date) => {
   });
 };
 
-// Function to format date only
 const formatDate = (date) => {
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -62,16 +57,9 @@ const formatDate = (date) => {
   return `${day}/${month}/${year}`;
 };
 
-// Helper function to get unique sorted dates
-const getUniqueSortedDates = (dates) => {
+const sortDates = (dates) => {
   if (!Array.isArray(dates)) return [];
-  return [...new Set(dates)].sort((a, b) => {
-    const [dayA, monthA, yearA] = a.split('/').map(Number);
-    const [dayB, monthB, yearB] = b.split('/').map(Number);
-    const dateA = new Date(yearA, monthA - 1, dayA);
-    const dateB = new Date(yearB, monthB - 1, dayB);
-    return dateA - dateB;
-  });
+  return [...new Set(dates)].sort();
 };
 
 const HiveDetails = () => {
@@ -82,28 +70,19 @@ const HiveDetails = () => {
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [airPumpDate, setAirPumpDate] = useState(null);
-
-  const [hiveData, setHiveData] = useState({
-    name: `Hive ${hiveId}`,
-    temperature: null,
-    humidity: null,
-    airPump: "OFF" // Add airPump property with default OFF
-  });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [sending, setSending] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState(null);
-  
-  // Add state for cached light mode images for PDF export
-  const [cachedLightModeImages, setCachedLightModeImages] = useState({
-    temperature: null,
-    humidity: null
-  });
-
-
   const [isAirPumpActive, setIsAirPumpActive] = useState(false);
   const startTime = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalIdRef = useRef(null);
+  const [hiveData, setHiveData] = useState({
+    name: `Hive ${hiveId}`,
+    temperature: null,
+    humidity: null,
+    airPump: "OFF" 
+  });  
   const [airPumpActivations, setAirPumpActivations] = useState(() => {
     // Try to load from localStorage as fallback
     if (typeof window !== 'undefined') {
@@ -119,6 +98,7 @@ const HiveDetails = () => {
     return [];
   });
   
+
   // Save activations to localStorage whenever they change
   useEffect(() => {
     if (typeof window !== 'undefined' && airPumpActivations.length > 0) {
@@ -132,10 +112,7 @@ const HiveDetails = () => {
   
   // Effect to monitor changes in airPump status from MQTT
   useEffect(() => {
-    console.log(`Pump status change - isActive: ${isAirPumpActive}, pumpStatus: ${hiveData.airPump}`);
-    
     if (hiveData.airPump === "ON" && !isAirPumpActive) {
-      console.log("Air pump turned ON - starting timer");
       startTimer();
     } else if (hiveData.airPump === "OFF" && isAirPumpActive) {
       console.log("Air pump turned OFF - stopping timer");
@@ -201,23 +178,16 @@ const HiveDetails = () => {
     }
   }, [mounted, hiveId]);
 
-  // Modified startTimer function to save state
   const startTimer = () => {
-    console.log("Starting air pump timer");
     setIsAirPumpActive(true);
     const now = new Date();
     const startTimeMs = now.getTime();
     startTime.current = startTimeMs;
     setElapsedTime(0);
-    setAirPumpDate(now); // Save the activation start date
-    
-    // Save timer state to localStorage
-    saveTimerState(hiveId, true, startTimeMs, "ON");
-    
-    console.log("Timer started at:", now.toISOString());
+    setAirPumpDate(now); 
+    saveTimerState(hiveId, true, startTimeMs, "ON");    
   }
 
-  // Modified stopTimer function to clear state
   const stopTimer = () => {
     console.log("Stopping air pump timer");
     if (!isAirPumpActive) {
@@ -249,11 +219,6 @@ const HiveDetails = () => {
     saveAirPumpActivation(formattedDate, formattedDuration);
   }
 
-  const resetTimer = () => {
-    setIsAirPumpActive(false);
-    setElapsedTime(0);
-  }
-
   const formatTimerOutput = (timeInMs) => {
     let hours = Math.floor(timeInMs / (1000 * 60 * 60));
     let minutes = Math.floor(timeInMs / (1000 * 60) % 60);
@@ -276,8 +241,7 @@ const HiveDetails = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
   
-  // Add back the formatTime function for displaying the current timer
-  const formatTime = () => {
+  const formatElapsedTime = () => {
     let hours = Math.floor(elapsedTime / (1000 * 60 * 60));
     let minutes = Math.floor(elapsedTime / (1000 * 60) % 60);
     let seconds = Math.floor(elapsedTime / (1000) % 60);
@@ -289,24 +253,6 @@ const HiveDetails = () => {
     return `${hours}:${minutes}:${seconds}`;
   }
   
-  // Update the table display to handle the new activation format
-  const formatActivationForDisplay = (activation) => {
-    // Extract date and time for display
-    let dateOnly = '';
-    let timeOnly = '';
-    
-    if (activation.date) {
-      const dateParts = activation.date.split(' ');
-      dateOnly = dateParts[0];
-      timeOnly = dateParts.length > 1 ? dateParts[1] : '';
-    }
-    
-    return {
-      date: dateOnly,
-      time: timeOnly,
-      duration: activation.duration
-    };
-  };
   
   const saveAirPumpActivation = async (date, duration) => {
     console.log("Saving air pump activation");
@@ -316,14 +262,12 @@ const HiveDetails = () => {
       return;
     }
     
-    // Create the activation record
     const activation = {
       date,
       duration,
       timestamp: new Date().toISOString()
     };
     
-    // Immediately update local state with the new activation
     setAirPumpActivations(prev => [activation, ...prev]);
     
     // Save to localStorage for persistence
@@ -334,7 +278,6 @@ const HiveDetails = () => {
       console.error("Error saving to localStorage:", storageError);
     }
     
-    // Only attempt to save to MongoDB if we have the required data
     if (!hiveId || !email) {
       console.error("Missing hiveId or email for MongoDB save:", { hiveId, email });
       return;
@@ -407,225 +350,11 @@ const HiveDetails = () => {
     return () => clearInterval(intervalIdRef.current);
   }, [isAirPumpActive, hiveId]);
 
-  // Add state for showing success message
   const [successMessage, setSuccessMessage] = useState('');
   
-  // Add state for automatic reporting
   const [autoReporting, setAutoReporting] = useState(false);
-  const [reportingInterval, setReportingInterval] = useState(null);
   
-  // Add state for scheduled reports
   const [isScheduleActive, setIsScheduleActive] = useState(false);
-  const [isLoadingSchedule, setIsLoadingSchedule] = useState(true);
-  const [scheduleError, setScheduleError] = useState(null);
-  const [statusMessage, setStatusMessage] = useState('');
-  const [scheduleInterval, setScheduleInterval] = useState('15s'); // Default to 15 seconds
-  const [isTestMode, setIsTestMode] = useState(true); // Default checked
-  
-  const intervalOptions = [
-    { value: '15s', label: '15 Seconds' },
-    { value: '1h', label: '1 Hour' },
-    { value: '24h', label: '24 Hours' }
-  ];
-
-  // Format interval text for display
-  const formatIntervalText = (intervalValue) => {
-    switch (intervalValue) {
-      case '15s': return '15 seconds';
-      case '1h': return 'hour';
-      case '24h': return '24 hours';
-      default: return 'hour';
-    }
-  };
-  
-  // Function to update scheduler interval on the server
-  const updateSchedulerInterval = async (newInterval) => {
-    if (!telegramChatId || !isScheduleActive) return;
-    
-    setIsLoadingSchedule(true);
-    setScheduleError(null);
-    
-    // Add a timeout to ensure the loading state doesn't get stuck
-    const loadingTimeout = setTimeout(() => {
-      setIsLoadingSchedule(false);
-      setScheduleError('Request timed out. Please try again.');
-    }, 5000);
-    
-    try {
-      const response = await fetch('/api/scheduler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'update',
-          hiveId,
-          chatId: telegramChatId,
-          username: searchParams.get('username') || 'User',
-          interval: newInterval
-        }),
-      });
-      
-      clearTimeout(loadingTimeout);
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setStatusMessage(`Reports scheduled every ${formatIntervalText(newInterval)}`);
-      } else {
-        setScheduleError(data.error || 'Failed to update scheduler interval');
-      }
-    } catch (error) {
-      clearTimeout(loadingTimeout);
-      console.error('Error updating scheduler interval:', error);
-      setScheduleError('Failed to update scheduler interval');
-    } finally {
-      clearTimeout(loadingTimeout);
-      setIsLoadingSchedule(false);
-    }
-  };
-  
-  // Handle scheduled report interval change
-  const handleIntervalChange = (e) => {
-    const newInterval = e.target.value;
-    setScheduleInterval(newInterval);
-    setIsTestMode(newInterval === '15s');
-    
-    // If the scheduler is active, update the interval on the server
-    if (isScheduleActive) {
-      updateSchedulerInterval(newInterval);
-    }
-  };
-
-  // Handle test mode checkbox change
-  const handleTestModeChange = (e) => {
-    const isChecked = e.target.checked;
-    setIsTestMode(isChecked);
-    if (isChecked) {
-      setScheduleInterval('15s');
-    } else if (scheduleInterval === '15s') {
-      setScheduleInterval('1h');
-    }
-  };
-
-  // Check scheduler status
-  const checkSchedulerStatus = async () => {
-    if (!telegramChatId) return;
-    
-    setIsLoadingSchedule(true);
-    setScheduleError(null);
-    
-    // Add a timeout to ensure loading state doesn't get stuck
-    const loadingTimeout = setTimeout(() => {
-      setIsLoadingSchedule(false);
-      setScheduleError('Status check timed out. Please refresh.');
-    }, 5000);
-    
-    try {
-      const response = await fetch(`/api/scheduler?hiveId=${hiveId}&chatId=${telegramChatId}&action=status`);
-      
-      clearTimeout(loadingTimeout);
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setIsScheduleActive(data.status === 'running');
-        if (data.status === 'running') {
-          const currentInterval = data.interval || '15s';
-          setScheduleInterval(currentInterval);
-          setIsTestMode(currentInterval === '15s');
-          setStatusMessage(`Reports scheduled every ${formatIntervalText(currentInterval)}`);
-        } else {
-          setStatusMessage('');
-        }
-      } else {
-        setScheduleError(data.error || 'Failed to check scheduler status');
-      }
-    } catch (error) {
-      clearTimeout(loadingTimeout);
-      console.error('Error checking scheduler status:', error);
-      setScheduleError('Failed to connect to scheduler service');
-    } finally {
-      clearTimeout(loadingTimeout);
-      setIsLoadingSchedule(false);
-    }
-  };
-
-  // Start or stop scheduled reports
-  const handleScheduleToggle = async () => {
-    if (!telegramChatId) return;
-    
-    setIsLoadingSchedule(true);
-    setScheduleError(null);
-    
-    // Add a timeout to ensure the loading state doesn't get stuck
-    const loadingTimeout = setTimeout(() => {
-      setIsLoadingSchedule(false);
-      setScheduleError('Request timed out. Please try again.');
-    }, 5000);
-    
-    try {
-      // If already active, stop it
-      if (isScheduleActive) {
-        const response = await fetch('/api/scheduler', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'stop',
-            hiveId,
-            chatId: telegramChatId
-          }),
-        });
-        
-        clearTimeout(loadingTimeout);
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          setIsScheduleActive(false);
-          setStatusMessage('');
-        } else {
-          setScheduleError(data.error || 'Failed to stop scheduler');
-        }
-      } else {
-        // Start the scheduler with current settings
-        const response = await fetch('/api/scheduler', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'start',
-            hiveId,
-            chatId: telegramChatId,
-            username: searchParams.get('username') || 'User',
-            reportTime: '08:00',
-            interval: scheduleInterval
-          }),
-        });
-        
-        clearTimeout(loadingTimeout);
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          setIsScheduleActive(true);
-          setStatusMessage(`Reports scheduled every ${formatIntervalText(scheduleInterval)}`);
-        } else {
-          setScheduleError(data.error || 'Failed to start scheduler');
-        }
-      }
-    } catch (error) {
-      clearTimeout(loadingTimeout);
-      console.error(`Error ${isScheduleActive ? 'stopping' : 'starting'} scheduler:`, error);
-      setScheduleError('Failed to connect to scheduler service');
-    } finally {
-      clearTimeout(loadingTimeout);
-      setIsLoadingSchedule(false);
-    }
-  };
 
   // Fetch user's Telegram chat ID when component mounts
   useEffect(() => {
@@ -637,47 +366,8 @@ const HiveDetails = () => {
         const data = await response.json();
         if (data.telegramChatId) {
           setTelegramChatId(data.telegramChatId);
-          
-          // First check if scheduler is already running
-          const statusResponse = await fetch(`/api/scheduler?hiveId=${hiveId}&chatId=${data.telegramChatId}&action=status`);
-          const statusData = await statusResponse.json();
-          
-          if (statusData.success && statusData.status === 'running') {
-            // Scheduler is already running, set UI state accordingly
-            setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every 24 hours');
-            setAutoReporting(true);
-            return; // Exit early - no need to start scheduler
-          }
-          
-          // Start the scheduler with automatic reporting
-          const response = await fetch('/api/scheduler', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'start',
-              hiveId,
-              chatId: data.telegramChatId,
-              username: searchParams.get('username') || 'User',
-              interval: '24h'  // Set to 24 hours interval
-            }),
-          });
-          
-          const schedulerData = await response.json();
-          if (schedulerData.success) {
-            setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every 24 hours');
-            setAutoReporting(true);
-          } else if (schedulerData.error === 'Scheduler already running') {
-            // This is actually a successful state - the scheduler is already running
-            setIsScheduleActive(true);
-            setStatusMessage('Reports are being sent automatically every 24 hours');
-            setAutoReporting(true);
-          } else {
-            console.error('Failed to start automatic reporting:', schedulerData.error);
-          }
+          setIsScheduleActive(true);
+          setAutoReporting(true);
         }
       } catch (error) {
         console.error('Error fetching Telegram chat ID:', error);
@@ -685,16 +375,10 @@ const HiveDetails = () => {
     };
     
     fetchTelegramChatId();
-  }, [email, hiveId]);
+  }, [email]);
 
-  // Check scheduler status when telegramChatId is available
-  useEffect(() => {
-    if (telegramChatId) {
-      checkSchedulerStatus();
-    }
-  }, [telegramChatId, hiveId]);
 
-  // Add this function to allow users to enter their Telegram chat ID
+
   const handleSetupTelegram = () => {
     const chatId = prompt('Please enter your Telegram chat ID. To get your ID, contact @userinfobot on Telegram.');
     if (!chatId) return;
@@ -731,178 +415,14 @@ const HiveDetails = () => {
     });
   };
 
-  // Add function to update cached light mode images
-  const updateCachedChartImages = useCallback(() => {
-    // Only proceed if we have charts to capture
-    const tempCanvas = document.querySelector('#temperature-chart canvas');
-    const humidityCanvas = document.querySelector('#humidity-chart canvas');
-    
-    if (!tempCanvas || !humidityCanvas) return;
-    
-    // Store the current theme
-    const currentTheme = theme;
-    
-    // Get chart instances
-    const tempChart = Chart.getChart(tempCanvas);
-    const humidityChart = Chart.getChart(humidityCanvas);
-    
-    if (!tempChart || !humidityChart) return;
-    
-    // Store original settings
-    const originalSettings = {
-      temperature: {
-        yTicksColor: tempChart.options.scales.y.ticks.color,
-        xTicksColor: tempChart.options.scales.x.ticks.color,
-        yGridColor: tempChart.options.scales.y.grid.color,
-        xGridColor: tempChart.options.scales.x.grid.color,
-        legendColor: tempChart.options.plugins.legend.labels.color
-      },
-      humidity: {
-        yTicksColor: humidityChart.options.scales.y.ticks.color,
-        xTicksColor: humidityChart.options.scales.x.ticks.color,
-        yGridColor: humidityChart.options.scales.y.grid.color,
-        xGridColor: humidityChart.options.scales.x.grid.color,
-        legendColor: humidityChart.options.plugins.legend.labels.color
-      }
-    };
-    
-    // Apply light mode settings temporarily
-    tempChart.options.scales.y.ticks.color = '#000000';
-    tempChart.options.scales.x.ticks.color = '#000000';
-    tempChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
-    tempChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
-    tempChart.options.plugins.legend.labels.color = '#000000';
-    tempChart.update();
-    
-    humidityChart.options.scales.y.ticks.color = '#000000';
-    humidityChart.options.scales.x.ticks.color = '#000000';
-    humidityChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
-    humidityChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
-    humidityChart.options.plugins.legend.labels.color = '#000000';
-    humidityChart.update();
-    
-    // Capture the images
-    const temperatureImage = tempCanvas.toDataURL('image/png');
-    const humidityImage = humidityCanvas.toDataURL('image/png');
-    
-    // Update the cached images
-    setCachedLightModeImages({
-      temperature: temperatureImage,
-      humidity: humidityImage
-    });
-    
-    // Restore original settings
-    tempChart.options.scales.y.ticks.color = originalSettings.temperature.yTicksColor;
-    tempChart.options.scales.x.ticks.color = originalSettings.temperature.xTicksColor;
-    tempChart.options.scales.y.grid.color = originalSettings.temperature.yGridColor;
-    tempChart.options.scales.x.grid.color = originalSettings.temperature.xGridColor;
-    tempChart.options.plugins.legend.labels.color = originalSettings.temperature.legendColor;
-    tempChart.update();
-    
-    humidityChart.options.scales.y.ticks.color = originalSettings.humidity.yTicksColor;
-    humidityChart.options.scales.x.ticks.color = originalSettings.humidity.xTicksColor;
-    humidityChart.options.scales.y.grid.color = originalSettings.humidity.yGridColor;
-    humidityChart.options.scales.x.grid.color = originalSettings.humidity.xGridColor;
-    humidityChart.options.plugins.legend.labels.color = originalSettings.humidity.legendColor;
-    humidityChart.update();
-  }, [theme]);
-  
-  // Update the cached images whenever chart data changes
-  useEffect(() => {
-    if (mounted && hiveData.temperature !== null && hiveData.humidity !== null) {
-      // Short delay to ensure charts are fully rendered
-      const timer = setTimeout(() => {
-        updateCachedChartImages();
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [mounted, hiveData.temperature, hiveData.humidity, updateCachedChartImages]);
-
-  // Function to start automatic reporting every minute
-  const startAutomaticReporting = async () => {
-    if (autoReporting) return; // Already running
-    if (!telegramChatId) {
-      if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
-        handleSetupTelegram();
-      }
-      return;
-    }
-    
-    try {
-      const response = await fetch('/api/scheduler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'start',
-          hiveId,
-          chatId: telegramChatId,
-          username: searchParams.get('username') || 'User',
-          interval: '24h' // Set to 24 hours interval
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setAutoReporting(true);
-        setSuccessMessage('Automatic reporting started. You will receive PDF reports every 24 hours.');
-      } else {
-        alert('Failed to start automatic reporting: ' + (data.error || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error starting automatic reporting:', error);
-      alert('Failed to start automatic reporting. Please try again later.');
-    }
-  };
-  
-  // Function to stop automatic reporting
-  const stopAutomaticReporting = async () => {
-    if (!autoReporting) return; // Not running
-    
-    try {
-      const response = await fetch('/api/scheduler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'stop',
-          hiveId
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setAutoReporting(false);
-        setSuccessMessage('Automatic reporting stopped.');
-      } else {
-        alert('Failed to stop automatic reporting: ' + (data.error || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error stopping automatic reporting:', error);
-      alert('Failed to stop automatic reporting. Please try again later.');
-    }
-  };
-
-  // Clean up interval on component unmount
-  useEffect(() => {
-    return () => {
-      if (reportingInterval) {
-        clearInterval(reportingInterval);
-      }
-    };
-  }, [reportingInterval]);
 
   // Extract the report sending logic to a separate function
-  const sendReport = async () => {
+  const sendReport = async (isAutoReport = false) => {
     if (!telegramChatId) return;
     
     setSending(true);
     try {
+    
       // Save current data to a JSON file on the server for persistence
       await fetch('/api/save-hive-data', {
         method: 'POST',
@@ -913,32 +433,97 @@ const HiveDetails = () => {
           hiveId: hiveId,
           temperature: hiveData.temperature,
           humidity: hiveData.humidity,
-          email: email // Add email to associate with the user
+          email: email 
         }),
       });
       
-      // Force update of cached chart images with light mode
-      await updateCachedChartImages();
+      const tempCanvas = document.querySelector('#temperature-chart canvas');
+      const humidityCanvas = document.querySelector('#humidity-chart canvas');
       
-      // Use the cached light mode images instead of creating new ones
-      let temperatureImage = cachedLightModeImages.temperature;
-      let humidityImage = cachedLightModeImages.humidity;
-      
-      // If cached images aren't available, create them with white background
-      if (!temperatureImage || !humidityImage) {
-        // Create PDF-ready chart images with guaranteed readability and white background
-        temperatureImage = await createReadableChartImage('temperature', temperatureData, hiveData.temperature);
-        humidityImage = await createReadableChartImage('humidity', humidityData, hiveData.humidity);
-      }
-      
-      // Verify we have both images
-      if (!temperatureImage || !humidityImage) {
-        console.error('Failed to generate chart images');
+      if (!tempCanvas || !humidityCanvas) {
+        console.error('Chart canvases not found');
         setSending(false);
         return;
       }
       
-      // Get username from URL parameters
+      // Get chart instances
+      const tempChart = Chart.getChart(tempCanvas);
+      const humidityChart = Chart.getChart(humidityCanvas);
+      
+      if (!tempChart || !humidityChart) {
+        console.error('Chart instances not found');
+        setSending(false);
+        return;
+      }
+      
+      // Store original settings
+      const originalSettings = {
+        temperature: {
+          yTicksColor: tempChart.options.scales.y.ticks.color,
+          xTicksColor: tempChart.options.scales.x.ticks.color,
+          yGridColor: tempChart.options.scales.y.grid.color,
+          xGridColor: tempChart.options.scales.x.grid.color,
+          legendColor: tempChart.options.plugins.legend.labels.color
+        },
+        humidity: {
+          yTicksColor: humidityChart.options.scales.y.ticks.color,
+          xTicksColor: humidityChart.options.scales.x.ticks.color,
+          yGridColor: humidityChart.options.scales.y.grid.color,
+          xGridColor: humidityChart.options.scales.x.grid.color,
+          legendColor: humidityChart.options.plugins.legend.labels.color
+        }
+      };
+      
+      tempChart.options.scales.y.ticks.color = '#000000';
+      tempChart.options.scales.x.ticks.color = '#000000';
+      tempChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
+      tempChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
+      tempChart.options.plugins.legend.labels.color = '#000000';
+      tempChart.update();
+      
+      humidityChart.options.scales.y.ticks.color = '#000000';
+      humidityChart.options.scales.x.ticks.color = '#000000';
+      humidityChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
+      humidityChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
+      humidityChart.options.plugins.legend.labels.color = '#000000';
+      humidityChart.update();
+      
+      // Create temporary canvases with white backgrounds
+      const createOptimizedImage = (canvas) => {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+        
+        // Fill with white background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the chart on top
+        ctx.drawImage(canvas, 0, 0);
+        
+        return tempCanvas.toDataURL('image/png');
+      };
+      
+      // capture the current state of the canvas as PNG with white background
+      const temperatureImage = createOptimizedImage(tempCanvas);
+      const humidityImage = createOptimizedImage(humidityCanvas);
+      
+      // Restore original chart settings
+      tempChart.options.scales.y.ticks.color = originalSettings.temperature.yTicksColor;
+      tempChart.options.scales.x.ticks.color = originalSettings.temperature.xTicksColor;
+      tempChart.options.scales.y.grid.color = originalSettings.temperature.yGridColor;
+      tempChart.options.scales.x.grid.color = originalSettings.temperature.xGridColor;
+      tempChart.options.plugins.legend.labels.color = originalSettings.temperature.legendColor;
+      tempChart.update();
+      
+      humidityChart.options.scales.y.ticks.color = originalSettings.humidity.yTicksColor;
+      humidityChart.options.scales.x.ticks.color = originalSettings.humidity.xTicksColor;
+      humidityChart.options.scales.y.grid.color = originalSettings.humidity.yGridColor;
+      humidityChart.options.scales.x.grid.color = originalSettings.humidity.xGridColor;
+      humidityChart.options.plugins.legend.labels.color = originalSettings.humidity.legendColor;
+      humidityChart.update();
+      
       const username = searchParams.get('username') || 'User';
       
       const response = await fetch('/api/send-telegram', {
@@ -954,15 +539,15 @@ const HiveDetails = () => {
           temperature_image: temperatureImage,
           humidity_image: humidityImage,
           username: username,
-          autoReport: autoReporting,
-          forceWhiteBackground: true,  // Add a flag to indicate white background is needed
-          reportType: autoReporting ? "Automatic In-App Report" : "Manual User Requested Report"  // Indicate report type
+          autoReport: isAutoReport,
+          forceWhiteBackground: true,  
+          reportType: isAutoReport ? "Automatic In-App Report" : "Manual User Requested Report",
+          airPumpStatus: hiveData.airPump || "OFF"  
         }),
       });
       const data = await response.json();
       if (data.success) {
-        // Only show success message for manual sends
-        if (!autoReporting) {
+        if (!isAutoReport) {
           setSuccessMessage('Hive report PDF sent to your Telegram successfully!');
           // Hide the message after 5 seconds
           setTimeout(() => {
@@ -972,7 +557,7 @@ const HiveDetails = () => {
           }, 5000);
         }
       } else {
-        if (!autoReporting) {
+        if (!isAutoReport) {
           alert('Failed to send Telegram message. Please check your chat ID and try again.');
         }
       }
@@ -985,7 +570,6 @@ const HiveDetails = () => {
     }
   };
 
-  // Modify handleSendTelegram to use the sendReport function
   const handleSendTelegram = () => {
     if (!telegramChatId) {
       if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
@@ -994,75 +578,60 @@ const HiveDetails = () => {
       return;
     }
     
-    sendReport();
+    // Explicitly set autoReporting to false for manual reports
+    setAutoReporting(false);
+    sendReport(false); 
   };
 
 
-  
-
-
-  // Replace single dateRange with separate states for each component
   const [summaryDateRange, setSummaryDateRange] = useState('lastWeek');
   const [historicalDateRange, setHistoricalDateRange] = useState('lastWeek');
   
-  // Initialize state for historical data
-  const [historicalData, setHistoricalData] = useState(() => {
-    // Try to load historical data from localStorage on initial render
-    if (typeof window !== 'undefined') {
+  // Initialize state for historical data with empty datasets
+  const [historicalData, setHistoricalData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: 'Temperature (°C)',
+        data: [],
+        borderColor: '#ba6719',
+        backgroundColor: '#ba6719',
+        tension: 0.4,
+        pointRadius: 2,
+        borderWidth: 2,
+        fill: false,
+        yAxisID: 'y'
+      },
+      {
+        label: 'Humidity (%)',
+        data: [],
+        borderColor: '#0EA5E9',
+        backgroundColor: '#0EA5E9',
+        tension: 0.4,
+        pointRadius: 2,
+        borderWidth: 2,
+        fill: false,
+        yAxisID: 'y2'
+      }
+    ]
+  });
+  
+  // Load saved historical data on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && hiveId) {
       const savedData = localStorage.getItem(`historicalData_hive_${hiveId}`);
       if (savedData) {
         try {
           const parsedData = JSON.parse(savedData);
-          // Ensure dates are unique and sorted
-          const uniqueSortedDates = getUniqueSortedDates(parsedData.labels);
-          
-          // Create new datasets with unique dates
-          const newDatasets = parsedData.datasets.map(dataset => ({
-            ...dataset,
-            data: uniqueSortedDates.map(date => {
-              const originalIndex = parsedData.labels.indexOf(date);
-              return originalIndex !== -1 ? dataset.data[originalIndex] : null;
-            })
-          }));
-
-          return {
-            labels: uniqueSortedDates,
-            datasets: newDatasets
-          };
+          if (parsedData.labels && parsedData.datasets) {
+            setHistoricalData(parsedData);
+          }
         } catch (e) {
-          console.error('Error parsing saved historical data:', e);
+          console.error('Error loading historical data', e);
         }
       }
     }
-    // Default initial state if no saved data exists
-    return {
-      labels: [],
-      datasets: [
-        {
-          label: 'Temperature (°C)',
-          data: [],
-          borderColor: '#ba6719',
-          backgroundColor: '#ba6719',
-          tension: 0.4,
-          pointRadius: 2,
-          borderWidth: 2,
-          fill: false,
-          yAxisID: 'y'
-        },
-        {
-          label: 'Humidity (%)',
-          data: [],
-          borderColor: '#0EA5E9',
-          backgroundColor: '#0EA5E9',
-          tension: 0.4,
-          pointRadius: 2,
-          borderWidth: 2,
-          fill: false,
-          yAxisID: 'y2'
-        }
-      ]
-    };
-  });
+  }, [hiveId]);
 
   // Add useEffect to save historical data whenever it changes
   useEffect(() => {
@@ -1071,56 +640,32 @@ const HiveDetails = () => {
     }
   }, [historicalData, hiveId]);
 
-  // Function to clear historical data older than 30 days
-  const cleanupOldData = useCallback(() => {
-    setHistoricalData(prev => {
-      if (!prev || !prev.labels || !prev.datasets) return prev;
-
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const cutoffIndex = prev.labels.findIndex(date => {
-        const [day, month, year] = date.split('/');
-        const dateObj = new Date(year, month - 1, day);
-        return dateObj >= thirtyDaysAgo;
-      });
-
-      if (cutoffIndex === -1) return prev;
-
-      const newData = {
-        labels: prev.labels.slice(cutoffIndex),
-        datasets: prev.datasets.map(dataset => ({
-          ...dataset,
-          data: dataset.data.slice(cutoffIndex)
-        }))
-      };
-
-      // Save cleaned up data to localStorage
-      localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newData));
-      return newData;
-    });
-  }, [hiveId]);
-
-  // Run cleanup on component mount and set up daily cleanup
+  // Clean up old historical data on component mount
   useEffect(() => {
-    cleanupOldData();
-
-    // Set up daily cleanup at midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const timeUntilMidnight = tomorrow - now;
-
-    const cleanupTimer = setTimeout(() => {
-      cleanupOldData();
-      // Set up recurring daily cleanup
-      const dailyCleanup = setInterval(cleanupOldData, 24 * 60 * 60 * 1000);
-      return () => clearInterval(dailyCleanup);
-    }, timeUntilMidnight);
-
-    return () => clearTimeout(cleanupTimer);
-  }, [cleanupOldData]);
+    // Simple cleanup of data older than 30 days
+    if (typeof window !== 'undefined') {
+      const savedData = localStorage.getItem(`historicalData_hive_${hiveId}`);
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          if (data.labels && data.labels.length > 30) {
+            // Keep only the last 30 days of data
+            const newData = {
+              labels: data.labels.slice(-30),
+              datasets: data.datasets.map(dataset => ({
+                ...dataset,
+                data: dataset.data.slice(-30)
+              }))
+            };
+            localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newData));
+            setHistoricalData(newData);
+          }
+        } catch (e) {
+          console.error('Error cleaning up historical data', e);
+        }
+      }
+    }
+  }, [hiveId]);
 
   // Add new state for summary data
   const [summaryData, setSummaryData] = useState({
@@ -1342,8 +887,8 @@ const HiveDetails = () => {
       }
     }
     return {
-      daily: {}, // Format: { "YYYY-MM-DD": { temperature: max, humidity: max } }
-      monthly: {} // Format: { "YYYY-MM": { temperature: max, humidity: max } }
+      daily: {}, 
+      monthly: {} 
     };
   });
 
@@ -1487,8 +1032,6 @@ const HiveDetails = () => {
     // Sort by date
     filteredData.sort((a, b) => a.date - b.date);
 
-    console.log('Filtered data:', filteredData); // Add this for debugging
-
     // Create the new data object with proper dataset configuration
     const newData = {
       labels: filteredData.map(data => 
@@ -1527,7 +1070,7 @@ const HiveDetails = () => {
       ]
     };
 
-    console.log('New chart data:', newData); // Add this for debugging
+
 
     // Update the appropriate data state based on the component
     if (forComponent === 'summary') {
@@ -1751,7 +1294,7 @@ const HiveDetails = () => {
     // Define topics before MQTT setup
     const tempTopic = `${userPassword}/moldPrevention/hive${hiveId}/temp`;
     const humidityTopic = `${userPassword}/moldPrevention/hive${hiveId}/humidity`;
-    const airPumpTopic = `${userPassword}/moldPrevention/hive${hiveId}/airPump`; // Add air pump topic
+    const airPumpTopic = `${userPassword}/moldPrevention/hive${hiveId}/airPump`;
 
     // MQTT client setup with WebSocket
     const client = mqtt.connect(MQTT_URL, {
@@ -1764,11 +1307,9 @@ const HiveDetails = () => {
     let isConnected = false;
 
     client.on('connect', () => {
-        console.log('Connected to MQTT broker');
         isConnected = true;
-        
         // Subscribe to topics using the user's password as namespace
-        client.subscribe([tempTopic, humidityTopic, airPumpTopic], (err) => { // Add airPump subscription
+        client.subscribe([tempTopic, humidityTopic, airPumpTopic], (err) => { 
             if (!err) {
                 console.log('Subscribed to topics:', tempTopic, humidityTopic, airPumpTopic);
             } else {
@@ -1779,19 +1320,13 @@ const HiveDetails = () => {
 
     client.on('message', (topic, message) => {
         if (!isConnected) return;
-        
-        console.log('Received message on topic:', topic);
-        console.log('Message content:', message.toString());
-        
+          
         const now = new Date();
         const currentTime = formatTime(now);
         const currentDate = formatDate(now);
 
-        // Handle air pump status messages
         if (topic === airPumpTopic) {
-            const status = message.toString();
-            console.log('Updating air pump status:', status);
-            
+            const status = message.toString();            
             setHiveData(prev => ({ ...prev, airPump: status }));
             
             // Update timer state in localStorage
@@ -2061,7 +1596,6 @@ const HiveDetails = () => {
             return newStats;
         });
 
-        // Update historical maximums
         updateHistoricalMaximums(value, topic === tempTopic ? 'temperature' : 'humidity');
     });
 
@@ -2111,45 +1645,66 @@ const HiveDetails = () => {
 
   const handleExport = (chartType, format) => {
     const canvas = document.querySelector(`#${chartType}-chart canvas`);
-    if (!canvas) return;
-
-    let mimeType;
-    switch (format) {
-      case 'png':
-        mimeType = 'image/png';
-        break;
-      case 'jpg':
-        mimeType = 'image/jpeg';
-        break;
-      case 'svg':
-        // For SVG, we need to create an SVG from the canvas
-        const svgString = new XMLSerializer().serializeToString(canvas);
-        const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `${chartType}-data-${formatDate(new Date())}.svg`;
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-        return;
-      case 'heic':
-        // Note: HEIC conversion would require additional libraries
-        alert('HEIC format is not supported in the browser. Please choose another format.');
-        return;
-      default:
-        mimeType = 'image/png';
+    if (!canvas) {
+      alert('Cannot find chart to export. Please try again.');
+      return;
     }
 
-    const link = document.createElement('a');
-    link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
-    link.href = canvas.toDataURL(mimeType);
-    link.click();
-    setActiveDropdown(null);
-  };
+    try {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width * 2; // Double the resolution for better quality
+      tempCanvas.height = canvas.height * 2;
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      // Scale for better resolution
+      tempCtx.scale(2, 2);
+      
+      // First fill with theme background
+      tempCtx.fillStyle = theme === 'dark' ? '#1e293b' : '#ffffff';
+      tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Then draw the original canvas content (with its current styling)
+      tempCtx.drawImage(canvas, 0, 0);
+      
+      // Set proper MIME type and quality
+      let mimeType, quality;
+      switch (format) {
+        case 'png':
+          mimeType = 'image/png';
+          quality = 1.0;
+          break;
+        case 'jpg':
+          mimeType = 'image/jpeg';
+          quality = 0.95; // High quality setting for JPEG
+          break;
+        default:
+          mimeType = 'image/png';
+          quality = 1.0;
+      }
 
-  // Function to reset loading state
-  const resetLoadingState = () => {
-    setIsLoadingSchedule(false);
+      // Create and trigger download
+      const link = document.createElement('a');
+      link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
+      link.href = tempCanvas.toDataURL(mimeType, quality);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => URL.revokeObjectURL(link.href), 100);
+    } catch (error) {
+      console.error('Error exporting chart:', error);
+      // Fallback to direct canvas export if the enhanced method fails
+      try {
+        const link = document.createElement('a');
+        link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
+        link.href = canvas.toDataURL(format === 'jpg' ? 'image/jpeg' : 'image/png');
+        link.click();
+      } catch (fallbackError) {
+        console.error('Fallback export failed:', fallbackError);
+        alert('Failed to export chart. Your browser may not support this feature.');
+      }
+    }
+    
+    setActiveDropdown(null);
   };
 
   // Close dropdown when clicking outside
@@ -2211,192 +1766,6 @@ const HiveDetails = () => {
     }
   }, [mounted, hiveData.temperature, hiveData.humidity]);
 
-  // Function to create readable chart images for PDF
-  const createReadableChartImage = async (type, chartData, currentValue) => {
-    return new Promise((resolve) => {
-      // Create a temporary container div
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.width = '800px';  // Increase width for better quality
-      tempContainer.style.height = '400px';  // Increase height for better quality
-      tempContainer.style.backgroundColor = '#FFFFFF';
-      document.body.appendChild(tempContainer);
-      
-      // Create a new canvas inside the temp container
-      const canvas = document.createElement('canvas');
-      canvas.width = 800;  // Increase canvas width
-      canvas.height = 400;  // Increase canvas height
-      tempContainer.appendChild(canvas);
-      
-      // Create a new Chart instance explicitly for the PDF with light mode styling
-      const ctx = canvas.getContext('2d');
-      
-      // Fill the background with white to ensure proper contrast in PDF
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Get data range for proper axis scaling
-      const dataValues = [...chartData.datasets[0].data].filter(val => val !== null && val !== undefined);
-      const dataMin = dataValues.length > 0 ? Math.min(...dataValues) : 0;
-      const dataMax = dataValues.length > 0 ? Math.max(...dataValues) : 100;
-      
-      // Calculate y-axis range with padding and ensure some minimum range for better visualization
-      let yMin, yMax;
-      if (type === 'temperature') {
-        // Add more range to temperature chart
-        const tempRange = Math.max(1.5, (dataMax - dataMin) * 1.5);  // At least 1.5 degrees range or 150% of data range
-        const midPoint = (dataMax + dataMin) / 2;
-        yMin = midPoint - tempRange / 2;
-        yMax = midPoint + tempRange / 2;
-        
-        // Ensure the current value is in the visible range with extra padding
-        if (currentValue !== null && currentValue !== undefined) {
-          yMin = Math.min(yMin, currentValue - 1);
-          yMax = Math.max(yMax, currentValue + 1);
-        }
-      } else {
-        // Add more range to humidity chart
-        const humRange = Math.max(10, (dataMax - dataMin) * 1.5);  // At least 10% range or 150% of data range
-        const midPoint = (dataMax + dataMin) / 2;
-        yMin = Math.max(midPoint - humRange / 2, 0);
-        yMax = Math.min(midPoint + humRange / 2, 100);
-        
-        // Ensure the current value is in the visible range with extra padding
-        if (currentValue !== null && currentValue !== undefined) {
-          yMin = Math.min(yMin, Math.max(currentValue - 5, 0));
-          yMax = Math.max(yMax, Math.min(currentValue + 5, 100));
-        }
-      }
-      
-      // Configure data for the chart with more vibrant colors
-      const pdfChartData = {
-        labels: [...chartData.labels],
-        datasets: [{
-          label: type === 'temperature' ? 'Temperature (°C)' : 'Humidity (%)',
-          data: [...chartData.datasets[0].data],
-          borderColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
-          backgroundColor: type === 'temperature' ? '#ba6719' : '#0EA5E9',
-          tension: 0.4,
-          pointRadius: 5,
-          borderWidth: 3,
-          fill: false
-        }]
-      };
-      
-      // Configure options for guaranteed readability with white background
-      const pdfChartOptions = {
-        responsive: false,
-        maintainAspectRatio: false,
-        animation: false,
-        parsing: {
-          xAxisKey: 'x',
-          yAxisKey: 'y'
-        },
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              color: '#000000',
-              font: {
-                size: 16,  // Increase font size
-                weight: 'bold',
-                family: 'Arial'
-              }
-            }
-          },
-          title: {
-            display: true,
-            text: type === 'temperature' ? 'Current temperature: ' + (currentValue?.toFixed(2) || '--') + '°C' : 
-                                        'Current humidity: ' + (currentValue?.toFixed(2) || '--') + '%',
-            color: '#000000',
-            font: {
-              size: 18,
-              weight: 'bold',
-              family: 'Arial'
-            },
-            position: 'top',
-            padding: {
-              top: 10,
-              bottom: 10
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: yMin,  // Use calculated min
-            max: yMax,  // Use calculated max
-            ticks: {
-              color: '#000000',
-              font: {
-                size: 14,  // Increase font size
-                weight: 'bold',
-                family: 'Arial'
-              },
-              precision: 2, // Exact precision for tick values
-              callback: function(value) {
-                return value.toFixed(2);
-              }
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.2)'
-            }
-          },
-          x: {
-            ticks: {
-              color: '#000000',
-              font: {
-                size: 14,  // Increase font size 
-                weight: 'bold',
-                family: 'Arial'
-              },
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.2)'
-            }
-          }
-        },
-        layout: {
-          padding: {
-            top: 10,
-            right: 25,
-            bottom: 30,  // More padding at bottom
-            left: 25
-          }
-        }
-      };
-      
-      // Create a new Chart instance with guaranteed readability settings
-      const newChart = new Chart(ctx, {
-        type: 'line',
-        data: pdfChartData,
-        options: pdfChartOptions
-      });
-      
-      // Give the chart time to render
-      setTimeout(() => {
-        try {
-          // Get chart as image
-          const imageUrl = canvas.toDataURL('image/jpeg', 1.0);  // Use JPEG with max quality
-          
-          // Clean up
-          newChart.destroy();
-          document.body.removeChild(tempContainer);
-          
-          resolve(imageUrl);
-        } catch (error) {
-          console.error('Error creating chart image:', error);
-          document.body.removeChild(tempContainer);
-          resolve(null);
-        }
-      }, 500);  // Increase timeout to ensure rendering completes
-    });
-  };
-
-  // Add state for MQTT monitor status
   const [monitorStatus, setMonitorStatus] = useState('checking');
   
   // Check MQTT monitor status when component mounts
@@ -2524,7 +1893,6 @@ const HiveDetails = () => {
               </div>
             </div>
 
-            {/* New Air Pump Metric Circle */}
             <div className="metric-card air-pump">
               <div className="metric-circle">
                 <div className="metric-icon-air-pump">
@@ -2547,7 +1915,7 @@ const HiveDetails = () => {
                   </div>
                   {isAirPumpActive && (
                     <div className="timer-display">
-                      Duration: {formatTime()}
+                      {formatElapsedTime()}
                     </div>
                   )}
                 </div>
@@ -2557,8 +1925,16 @@ const HiveDetails = () => {
         </div>
 
         {/* Report Section */}
-        <div className={`exact-screenshot-style ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
+        <div className={`exact-screenshot-style ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`} style={{ 
+          backgroundColor: theme === 'dark' ? '#1F283B' : undefined,
+          borderRadius: '12px',
+          padding: '20px',
+          marginBottom: '20px'
+        }}>
           <h2>PDF Report</h2>
+          <p>
+            Get report manually via Telegram or wait for automatic report every 24 hours
+          </p>
           
           {successMessage && (
             <div className="status-message success" style={{ 
@@ -2648,29 +2024,17 @@ const HiveDetails = () => {
           {/* Air Pump Activations Table */}
           <div className="air-pump-activations">
             <h2 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Check last air pump activations</h2>
-            
-            <div className="activation-table-container">
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
                 <button
                   className="clear-activations-button"
                   onClick={clearAirPumpActivations}
-                  style={{ 
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    backgroundColor: '#f87171',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '14px'
-                  }}
                 >
                   <Trash2 size={16} />
                   Clear History
                 </button>
               </div>
+            <div className="activation-table-container">
+              
               <table className="activation-log-table" style={{ padding: 0, margin: 0, borderSpacing: 0 }}>
                 <thead>
                   <tr>
@@ -2712,5 +2076,4 @@ const HiveDetails = () => {
     </div>
   );
 };
-
 export default HiveDetails;

@@ -33,7 +33,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
       console.log('This position already has a hive');
       return;
     }
-    // Store the pending hive information and show confirmation
     setPendingHiveAdd({ groupId, hexIndex });
     setShowAddHiveConfirm(true);
   };
@@ -41,7 +40,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
   const handleConfirmAddHive = async () => {
     const { groupId, hexIndex } = pendingHiveAdd;
     
-    // Calculate total hives across all groups for unique ID and naming
     const totalHives = hiveGroups.reduce((sum, g) => sum + g.hives.length, 0);
     
     const newHive = {
@@ -98,7 +96,6 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     setPendingHiveAdd(null);
   };
 
-  // Function to handle overlay click
   const handleOverlayClick = (e) => {
     if (e.target.className === 'logout-modal-overlay') {
       setShowAddHiveConfirm(false);
@@ -106,13 +103,11 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     }
   };
   
-  // Function to add a new group of hexagons
   const addNewGroup = () => {
     const newGroupId = hiveGroups.length + 1;
     setHiveGroups([...hiveGroups, { id: newGroupId, hives: [] }]);
   };
   
-  // Function to handle hive selection
   const selectHive = async (hive) => {
     console.log('Selecting hive with password:', password ? '[PRESENT]' : '[MISSING]');
     setSelectedHive(hive);
@@ -144,15 +139,14 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         humidity: false
       };
 
-      // First, create variables to store both values
       let tempValue = null;
       let humidityValue = null;
 
       // Set a timeout for waiting for data
       const timeout = setTimeout(() => {
         client.end();
-        setMessage({ text: 'Timeout waiting for hive data. Please try again.', type: 'error' });
-        setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        setMessage({ text: 'Setup hive sensors and try again', type: 'error' });
+        setTimeout(() => setMessage({ text: '', type: '' }), 5000);
         setIsLoading(false);
       }, 10000); // 10 second timeout
 
@@ -314,7 +308,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
                       // Calculate position based on index (60 degrees apart)
                       const angle = (index - 1) * 60;
                       const radian = angle * Math.PI / 180;
-                      const radius = 155; // Adjusted to make hexagons touch with minimal gap
+                      const radius = 155; 
                       const top = Math.sin(radian) * radius;
                       const left = Math.cos(radian) * radius;
                       
@@ -336,13 +330,11 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
                     })}
                   </div>
                   
-                  {/* Group Label */}
                   <div className="group-label">
                     Group {group.id}
                   </div>
                 </div>
                 
-                {/* Add Group Button */}
                 {showAddGroupButton && (
                   <button 
                     onClick={addNewGroup}
@@ -374,7 +366,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
           <div className="logout-modal">
             <div className="logout-modal-content">
               <h3 className="logout-modal-title">Add New Beehive</h3>
-              <p style={{ textAlign: 'center', marginBottom: '20px', color: theme === 'dark' ? '#e0e0e0' : '#333' }}>
+              <p style={{ textAlign: 'center', marginBottom: '20px', color: theme === 'dark' ? '#e0e0e0' : '#333', fontFamily: 'MonoSpace, FreeMono, monospace' }}>
                 Are you sure you want to add a new beehive to this position?
               </p>
               <div className="logout-modal-buttons">

@@ -54,9 +54,11 @@ export default function RootLayout({ children }) {
                     document.body.classList.remove('theme-loading');
                   }, 50);
 
-                  // Handle page refresh - always scroll to top
+                  // Handle page refresh - only scroll to top if there's no hash
                   if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
-                    window.scrollTo(0, 0);
+                    if (!window.location.hash) {
+                      window.scrollTo(0, 0);
+                    }
                   }
                 } catch (e) {
                   console.error('Error in theme script:', e);

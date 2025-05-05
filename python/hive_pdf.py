@@ -182,7 +182,7 @@ def create_placeholder_chart(chart_type, value=None):
     
     return base64.b64encode(image_png).decode('utf-8')
 
-def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None):
+def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None, air_pump_status=None):
     """
     Create a PDF report with the current temperature and humidity data from a beehive.
     
@@ -196,6 +196,7 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         username (str): Name of the user generating the report
         force_white_background (bool): If True, always generate new placeholder charts with white backgrounds
         report_type (str): Type of report (Automatic, Manual, etc.)
+        air_pump_status (str): Status of the air pump (ON or OFF)
     
     Returns:
         str: Path to the created PDF file
@@ -223,7 +224,7 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
                     # Fallback to local file if no MongoDB data
                     try:
                         # Try to read from a locally stored JSON file (if it exists)
-                        json_path = f'hive_data_{hive_id}.json'
+                        json_path = f'../hive_data_{hive_id}.json'
                         if os.path.exists(json_path):
                             with open(json_path, 'r') as f:
                                 hive_data = json.load(f)
@@ -243,7 +244,7 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
                 print("Could not connect to MongoDB, trying file fallback")
                 try:
                     # Try to read from a locally stored JSON file (if it exists)
-                    json_path = f'hive_data_{hive_id}.json'
+                    json_path = f'../hive_data_{hive_id}.json'
                     if os.path.exists(json_path):
                         with open(json_path, 'r') as f:
                             hive_data = json.load(f)
@@ -342,6 +343,10 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         ['Humidity', f"{humidity}%", get_humidity_status(humidity)]
     ]
     
+    # Add air pump status to the table if provided
+    if air_pump_status is not None:
+        data.append(['Air Pump', air_pump_status, "Active" if air_pump_status == "ON" else "Inactive"])
+    
     table = Table(data, colWidths=[120, 120, 120])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.orange),
@@ -406,10 +411,16 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         # Add placeholder text if no image provided
         story.append(Paragraph("Humidity graph not available", normal_style))
     
+    # Ensure PDFs are created in the root directory by prepending '../' to the path if it's a relative filename
+    output_path = filename
+    if not os.path.isabs(filename):
+        output_path = os.path.join('..', filename)
+    
     # Build the PDF with the custom page template for borders
+    doc = SimpleDocTemplate(output_path, pagesize=letter, leftMargin=20, rightMargin=20, topMargin=40, bottomMargin=30)
     doc.build(story, canvasmaker=PageTemplate)
-    print(f"Hive Report PDF created: {filename}")
-    return filename
+    print(f"Hive Report PDF created: {output_path}")
+    return output_path
 
 def get_temperature_status(temperature):
     """Determine the status based on temperature reading"""
@@ -443,4 +454,4 @@ def get_humidity_status(humidity):
 
 if __name__ == "__main__":
     
-    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="") 
+    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="", air_pump_status="ON") 

@@ -6,10 +6,11 @@ import mqtt from 'mqtt';
 const activePumps = {};
 let mqttClient = null;
 let isMonitoring = false;
+const DEBUG_MODE = false;
 
 // Start monitoring function to track MQTT messages
 function startMonitoring() {
-  if (isMonitoring) return; // Don't start multiple monitoring instances
+  if (isMonitoring) return; 
   
   try {
     // Connect to MQTT broker
@@ -22,14 +23,13 @@ function startMonitoring() {
     
     // Set up listeners
     mqttClient.on('connect', () => {
-      console.log('[MQTT Monitor] Connected to MQTT broker');
       isMonitoring = true;
       
       // Subscribe to wildcard topic to capture all air pump messages
       mqttClient.subscribe('+/moldPrevention/+/airPump', (err) => {
         if (err) {
           console.error('[MQTT Monitor] Failed to subscribe to air pump topics:', err);
-        } else {
+        } else if (DEBUG_MODE) {
           console.log('[MQTT Monitor] Subscribed to air pump topics');
         }
       });
@@ -47,15 +47,16 @@ function startMonitoring() {
         const userPassword = topicParts[0];
         const hiveId = topicParts[2].replace('hive', '');
         const status = message.toString();
-        
-        console.log(`[MQTT Monitor] Received air pump status for hive ${hiveId}: ${status}`);
-        
+                
         // Get the associated email from the database using the password
         const db = await connectToDatabase();
         const user = await db.collection('users').findOne({ password: userPassword });
         
         if (!user) {
-          console.log(`[MQTT Monitor] No user found with password: ${userPassword}`);
+          // Only log unknown passwords if debugging is enabled
+          if (DEBUG_MODE) {
+            console.log(`[MQTT Monitor] No user found with password: ${userPassword}`);
+          }
           return;
         }
         
@@ -71,7 +72,9 @@ function startMonitoring() {
               email,
               username
             };
-            console.log(`[MQTT Monitor] Started tracking air pump for hive ${hiveId}`);
+            if (DEBUG_MODE) {
+              console.log(`[MQTT Monitor] Started tracking air pump for hive ${hiveId}`);
+            }
           }
         } else if (status === 'OFF') {
           // End tracking and save activation
@@ -112,7 +115,9 @@ function startMonitoring() {
               // Also save to dedicated collection
               await db.collection('air_pump_activations').insertOne(activation);
               
-              console.log(`[MQTT Monitor] Saved air pump activation for hive ${hiveId}, duration: ${formattedDuration}`);
+              if (DEBUG_MODE) {
+                console.log(`[MQTT Monitor] Saved air pump activation for hive ${hiveId}, duration: ${formattedDuration}`);
+              }
               
               // Clean up tracking
               delete activePumps[pumpKey];
@@ -132,7 +137,9 @@ function startMonitoring() {
     });
     
     mqttClient.on('close', () => {
-      console.log('[MQTT Monitor] Connection closed');
+      if (DEBUG_MODE) {
+        console.log('[MQTT Monitor] Connection closed');
+      }
       isMonitoring = false;
     });
     
@@ -156,8 +163,7 @@ export async function GET() {
   });
 }
 
-// In Next.js 13+, we can't use an actual background service
-// But we can start the monitor on first API call
+
 startMonitoring();
 
 export async function POST() {

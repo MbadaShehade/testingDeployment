@@ -41,8 +41,6 @@ const RealTimeTemperatureGraph = ({
         >
           <div className="format-option" onClick={() => handleExport('temperature', 'png')}>PNG</div>
           <div className="format-option" onClick={() => handleExport('temperature', 'jpg')}>JPG</div>
-          <div className="format-option" onClick={() => handleExport('temperature', 'heic')}>HEIC</div>
-          <div className="format-option" onClick={() => handleExport('temperature', 'svg')}>SVG</div>
         </div>
       </div>
     </div>

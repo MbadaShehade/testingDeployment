@@ -66,5 +66,5 @@ export default function ScrollAnimations() {
     };
   }, []);
 
-  return null; // This component doesn't render anything
+  return null; 
 }

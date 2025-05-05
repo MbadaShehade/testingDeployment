@@ -28,7 +28,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Add responsive styling for smaller screens */
+
 @media (max-width: 992px) {
   .more-details-text {
     font-size: 3rem;

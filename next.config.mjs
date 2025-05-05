@@ -3,7 +3,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Disable sourcemaps in production to reduce bundle size
   productionBrowserSourceMaps: false,
   async headers() {
     return [

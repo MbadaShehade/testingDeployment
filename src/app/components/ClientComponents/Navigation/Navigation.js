@@ -17,29 +17,25 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
 
-    // Handle page refresh - always start from top
+    // Handle page refresh - don't force scroll to top if there's a hash
     if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
-      window.scrollTo(0, 0);
       if (window.location.hash) {
-        router.replace('/');
+        // Don't scroll to top if there's a hash, let the hash handler work
+        router.replace(window.location.pathname + window.location.hash);
+      } else {
+        // Only scroll to top if there's no hash
+        window.scrollTo(0, 0);
       }
     } 
-    // Handle navigation from other pages (like /login)
     else if (window.location.hash && pathname === '/') {
       const targetId = window.location.hash.substring(1);
       const element = document.getElementById(targetId);
       if (element) {
-        // Give time for the page to properly load and render
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }, 500);
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     }
 
-    // 1. menuOpen - the menu must currently be open
-    // 2. menuRef.current exists - the menu DOM element must be rendered
-    // 3. click was not inside menu - event.target is not contained in menuRef
-    // 4. click was not on hamburger - event.target is not contained in hamburgerRef
+  
     const handleClickOutside = (event) => {
       if (menuOpen && 
           menuRef.current && 
@@ -66,12 +62,19 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
     e.preventDefault();
     setMenuOpen(false);
     
-    const targetElement = document.getElementById(id);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth' });
-      
-      // Update URL without page reload, for bookmarking
-      window.history.pushState(null, '', `#${id}`);
+    // Check if we're on the homepage
+    if (pathname === '/') {
+      // We're on the homepage, just scroll to the section
+      const targetElement = document.getElementById(id);
+      if (targetElement) {
+        // Scroll immediately without delay
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+        
+        // Update URL without page reload, for bookmarking
+        window.history.pushState(null, '', `#${id}`);
+      }
+    } else {
+      router.push(`/#${id}`);
     }
   };
 

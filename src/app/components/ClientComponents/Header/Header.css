@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center; /* Center the header content */
-  padding: 20px 0; /* Adjust padding */
+  justify-content: center; 
+  padding: 20px 0; 
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -13,9 +13,9 @@
 
 .corner-flower {
   position: absolute;
-  width: 150px; /* Set consistent width for both flowers */
-  height: 175px; /* Set consistent height for both flowers */
-  object-fit: contain; /* Maintain aspect ratio within dimensions */
+  width: 150px; 
+  height: 175px; 
+  object-fit: contain; 
   z-index: 10;
   top: 0;
   transition: all 0.3s ease;
@@ -38,7 +38,7 @@
   box-sizing: border-box;
   position: relative;
   z-index: 20;
-  margin: 0 160px; /* Add margin to prevent overlap with flower decorations */
+  margin: 0 160px; 
 }
 
 

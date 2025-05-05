@@ -28,7 +28,7 @@ export async function POST(request) {
       }
 
       // Start the scheduler process
-      const schedulerPath = path.join(process.cwd(), 'telegram_scheduler_mqtt.py');
+      const schedulerPath = path.join(process.cwd(), 'python/telegram_scheduler_mqtt.py');
       const args = [
         schedulerPath,
         '--hive_id', hiveId,
@@ -134,8 +134,8 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
         // Create a data object with default values that will be updated by real data in the scheduler
         const hiveData = {
           hiveId,
-          temperature: 24.9, // Default values closer to what's shown in the UI
-          humidity: 68.9,    // Default values closer to what's shown in the UI
+          temperature: 24.9, 
+          humidity: 68.9,    
           timestamp: new Date()
         };
         
@@ -175,7 +175,7 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
       }
       
       // Construct command to start the scheduler
-      let command = `python -B telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
+      let command = `python -B python/telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
       
       if (username) {
         command += ` --username "${username}"`;
@@ -207,7 +207,7 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
       // We would need a more complex solution to stop the scheduler via command line
       // A simple approach is to kill the process running the scheduler for this hive/chat combo
       try {
-        await execAsync(`pkill -f "telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
+        await execAsync(`pkill -f "python/telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
         return NextResponse.json({ 
           status: 'stopped',
           message: 'Scheduler stopped via command line'
@@ -223,10 +223,10 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
       // For updating interval, we need to stop the current scheduler and start a new one
       try {
         // First, stop the current scheduler
-        await execAsync(`pkill -f "telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
+        await execAsync(`pkill -f "python/telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
         
         // Then start a new one with the updated interval
-        let command = `python -B telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
+        let command = `python -B python/telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
         
         if (username) {
           command += ` --username "${username}"`;
