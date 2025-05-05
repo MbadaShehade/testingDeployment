@@ -1874,6 +1874,7 @@ const HiveDetails = () => {
           </h2>
           
         </div>
+        
 
         <div className="real-time-data">
           <div className="metrics-container">
