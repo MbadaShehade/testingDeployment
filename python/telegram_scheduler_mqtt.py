@@ -11,17 +11,17 @@ from datetime import datetime
 import base64
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
+import tempfile
 
 # Load environment variables
 load_dotenv('.env.local')
 
-# Set up logging
+# Disable file logging entirely
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("telegram_scheduler_mqtt.log"),
-        logging.StreamHandler()
+        logging.StreamHandler()  # Only log to console
     ]
 )
 logger = logging.getLogger("telegram_scheduler_mqtt")
@@ -121,7 +121,7 @@ def send_report(hive_id, chat_id, username=None):
     
     try:
         # Call the telegram_bot.py script to generate and send the PDF
-        cmd = f"python telegram_bot.py '{json_data}'"
+        cmd = f"python python/telegram_bot.py '{json_data}'"
         logger.debug(f"Running command: {cmd}")
         
         process = subprocess.Popen(

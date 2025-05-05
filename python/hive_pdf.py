@@ -10,6 +10,25 @@ import datetime
 import json
 import base64
 from io import BytesIO
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('.env.local')
+
+# MongoDB connection
+MONGODB_URI = os.getenv('MONGODB_URI')
+DB_NAME = 'MoldInBeehives'
+
+# Connect to MongoDB
+def get_mongodb_connection():
+    try:
+        client = MongoClient(MONGODB_URI)
+        db = client[DB_NAME]
+        return db
+    except Exception as e:
+        print(f"MongoDB connection error: {e}")
+        return None
 
 class PDFBorder(Flowable):
     """Custom Flowable to draw a decorative border around the page"""
@@ -163,7 +182,7 @@ def create_placeholder_chart(chart_type, value=None):
     
     return base64.b64encode(image_png).decode('utf-8')
 
-def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None):
+def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None, air_pump_status=None):
     """
     Create a PDF report with the current temperature and humidity data from a beehive.
     
@@ -177,26 +196,70 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         username (str): Name of the user generating the report
         force_white_background (bool): If True, always generate new placeholder charts with white backgrounds
         report_type (str): Type of report (Automatic, Manual, etc.)
+        air_pump_status (str): Status of the air pump (ON or OFF)
     
     Returns:
         str: Path to the created PDF file
     """
-    # Try to load data from JSON file if values are not provided
+    # Try to load data if values are not provided
     if (temperature is None or humidity is None) and hive_id is not None:
         try:
-            # Try to read from a locally stored JSON file (if it exists)
-            json_path = f'hive_data_{hive_id}.json'
-            if os.path.exists(json_path):
-                with open(json_path, 'r') as f:
-                    hive_data = json.load(f)
-                    temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
-                    humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
-                    print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+            # First try MongoDB
+            db = get_mongodb_connection()
+            if db:
+                # Find the most recent data for this hive
+                hive_data_collection = db['hive_data']
+                latest_data = hive_data_collection.find_one(
+                    {"hiveId": hive_id},
+                    sort=[("timestamp", -1)]
+                )
+                
+                if latest_data:
+                    temperature = temperature if temperature is not None else latest_data.get('temperature', 24.9)
+                    humidity = humidity if humidity is not None else latest_data.get('humidity', 77.6)
+                    print(f"Loaded data from MongoDB for PDF: temp={temperature}°C, humidity={humidity}%")
+                else:
+                    print("No data found in MongoDB for this hive")
+                    
+                    # Fallback to local file if no MongoDB data
+                    try:
+                        # Try to read from a locally stored JSON file (if it exists)
+                        json_path = f'../hive_data_{hive_id}.json'
+                        if os.path.exists(json_path):
+                            with open(json_path, 'r') as f:
+                                hive_data = json.load(f)
+                                temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
+                                humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
+                                print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+                        else:
+                            # Use better defaults if no file exists
+                            temperature = temperature if temperature is not None else 24.9
+                            humidity = humidity if humidity is not None else 77.6
+                            print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                    except Exception as e:
+                        print(f"Error reading from file: {e}")
+                        temperature = temperature if temperature is not None else 24.9
+                        humidity = humidity if humidity is not None else 77.6
             else:
-                # Use better defaults if no file exists
-                temperature = temperature if temperature is not None else 24.9
-                humidity = humidity if humidity is not None else 77.6
-                print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                print("Could not connect to MongoDB, trying file fallback")
+                try:
+                    # Try to read from a locally stored JSON file (if it exists)
+                    json_path = f'../hive_data_{hive_id}.json'
+                    if os.path.exists(json_path):
+                        with open(json_path, 'r') as f:
+                            hive_data = json.load(f)
+                            temperature = temperature if temperature is not None else hive_data.get('temperature', 24.9)
+                            humidity = humidity if humidity is not None else hive_data.get('humidity', 77.6)
+                            print(f"Loaded data from file for PDF: temp={temperature}°C, humidity={humidity}%")
+                    else:
+                        # Use better defaults if no file exists
+                        temperature = temperature if temperature is not None else 24.9
+                        humidity = humidity if humidity is not None else 77.6
+                        print(f"No data file found, using values: temp={temperature}°C, humidity={humidity}%")
+                except Exception as e:
+                    print(f"Error reading from file: {e}")
+                    temperature = temperature if temperature is not None else 24.9
+                    humidity = humidity if humidity is not None else 77.6
         except Exception as e:
             print(f"Warning: Could not load hive data: {e}")
             temperature = temperature if temperature is not None else 24.9
@@ -280,6 +343,10 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         ['Humidity', f"{humidity}%", get_humidity_status(humidity)]
     ]
     
+    # Add air pump status to the table if provided
+    if air_pump_status is not None:
+        data.append(['Air Pump', air_pump_status, "Active" if air_pump_status == "ON" else "Inactive"])
+    
     table = Table(data, colWidths=[120, 120, 120])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.orange),
@@ -344,10 +411,16 @@ def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature
         # Add placeholder text if no image provided
         story.append(Paragraph("Humidity graph not available", normal_style))
     
+    # Ensure PDFs are created in the root directory by prepending '../' to the path if it's a relative filename
+    output_path = filename
+    if not os.path.isabs(filename):
+        output_path = os.path.join('..', filename)
+    
     # Build the PDF with the custom page template for borders
+    doc = SimpleDocTemplate(output_path, pagesize=letter, leftMargin=20, rightMargin=20, topMargin=40, bottomMargin=30)
     doc.build(story, canvasmaker=PageTemplate)
-    print(f"Hive Report PDF created: {filename}")
-    return filename
+    print(f"Hive Report PDF created: {output_path}")
+    return output_path
 
 def get_temperature_status(temperature):
     """Determine the status based on temperature reading"""
@@ -381,4 +454,4 @@ def get_humidity_status(humidity):
 
 if __name__ == "__main__":
     
-    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="") 
+    create_hive_report_pdf(hive_id="1", temperature=33.5, humidity=55.2, username="", air_pump_status="ON") 

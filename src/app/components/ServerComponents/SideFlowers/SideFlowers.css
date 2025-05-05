@@ -11,7 +11,7 @@
     .rightSideFlower2 {
       position: absolute;
       right: 0;
-      top: 1950px;
+      top: 1750px;
       width: 100px;
       height: 300px;
       z-index: 5;
@@ -44,6 +44,7 @@
       left: 0;
       top: 2850px;
       width: 100px;
+      height: 350px;
     }
     .leftSideFlower3 {
       position: absolute;
@@ -57,7 +58,7 @@
     .rightSideFlowerLogin {
       position: absolute;
       right: 0;
-      top: 580px;
+      top: 555px;
       width: 100px;
       height: 300px;
       z-index: 5;
@@ -66,7 +67,7 @@
     .leftSideFlowerLogin {
       position: absolute;
       left: 0;
-      top: 130px;
+      top: 140px;
       width: 100px;
       height: 300px;
       z-index: 5;
@@ -123,7 +124,7 @@
     .leftSideFlowerHiveDetails3 {
       position: absolute;
       left: 0;
-      top: 2870px;
+      top: 2950px;
       width: 100px;
       height: 300px;
     }

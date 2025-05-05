@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/app/lib/mongodb';
+import clientPromise from '@/app/_lib/mongodb';
 import bcrypt from 'bcrypt';
 
 
 export async function POST(request) {
   try {
-    const { action, username, email, password } = await request.json();
+    const { action, username, email, password, newPassword } = await request.json();
     const client = await clientPromise;
     const db = client.db('MoldInBeehives');
     const users = db.collection('users');
@@ -83,6 +83,45 @@ export async function POST(request) {
       return NextResponse.json({ //LOGIN API RESPONSE
         message: 'Login successful',
         userId: user._id
+      });
+    } else if (action === 'verifyEmail') { //###################VERIFY EMAIL REQUEST###################
+      // Find user by email
+      const user = await users.findOne({ email });
+
+      if (!user) {
+        return NextResponse.json(
+          { error: 'Email not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        message: 'Email verified',
+        userId: user._id
+      });
+    } else if (action === 'resetPassword') { //###################RESET PASSWORD REQUEST###################
+      // Find user by email
+      const user = await users.findOne({ email });
+
+      if (!user) {
+        return NextResponse.json(
+          { error: 'Email not found' },
+          { status: 404 }
+        );
+      }
+
+      // Hash the new password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+      
+      // Update user's password
+      await users.updateOne(
+        { email },
+        { $set: { password: hashedPassword } }
+      );
+
+      return NextResponse.json({
+        message: 'Password updated successfully'
       });
     }
 

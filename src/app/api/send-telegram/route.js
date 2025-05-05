@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
-    // Get data from request body
     const data = await request.json();
     const { 
       hiveId, 
@@ -17,23 +16,24 @@ export async function POST(request) {
       reportType
     } = data;
     
-    // If sendNow flag is set, use a different approach to get the latest data
     if (sendNow) {
       console.log('Sending immediate report for hive', hiveId);
       
-      // In a real implementation, you would fetch real-time data from your database or IoT platform
-      // For now, we'll use the python script to fetch the latest data
       
       const jsonData = JSON.stringify({ 
         hiveId: hiveId || null, 
         chatId: chatId || null,
         username: username || null,
         sendNow: true,
-        reportType: reportType || "Immediate Report"
+        reportType: reportType || "Immediate Report",
+        // Always pass temperature and humidity directly if available
+        temperature: temperature || null,
+        humidity: humidity || null,
+        airPumpStatus: data.airPumpStatus || "OFF"
       });
       
       // Execute a Python script to generate and send a PDF with the most recent data
-      const pythonProcess = exec(`python telegram_bot.py '${jsonData}'`);
+      const pythonProcess = exec(`python -B python/telegram_bot.py '${jsonData}'`);
       
       return new Promise((resolve) => {
         pythonProcess.stdout.on('data', (data) => {
@@ -72,11 +72,12 @@ export async function POST(request) {
       humidity_image: humidity_image || null,
       username: username || null,
       forceWhiteBackground: data.forceWhiteBackground || false,
-      reportType: reportType || "Standard Report"
+      reportType: reportType || "Standard Report",
+      airPumpStatus: data.airPumpStatus || "OFF"
     });
     
     // Execute the Python script to send a PDF with the data
-    const pythonProcess = exec(`python telegram_bot.py '${jsonData}'`);
+    const pythonProcess = exec(`python -B python/telegram_bot.py '${jsonData}'`);
     
     return new Promise((resolve) => {
       pythonProcess.stdout.on('data', (data) => {

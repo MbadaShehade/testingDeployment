@@ -2,6 +2,7 @@
   text-align: center;
   z-index: 2;
   margin-top: 60px;
+  cursor: pointer;
 }
 
 .swipe-up-button-link {
@@ -10,6 +11,7 @@
   align-items: center;
   text-decoration: none;
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .swipe-up-button-link:hover {
@@ -67,4 +69,5 @@
   font-size: 2rem;
   color: #ba6719;
   animation: bounce 1.5s infinite ease-in-out;
+  cursor: pointer;
 }

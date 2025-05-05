@@ -1,6 +1,6 @@
 #!/bin/bash
-#chmod +x start_scheduler.sh
-#./start_scheduler.sh
+#chmod +x python/start_scheduler.sh
+#./python/start_scheduler.sh
 
 # Kill any existing scheduler processes
 pkill -f "python telegram_scheduler_mqtt.py"

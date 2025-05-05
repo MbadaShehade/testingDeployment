@@ -111,7 +111,7 @@
 /* Add new media query for screens 1298px and below */
 @media (max-width: 1298px) {
   .welcome-title {
-    margin-left: 20px; /* Move the title to the right */
+    margin-left: 20px; 
   }
 }
 

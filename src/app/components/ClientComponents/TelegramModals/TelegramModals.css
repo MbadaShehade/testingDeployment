@@ -1,0 +1,188 @@
+/* Telegram Modal Styles */
+.telegram-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.telegram-modal {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+  cursor: default;
+}
+
+.theme-dark .telegram-modal {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+.telegram-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.telegram-modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  text-align: center;
+  font-family: FreeMono, monospace;
+  color: #333;
+}
+
+.theme-dark .telegram-modal-title {
+  color: #e0e0e0;
+}
+
+.telegram-modal-content p {
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: FreeMono, monospace;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.theme-dark .telegram-modal-content p {
+  color: #d1d5db;
+}
+
+.telegram-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 15px;
+}
+
+.telegram-modal-button {
+  padding: 10px 20px;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: FreeMono, monospace;
+  border: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.telegram-modal-button.cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.theme-dark .telegram-modal-button.cancel-button {
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.telegram-modal-button.cancel-button:hover {
+  background-color: #d0d0d0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.theme-dark .telegram-modal-button.cancel-button:hover {
+  background-color: #444;
+}
+
+.telegram-modal-button.confirm-button {
+  background: linear-gradient(to right, #0088cc, #005f8c);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.telegram-modal-button.confirm-button:hover {
+  background: linear-gradient(to right, #006bb3, #004d73);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Telegram Input Styling */
+.telegram-input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-family: FreeMono, monospace;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: white;
+  color: #1f2937;
+  margin-bottom: 5px;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.telegram-input:focus {
+  border-color: #0088cc;
+  box-shadow: 0 0 0 2px rgba(0, 136, 204, 0.25);
+}
+
+.theme-dark .telegram-input {
+  background-color: #333;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.theme-dark .telegram-input:focus {
+  border-color: #0088cc;
+  box-shadow: 0 0 0 2px rgba(0, 136, 204, 0.5);
+}
+
+.telegram-input::placeholder {
+  color: #9ca3af;
+}
+
+.theme-dark .telegram-input::placeholder {
+  color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 567px) {
+  .telegram-modal {
+    padding: 20px;
+  }
+  
+  .telegram-modal-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  
+  .telegram-modal-content p {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  .telegram-modal-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+} 

@@ -19,7 +19,6 @@ export const saveTimerState = (hiveId, isActive, startTime, status) => {
     };
     
     localStorage.setItem(`${TIMER_PREFIX}${hiveId}`, JSON.stringify(state));
-    console.log(`[Timer Storage] Saved timer state for hive ${hiveId}:`, state);
   } catch (error) {
     console.error('[Timer Storage] Error saving timer state:', error);
   }

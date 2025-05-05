@@ -27,7 +27,7 @@
   font-weight: 1000;
 }
 
-/* Add responsive styling for smaller screens */
+
 @media (max-width: 992px) {
   .discover-text {
     font-size: 3rem;

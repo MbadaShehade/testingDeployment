@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/app/lib/mongodb';
+import { connectToDatabase } from '@/app/_lib/mongodb';
 
 // GET handler to retrieve air pump activations for a specific hive
 export async function GET(request) {

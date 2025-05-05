@@ -108,7 +108,6 @@ export default function LoggedInPage() {
       }
     };
 
-    // Handle any errors
     eventSource.onerror = (error) => {
       console.error('EventSource error:', error);
       eventSource.close();
@@ -177,7 +176,7 @@ export default function LoggedInPage() {
       <FlowersRenderer />
       <main className={`main-content ${showLogoutConfirm ? 'content-hidden' : ''}`}>
         <h2 className={`welcome-title ${theme === 'dark' ? 'dark' : 'light'}`}>
-          Welcome, {username}!
+          Welcome,{username}!
         </h2>
         <p className="welcome-description">
           Your HiveGuard dashboard gives you real-time insights into your beehive conditions. 

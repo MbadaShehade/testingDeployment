@@ -83,7 +83,7 @@
   -webkit-text-fill-color: transparent;
   margin: 0 0 15px;
   margin-top: -40px;
-  padding-right: 10px; /* Add padding to ensure text has enough space */
+  padding-right: 10px; 
 }
 
 .dark .step-title {
@@ -111,6 +111,7 @@
 }
 .monitoring-image {
   width: 370px !important;
+  height: auto;
 }
 
 /* Specific styling for the monitoring title to ensure visibility */

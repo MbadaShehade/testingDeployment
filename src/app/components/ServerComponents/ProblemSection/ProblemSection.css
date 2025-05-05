@@ -140,10 +140,6 @@ transform: scale(1.2);
 }
 }
 
-
-
-
-
 @media (max-width: 768px) {
 .honey-spoon-image {
   position: relative;
@@ -176,7 +172,6 @@ transform: scale(1.2);
 }
 }
 
-
 @media (min-width: 769px) and (max-width: 1200px) {
 .discover-solution{
   margin-top: 30px;
@@ -203,4 +198,3 @@ transform: scale(1.2);
 
 }
 }
-

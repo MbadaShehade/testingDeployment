@@ -4,11 +4,9 @@ import { promisify } from 'util';
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import { connectToDatabase } from '@/app/_lib/mongodb';
 
 const execAsync = promisify(exec);
-
-// Flask API URL (should be in environment variables in a real app)
-const SCHEDULER_API_URL = process.env.SCHEDULER_API_URL || 'http://localhost:5000/api/scheduler';
 
 // Store active schedulers
 const activeSchedulers = new Map();
@@ -30,7 +28,7 @@ export async function POST(request) {
       }
 
       // Start the scheduler process
-      const schedulerPath = path.join(process.cwd(), 'telegram_scheduler_mqtt.py');
+      const schedulerPath = path.join(process.cwd(), 'python/telegram_scheduler_mqtt.py');
       const args = [
         schedulerPath,
         '--hive_id', hiveId,
@@ -44,7 +42,7 @@ export async function POST(request) {
         args.push('--interval', interval);
       }
       
-      const scheduler = spawn('python', args);
+      const scheduler = spawn('python', ['-B', ...args]);
 
       // Store the process
       activeSchedulers.set(hiveId, scheduler);
@@ -131,29 +129,53 @@ export async function GET(request) {
 async function executeSchedulerCommand(action, hiveId, chatId, username, testMode, reportTime, interval) {
   try {
     if (action === 'start') {
-      // Try to fetch and save current hive data
+      // Try to fetch and save current hive data to MongoDB
       try {
-        // Create a JSON string with default values that will be updated by real data in the scheduler
+        // Create a data object with default values that will be updated by real data in the scheduler
         const hiveData = {
-          temperature: 24.9, // Default values closer to what's shown in the UI
-          humidity: 68.9,    // Default values closer to what's shown in the UI
-          timestamp: new Date().toISOString()
+          hiveId,
+          temperature: 24.9, 
+          humidity: 68.9,    
+          timestamp: new Date()
         };
         
-        const jsonData = JSON.stringify(hiveData, null, 2);
-        const escapedJson = jsonData.replace(/'/g, "\\'");
+        // Connect to MongoDB and save the data
+        const db = await connectToDatabase();
+        const hiveDataCollection = db.collection('hive_data');
         
-        // Save the data to a file that telegram_bot.py will read
-        await execAsync(`echo '${escapedJson}' > hive_data_${hiveId}.json`);
+        // Update or insert data for this hive
+        await hiveDataCollection.updateOne(
+          { hiveId: hiveId }, 
+          { $set: hiveData },
+          { upsert: true }
+        );
         
-        console.log(`Saved initial hive data for hive ${hiveId}`);
+        console.log(`Saved initial hive data to MongoDB for hive ${hiveId}`);
       } catch (saveError) {
-        console.error('Error saving initial hive data:', saveError);
-        // Continue even if saving fails
+        console.error('Error saving initial hive data to MongoDB:', saveError);
+        
+        // Fallback to file-based approach if MongoDB fails
+        try {
+          const hiveData = {
+            temperature: 24.9,
+            humidity: 68.9,
+            timestamp: new Date().toISOString()
+          };
+          
+          const jsonData = JSON.stringify(hiveData, null, 2);
+          const escapedJson = jsonData.replace(/'/g, "\\'");
+          
+          // Save the data to a file that telegram_bot.py will read
+          await execAsync(`echo '${escapedJson}' > hive_data_${hiveId}.json`);
+          
+          console.log(`Saved initial hive data to file for hive ${hiveId}`);
+        } catch (fileError) {
+          console.error('Error saving initial hive data to file:', fileError);
+        }
       }
       
       // Construct command to start the scheduler
-      let command = `python telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
+      let command = `python -B python/telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
       
       if (username) {
         command += ` --username "${username}"`;
@@ -185,7 +207,7 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
       // We would need a more complex solution to stop the scheduler via command line
       // A simple approach is to kill the process running the scheduler for this hive/chat combo
       try {
-        await execAsync(`pkill -f "telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
+        await execAsync(`pkill -f "python/telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
         return NextResponse.json({ 
           status: 'stopped',
           message: 'Scheduler stopped via command line'
@@ -201,10 +223,10 @@ async function executeSchedulerCommand(action, hiveId, chatId, username, testMod
       // For updating interval, we need to stop the current scheduler and start a new one
       try {
         // First, stop the current scheduler
-        await execAsync(`pkill -f "telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
+        await execAsync(`pkill -f "python/telegram_scheduler_mqtt.py.*hive_id ${hiveId}.*chat_id ${chatId}"`);
         
         // Then start a new one with the updated interval
-        let command = `python telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
+        let command = `python -B python/telegram_scheduler_mqtt.py --hive_id "${hiveId}" --chat_id "${chatId}" --password "hivemonitor"`;
         
         if (username) {
           command += ` --username "${username}"`;

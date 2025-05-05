@@ -132,11 +132,12 @@
 
 .metric-card {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .metric-card.temperature .metric-circle {
@@ -169,41 +170,59 @@
   box-shadow: 0 4px 16px rgba(14, 165, 147, 0.2);  /* Stronger air pump shadow on hover */
 }
 
-/* Remove the general shadow from metric-circle since we're using specific ones */
+/* Ensure the circle maintains perfect proportions */
 .metric-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
   background: #FFFFFF;
   border-radius: 50%;
-  width: 100%;
-  height: 100%;
+  width: 220px;
+  height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 0;
+  box-sizing: border-box;
   transition: box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+/* Ensure content is properly centered inside the circle */
+.metric-content {
+  text-align: center;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Make sure icons are properly centered */
+.metric-icon-temperature,
+.metric-icon-humidity,
+.metric-icon-air-pump {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .metric-icon-temperature {
   color: #ab1906cc;
-  margin-bottom: 0.5rem;
 }
 
 .metric-icon-humidity {
   color: #0EA5E9;
-  margin-bottom: 0.5rem;
 }
 
 .metric-icon-air-pump {
   color: #06b6d4;  /* Cyan color for air pump */
-  margin-bottom: 0.5rem;
-}
-
-.metric-content {
-  text-align: center;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .metric-content h3 {
@@ -215,24 +234,28 @@
 }
 
 .metric-value {
-  font-size: 2.5rem;
-  font-weight: 600;
+  font-size: 2.3rem;
+  font-weight: 400;
   color: #1F2937;
   line-height: 1;
   margin-bottom: 0.5rem;
+  font-family: FreeMono, monospace;
 }
 
 .metric-value.air-pump-value {
-  font-size: 2.5rem;
-  font-weight: 600;
+  font-size: 2.3rem;
+  font-weight: 400;
   color: #1F2937;
   line-height: 1;
   margin-bottom: 0.5rem;
+  font-family: FreeMono, monospace;
 }
 
 .metric-status {
   font-size: 0.875rem;
   font-weight: 500;
+  font-family: FreeMono, monospace;
+
 }
 
 .metric-status.optimal {
@@ -241,15 +264,29 @@
 
 .metric-status.warning {
   color: #d97706;
+  font-family: FreeMono, monospace;
 }
 
 .metric-status.critical {
   color: #dc2626;
+  font-family: FreeMono, monospace;
 }
 
 /* Dark theme adjustments */
 .theme-dark .metric-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
   background: #1E293B;
+  border-radius: 50%;
+  width: 220px;
+  height: 220px;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
 }
 
 .theme-dark .metric-content h3 {
@@ -441,7 +478,7 @@
   flex-direction: column;
   gap: 2rem;
   margin-top: 2rem;
-  width: 100%;
+  width: 96%;
 }
 
 .chart-section {
@@ -1137,6 +1174,7 @@
   background-color: #14213D;
   color: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  font-family: FreeMono, monospace;
 }
 
 .exact-screenshot-style.theme-light {
@@ -1360,37 +1398,43 @@
 
 .buttons-row {
   display: flex;
-  gap: 16px;
-  margin-top: 8px;
+  justify-content: center;
+  padding: 20px 0;
+  gap: 15px;
 }
 
-.send-report-button, 
-.toggle-button {
+.buttons-row .send-report-button {
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+}
+
+.send-report-button {
+  background: linear-gradient(to right, #0088cc, #005f8c);
+  color: white;
+  flex: 1;
+  border: none;
+  border-radius: 5px;
   padding: 10px 16px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: none;
-}
-
-.send-report-button {
-  background-color: #0EA5E9;
-  color: white;
-  flex: 1;
+  font-family: FreeMono, monospace;
+  position: relative;
+  overflow: hidden;
 }
 
 .send-report-button:hover {
-  background-color: #0284C7;
+  background: linear-gradient(to right, #006bb3, #004d73);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .send-report-button:disabled {
-  background-color: #0EA5E9;
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -1413,6 +1457,11 @@
 
 .spinner {
   animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Activation Log Table Styles */
@@ -1474,6 +1523,7 @@
   padding: 0;
   position: relative;
   overflow-x: hidden;
+  font-family: FreeMono, monospace;
 }
 
 /* Keep these air pump activation styles */
@@ -1578,16 +1628,21 @@
 
 .timer-display {
   margin-top: 10px;
-  padding: 6px 0;
-  font-family: monospace;
-  font-size: 16px;
+  padding: 8px 12px;
+  font-family: FreeMono, monospace;
+  font-size: 14px;
   font-weight: bold;
-  color: #06B6A5;
+  color: white;
   text-align: center;
-  width: 100%;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
+  background-color: rgba(6, 182, 165, 0.25);
+  border-radius: 12px;
+  border: 1px solid rgba(6, 182, 165, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   animation: pulse 2s infinite;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes pulse {
@@ -1597,7 +1652,10 @@
 }
 
 .theme-dark .timer-display {
-  color: #4fd1c5;
+  color: white;
+  background-color: rgba(6, 182, 165, 0.3);
+  border: 1px solid rgba(79, 209, 197, 0.6);
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Styling for the air pump activations table with scrolling */
@@ -1706,3 +1764,82 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .metric-card {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .metric-circle {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .theme-dark .metric-circle {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .metric-value {
+    font-size: 2rem;
+  }
+  
+  .metrics-container {
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metric-card {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .metric-circle {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .theme-dark .metric-circle {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .metric-value {
+    font-size: 1.75rem;
+  }
+  
+  .metrics-container {
+    gap: 2rem;
+  }
+}
+
+.clear-activations-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  background: linear-gradient(to right, #d8221f, #6b0000);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: FreeMono, monospace;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 130px;
+}
+
+.clear-activations-button:hover {
+  background: linear-gradient(to right, #d32f2f, #b71c1c);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.clear-activations-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

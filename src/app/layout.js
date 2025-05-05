@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Footer from "./components/ServerComponents/Footer/Footer";
-import { fetchServerMQTTMonitor } from './lib/mqtt-helpers';
+import { fetchServerMQTTMonitor } from './_lib/mqtt-helpers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
 
 export const metadata = {
   title: "HiveGuard - Protect Your Hive With IOT",
@@ -54,9 +55,11 @@ export default function RootLayout({ children }) {
                     document.body.classList.remove('theme-loading');
                   }, 50);
 
-                  // Handle page refresh - always scroll to top
+                  // Handle page refresh - only scroll to top if there's no hash
                   if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
-                    window.scrollTo(0, 0);
+                    if (!window.location.hash) {
+                      window.scrollTo(0, 0);
+                    }
                   }
                 } catch (e) {
                   console.error('Error in theme script:', e);
