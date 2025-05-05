@@ -12,6 +12,7 @@ import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/Flow
 import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
 import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
 import HistoricalDataGraph from '../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph';
+import TelegramModals from '../components/ClientComponents/TelegramModals/TelegramModals';
 import mqtt from 'mqtt';
 import { Chart } from 'chart.js/auto';
 import { MQTT_URL } from '../_lib/mqtt-config';
@@ -74,6 +75,11 @@ const HiveDetails = () => {
   const [sending, setSending] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState(null);
   const [isAirPumpActive, setIsAirPumpActive] = useState(false);
+  const [showTelegramSetupModal, setShowTelegramSetupModal] = useState(false);
+  const [showTelegramErrorModal, setShowTelegramErrorModal] = useState(false);
+  const [telegramErrorMessage, setTelegramErrorMessage] = useState('');
+  const [showChatIdInputModal, setShowChatIdInputModal] = useState(false);
+  const [inputChatId, setInputChatId] = useState('');
   const startTime = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalIdRef = useRef(null);
@@ -380,12 +386,21 @@ const HiveDetails = () => {
 
 
   const handleSetupTelegram = () => {
-    const chatId = prompt('Please enter your Telegram chat ID. To get your ID, contact @userinfobot on Telegram.');
-    if (!chatId) return;
+    setShowChatIdInputModal(true);
+  };
+
+  // Add handler for chat ID submission
+  const handleChatIdSubmit = () => {
+    if (!inputChatId) {
+      setShowChatIdInputModal(false);
+      return;
+    }
     
     // Validate chat ID (should be a number)
-    if (!/^-?\d+$/.test(chatId)) {
-      alert('Telegram chat ID must be a number. Please try again.');
+    if (!/^-?\d+$/.test(inputChatId)) {
+      setTelegramErrorMessage('Telegram chat ID must be a number. Please try again.');
+      setShowTelegramErrorModal(true);
+      setShowChatIdInputModal(false);
       return;
     }
     
@@ -397,24 +412,30 @@ const HiveDetails = () => {
       },
       body: JSON.stringify({
         email,
-        telegramChatId: chatId
+        telegramChatId: inputChatId
       }),
     })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        setTelegramChatId(chatId);
-        alert('Telegram chat ID saved successfully!');
+        setTelegramChatId(inputChatId);
+        setTelegramErrorMessage('Telegram chat ID saved successfully!');
+        setShowTelegramErrorModal(true);
       } else {
-        alert('Failed to save Telegram chat ID: ' + (data.error || 'Unknown error'));
+        setTelegramErrorMessage('Failed to save Telegram chat ID: ' + (data.error || 'Unknown error'));
+        setShowTelegramErrorModal(true);
       }
     })
     .catch(error => {
       console.error('Error saving Telegram chat ID:', error);
-      alert('Error saving Telegram chat ID');
+      setTelegramErrorMessage('Error saving Telegram chat ID');
+      setShowTelegramErrorModal(true);
+    })
+    .finally(() => {
+      setShowChatIdInputModal(false);
+      setInputChatId('');
     });
   };
-
 
   // Extract the report sending logic to a separate function
   const sendReport = async (isAutoReport = false) => {
@@ -558,13 +579,15 @@ const HiveDetails = () => {
         }
       } else {
         if (!isAutoReport) {
-          alert('Failed to send Telegram message. Please check your chat ID and try again.');
+          setTelegramErrorMessage('Failed to send Telegram message. Please check your chat ID and try again.');
+          setShowTelegramErrorModal(true);
         }
       }
     } catch (error) {
       console.error('Error:', error);
       setSending(false);
-      alert('Failed to send report. Please try again later.');
+      setTelegramErrorMessage('Failed to send report. Please try again later.');
+      setShowTelegramErrorModal(true);
     } finally {
       setSending(false);
     }
@@ -572,9 +595,8 @@ const HiveDetails = () => {
 
   const handleSendTelegram = () => {
     if (!telegramChatId) {
-      if (confirm('You need to set up your Telegram bot first. Would you like to do that now?')) {
-        handleSetupTelegram();
-      }
+      // Instead of confirm dialog, show our custom modal
+      setShowTelegramSetupModal(true);
       return;
     }
     
@@ -583,6 +605,14 @@ const HiveDetails = () => {
     sendReport(false); 
   };
 
+  const handleModalOverlayClick = (e) => {
+    // Only close if the click is directly on the overlay, not its children
+    if (e.target.className.includes('modal-overlay')) {
+      setShowTelegramSetupModal(false);
+      setShowTelegramErrorModal(false);
+      setShowChatIdInputModal(false);
+    }
+  };
 
   const [summaryDateRange, setSummaryDateRange] = useState('lastWeek');
   const [historicalDateRange, setHistoricalDateRange] = useState('lastWeek');
@@ -1952,12 +1982,11 @@ const HiveDetails = () => {
             </div>
           )}
           
-          <div className="buttons-row" style={{ justifyContent: 'center', padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div className="buttons-row">
             <button
               className="send-report-button"
               onClick={handleSendTelegram}
               disabled={sending}
-              style={{ width: '100%', maxWidth: '400px', alignSelf: 'center' }}
             >
               {sending ? (
                 <>
@@ -1971,7 +2000,7 @@ const HiveDetails = () => {
                     alt="Telegram"
                     width={18}
                     height={18}
-                    style={{ marginRight: '1px', borderRadius: '100%' }}
+                    style={{ marginRight: '5px', borderRadius: '100%' }}
                   />
                   Get Report Now via Telegram
                 </>
@@ -2030,7 +2059,7 @@ const HiveDetails = () => {
                   onClick={clearAirPumpActivations}
                 >
                   <Trash2 size={16} />
-                  Clear History
+                  <span>Clear History</span>
                 </button>
               </div>
             <div className="activation-table-container">
@@ -2073,6 +2102,21 @@ const HiveDetails = () => {
           </div>
         </div>
       </div>
+
+      <TelegramModals 
+        showTelegramSetupModal={showTelegramSetupModal}
+        showTelegramErrorModal={showTelegramErrorModal}
+        showChatIdInputModal={showChatIdInputModal}
+        telegramErrorMessage={telegramErrorMessage}
+        inputChatId={inputChatId}
+        setInputChatId={setInputChatId}
+        handleModalOverlayClick={handleModalOverlayClick}
+        setShowTelegramSetupModal={setShowTelegramSetupModal}
+        setShowTelegramErrorModal={setShowTelegramErrorModal}
+        setShowChatIdInputModal={setShowChatIdInputModal}
+        handleSetupTelegram={handleSetupTelegram}
+        handleChatIdSubmit={handleChatIdSubmit}
+      />
     </div>
   );
 };
