@@ -243,12 +243,12 @@
 }
 
 .metric-value.air-pump-value {
-  font-size: 2.3rem;
-  font-weight: 400;
+  font-size: 2rem;
+  font-weight: 600;
   color: #1F2937;
   line-height: 1;
   margin-bottom: 0.5rem;
-  font-family: FreeMono, monospace;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .metric-status {
@@ -1632,7 +1632,7 @@
   font-family: FreeMono, monospace;
   font-size: 14px;
   font-weight: bold;
-  color: white;
+  color: rgb(0, 0, 0);
   text-align: center;
   width: 90%;
   margin-left: auto;
@@ -1642,7 +1642,7 @@
   border: 1px solid rgba(6, 182, 165, 0.6);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   animation: pulse 2s infinite;
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  text-shadow: 0px 1px 2px rgba(44, 44, 44, 0.4);
 }
 
 @keyframes pulse {
@@ -1655,7 +1655,7 @@
   color: white;
   background-color: rgba(6, 182, 165, 0.3);
   border: 1px solid rgba(79, 209, 197, 0.6);
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0px 1px 2px rgba(44, 44, 44, 0.4);
 }
 
 /* Styling for the air pump activations table with scrolling */

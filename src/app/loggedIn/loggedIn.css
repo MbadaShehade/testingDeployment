@@ -54,7 +54,7 @@
 }
 
 .logout-button:hover {
-  background-color: #483420;
+  background: linear-gradient(to right, #b52c2c, #6e1b1b) !important;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer !important;
 }
@@ -286,14 +286,14 @@
 }
 
 .confirm-button {
-  background: linear-gradient(to right, #8d7864, #5f462e);
+  background: linear-gradient(to right, #c53030, #7f1d1d);
   color: white;
   position: relative;
   overflow: hidden;
 }
 
 .confirm-button:hover {
-  background: linear-gradient(to right, #7d6854, #4f361e);
+  background: linear-gradient(to right, #b52c2c, #6e1b1b);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 

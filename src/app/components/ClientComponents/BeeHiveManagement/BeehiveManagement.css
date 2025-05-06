@@ -799,58 +799,74 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.5s ease;
+  backdrop-filter: blur(5px);
 }
 
 .loading-card {
-  background: white;
+  background-color: white;
   border-radius: 12px;
-  padding: 30px;
-  width: 90%;
-  max-width: 300px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.3s ease-out;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  width: 85%;
+  max-width: 320px;
+  animation: cardSlideUp 0.6s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .theme-dark .loading-card {
-  background: #2a2a2a;
-  color: white;
+  background-color: #1e293b;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #8d7864;
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(186, 103, 25, 0.3);
+  border-top: 4px solid #ba6719;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 1.2s linear infinite;
+  margin-bottom: 16px;
 }
 
 .theme-dark .loading-spinner {
-  border: 4px solid #333;
-  border-top: 4px solid #f0c14b;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #ba6719;
 }
 
 .loading-text {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1f2937;
   text-align: center;
-  color: #333;
   font-family: FreeMono, monospace;
+  margin-bottom: 8px;
 }
 
 .theme-dark .loading-text {
-  color: #fff;
+  color: #e5e7eb;
+}
+
+.loading-subtext {
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: center;
+  font-family: FreeMono, monospace;
+}
+
+.theme-dark .loading-subtext {
+  color: #9ca3af;
 }
 
 @keyframes spin {
@@ -859,6 +875,36 @@
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cardSlideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+.add-hive-button {
+  background: linear-gradient(to right, #8d7864, #5f462e);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 30px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: FreeMono, monospace;
+  position: relative;
+  overflow: hidden;
+  min-width: 220px;
 }

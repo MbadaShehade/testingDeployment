@@ -7,23 +7,37 @@ import { useRouter, usePathname } from 'next/navigation';
 export default function Navigation({ isLoggedIn, hiveDetails }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   
   useEffect(() => {
+    // Mark as mounted to enable client-side rendering
+    setIsMounted(true);
+    
+    // Set initial window width
     setWindowWidth(window.innerWidth);
+    
     const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
+    
+    // Handle click outside to close menu
+    const handleClickOutside = (event) => {
+      if (menuOpen && 
+          menuRef.current && 
+          !menuRef.current.contains(event.target) &&
+          hamburgerRef.current &&
+          !hamburgerRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
 
-    // Handle page refresh - don't force scroll to top if there's a hash
+    // Handle scroll to hash
     if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
       if (window.location.hash) {
-        // Don't scroll to top if there's a hash, let the hash handler work
         router.replace(window.location.pathname + window.location.hash);
       } else {
-        // Only scroll to top if there's no hash
         window.scrollTo(0, 0);
       }
     } 
@@ -35,17 +49,8 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       }
     }
 
-  
-    const handleClickOutside = (event) => {
-      if (menuOpen && 
-          menuRef.current && 
-          !menuRef.current.contains(event.target) &&
-          hamburgerRef.current &&
-          !hamburgerRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    };
-
+    // Add event listeners
+    window.addEventListener('resize', handleResize);
     document.addEventListener('mousedown', handleClickOutside);
     
     return () => {
@@ -77,6 +82,25 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       router.push(`/#${id}`);
     }
   };
+
+  // If not mounted, return a placeholder structure that matches client render
+  if (!isMounted) {
+    return (
+      <>
+        {!isLoggedIn && !hiveDetails && (
+          <nav>
+            <ul className="nav-links">
+              <li><a href="#problem" className="nav-link"><i>The Problem</i></a></li>
+              <li><a href="#how-it-works" className="nav-link"><i>Our Solution</i></a></li>
+            </ul>
+          </nav>
+        )}
+        <div className="header-controls">
+          <ThemeToggle />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import  './BeehiveManagement.css';
 import mqtt from 'mqtt';
 
-const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups}) => {
+const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups, returnFromHive = false}) => {
   const router = useRouter();
   const [selectedHive, setSelectedHive] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(returnFromHive);
   const { theme } = useTheme();
   const [message, setMessage] = useState({ text: '', type: '' });
   const [showAddHiveConfirm, setShowAddHiveConfirm] = useState(false);
@@ -18,13 +19,22 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
 
   // Log when props change
   useEffect(() => {
-    console.log('BeehiveManagement props updated:', { email, username, password: password ? '[PRESENT]' : '[MISSING]' });
-  }, [email, username, password]);
+    console.log('BeehiveManagement props updated:', { email, username, password: password ? '[PRESENT]' : '[MISSING]', returnFromHive });
+  }, [email, username, password, returnFromHive]);
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // If returning from hive details, show a brief loading state
+    if (returnFromHive) {
+      const timer = setTimeout(() => {
+        setInitialLoading(false);
+      }, 1200); 
+      
+      return () => clearTimeout(timer);
+    }
+  }, [returnFromHive]);
 
   const addHive = async (groupId, hexIndex) => {
     // Check if this position already has a hive in the current state
@@ -212,6 +222,20 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
   // Don't render until client-side to avoid hydration mismatch
   if (!mounted) return null;
   
+  // Show loading state when returning from hive details
+  if (initialLoading) {
+    return (
+      <div className={`app-container theme-${theme}`}>
+        <div className="loading-overlay">
+          <div className="loading-card">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">Loading beehive management...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   // Create a hexagon SVG with hive name
   const Hexagon = ({ filled, label, onClick }) => {
     const isDark = theme === 'dark';
@@ -378,7 +402,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
                 </button>
                 <button 
                   onClick={handleConfirmAddHive} 
-                  className="logout-modal-button confirm-button"
+                  className="add-hive-button"
                 >
                   Add Hive
                 </button>
@@ -392,3 +416,4 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
 };
 
 export default BeehiveManagement;
+
