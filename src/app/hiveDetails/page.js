@@ -13,6 +13,7 @@ import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTem
 import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
 import HistoricalDataGraph from '../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph';
 import TelegramModals from '../components/ClientComponents/TelegramModals/TelegramModals';
+import ClearHistoryModal from '../components/ClientComponents/ClearHistoryModal/ClearHistoryModal';
 import mqtt from 'mqtt';
 import { Chart } from 'chart.js/auto';
 import { MQTT_URL } from '../_lib/mqtt-config';
@@ -79,6 +80,7 @@ const HiveDetails = () => {
   const [showTelegramErrorModal, setShowTelegramErrorModal] = useState(false);
   const [telegramErrorMessage, setTelegramErrorMessage] = useState('');
   const [showChatIdInputModal, setShowChatIdInputModal] = useState(false);
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
   const [inputChatId, setInputChatId] = useState('');
   const startTime = useRef(0);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -1670,7 +1672,7 @@ const HiveDetails = () => {
   const handleReturnClick = () => {
     const email = searchParams.get('email');
     const username = searchParams.get('username');
-    router.push(`/loggedIn?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
+    router.push(`/loggedIn?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&returnFromHive=true`);
   };
 
   const handleExport = (chartType, format) => {
@@ -1816,6 +1818,8 @@ const HiveDetails = () => {
 
   // Add function to clear air pump activations
   const clearAirPumpActivations = async () => {
+    setShowClearHistoryModal(false);
+    
     if (!hiveId || !email) {
       console.error("Missing hiveId or email for clearing activations");
       return;
@@ -1969,14 +1973,15 @@ const HiveDetails = () => {
           
           {successMessage && (
             <div className="status-message success" style={{ 
-                backgroundColor: '#4ade80', 
+                background: 'linear-gradient(135deg, #4ade80 0%,rgb(23, 171, 77) 100%)', 
                 color: '#052e16', 
                 padding: '12px', 
                 borderRadius: '6px',
                 marginBottom: '15px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px' 
+                gap: '8px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
               }}>
               <CheckCircle size={18} />
               <span>{successMessage}</span>
@@ -2055,14 +2060,14 @@ const HiveDetails = () => {
           <div className="air-pump-activations">
             <h2 className={`compare-hives-title ${theme === 'dark' ? 'dark' : 'light'}`}>Check last air pump activations</h2>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-                <button
-                  className="clear-activations-button"
-                  onClick={clearAirPumpActivations}
-                >
-                  <Trash2 size={16} />
-                  <span>Clear History</span>
-                </button>
-              </div>
+              <button
+                className="clear-activations-button"
+                onClick={() => setShowClearHistoryModal(true)}
+              >
+                <Trash2 size={16} />
+                <span>Clear History</span>
+              </button>
+            </div>
             <div className="activation-table-container">
               
               <table className="activation-log-table" style={{ padding: 0, margin: 0, borderSpacing: 0 }}>
@@ -2117,6 +2122,17 @@ const HiveDetails = () => {
         setShowChatIdInputModal={setShowChatIdInputModal}
         handleSetupTelegram={handleSetupTelegram}
         handleChatIdSubmit={handleChatIdSubmit}
+      />
+
+      <ClearHistoryModal
+        isOpen={showClearHistoryModal}
+        onClose={() => setShowClearHistoryModal(false)}
+        onConfirm={clearAirPumpActivations}
+        title="Clear Air Pump History"
+        message="Are you sure you want to clear all air pump activation history?"
+        confirmText="Yes, Clear History"
+        cancelText="Cancel"
+        theme={theme}
       />
     </div>
   );
