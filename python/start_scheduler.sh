@@ -5,8 +5,8 @@
 # Kill any existing scheduler processes
 pkill -f "python telegram_scheduler_mqtt.py"
 
-# Start the scheduler in the background
-nohup python telegram_scheduler_mqtt.py --hive_id 1 --chat_id 1234204680 --password test --username test > /dev/null 2>&1 &
+# Start all user schedulers in the background
+nohup python start_schedulers_for_all_users.py > /dev/null 2>&1 &
 
 # Print the process ID
-echo "Scheduler started with PID: $!" 
+echo "All schedulers started with PID: $!" 

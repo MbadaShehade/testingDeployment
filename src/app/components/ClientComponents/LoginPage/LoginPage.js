@@ -134,7 +134,7 @@ export default function LoginPage() {
         // Store both the original password (for MQTT) and encrypted password (from DB)
         const originalPassword = password; // The password before encryption
         router.push(`/loggedIn?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(originalPassword)}`);
-      }, 1000);
+      }, 1500);
 
     } catch (err) {
       setIsLoading(false);

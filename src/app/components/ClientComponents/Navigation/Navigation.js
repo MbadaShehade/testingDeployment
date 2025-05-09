@@ -36,9 +36,7 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
     // Handle scroll to hash
     if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
       if (window.location.hash) {
-        router.replace(window.location.pathname + window.location.hash);
-      } else {
-        window.scrollTo(0, 0);
+        router.replace(window.location.pathname);
       }
     } 
     else if (window.location.hash && pathname === '/') {
@@ -74,9 +72,6 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       if (targetElement) {
         // Scroll immediately without delay
         targetElement.scrollIntoView({ behavior: 'smooth' });
-        
-        // Update URL without page reload, for bookmarking
-        window.history.pushState(null, '', `#${id}`);
       }
     } else {
       router.push(`/#${id}`);
