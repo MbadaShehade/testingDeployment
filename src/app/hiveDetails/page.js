@@ -1316,17 +1316,17 @@ const HiveDetails = () => {
       setHiveData(data);
     }
 
-    // Get the user's password from URL parameters first
-    const userPassword = searchParams.get('password');
-    if (!userPassword) {
-        console.error('No user password found for MQTT topics');
+    // Get the user's username from URL parameters or sessionStorage
+    const userNameForTopic = searchParams.get('username') || sessionStorage.getItem('username');
+    if (!userNameForTopic) {
+        console.error('No username found for MQTT topics');
         return;
     }
 
     // Define topics before MQTT setup
-    const tempTopic = `${userPassword}/moldPrevention/hive${hiveId}/temp`;
-    const humidityTopic = `${userPassword}/moldPrevention/hive${hiveId}/humidity`;
-    const airPumpTopic = `${userPassword}/moldPrevention/hive${hiveId}/airPump`;
+    const tempTopic = `${userNameForTopic}/moldPrevention/hive${hiveId}/temp`;
+    const humidityTopic = `${userNameForTopic}/moldPrevention/hive${hiveId}/humidity`;
+    const airPumpTopic = `${userNameForTopic}/moldPrevention/hive${hiveId}/airPump`;
 
     // MQTT client setup with WebSocket
     const client = mqtt.connect(MQTT_URL, {

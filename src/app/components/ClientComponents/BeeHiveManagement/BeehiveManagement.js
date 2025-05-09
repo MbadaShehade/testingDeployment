@@ -126,11 +126,11 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
     
     try {
       // Try to get password from props or sessionStorage
-      const userPassword = password || sessionStorage.getItem('userPassword');
+      const userNameForTopic = username || sessionStorage.getItem('username');
       
-      if (!userPassword) {
-        console.error('No password provided to BeehiveManagement');
-        setMessage({ text: 'Error: Missing password', type: 'error' });
+      if (!userNameForTopic) {
+        console.error('No username provided to BeehiveManagement for MQTT topic');
+        setMessage({ text: 'Error: Missing username for MQTT topic', type: 'error' });
         setTimeout(() => setMessage({ text: '', type: '' }), 3000);
         setIsLoading(false);
         return;
@@ -152,19 +152,24 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
       let tempValue = null;
       let humidityValue = null;
 
+      // Track connection state
+      let isConnected = false;
       // Set a timeout for waiting for data
       const timeout = setTimeout(() => {
-        client.end();
-        setMessage({ text: 'Setup hive sensors and try again', type: 'error' });
-        setTimeout(() => setMessage({ text: '', type: '' }), 5000);
-        setIsLoading(false);
+        if (!isConnected) {
+          client.end();
+          setMessage({ text: 'Setup hive sensors and try again', type: 'error' });
+          setTimeout(() => setMessage({ text: '', type: '' }), 5000);
+          setIsLoading(false);
+        }
       }, 10000); // 10 second timeout
 
       client.on('connect', () => {
+        isConnected = true;
+        clearTimeout(timeout);
         console.log('Connected to MQTT broker for initial data');
-        const tempTopic = `${userPassword}/moldPrevention/hive${hive.id}/temp`;
-        const humidityTopic = `${userPassword}/moldPrevention/hive${hive.id}/humidity`;
-        
+        const tempTopic = `${userNameForTopic}/moldPrevention/hive${hive.id}/temp`;
+        const humidityTopic = `${userNameForTopic}/moldPrevention/hive${hive.id}/humidity`;
         client.subscribe([tempTopic, humidityTopic]);
       });
 
@@ -194,7 +199,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
             timestamp: Date.now()
           }));
 
-          router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(userPassword)}`);
+          router.push(`/hiveDetails?id=${hive.id}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(userNameForTopic)}&password=${encodeURIComponent(password)}`);
         }
       });
 
@@ -416,4 +421,3 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
 };
 
 export default BeehiveManagement;
-

@@ -7,8 +7,8 @@ import MoreDetailsLink from '../../ClientComponents/MoreDetailsLink/MoreDetailsL
 
 export default function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="how-it-works-section">
-        <h2 className="how-it-works-title">How it works?</h2>
+    <section  className="how-it-works-section">
+        <h2 id="how-it-works" className="how-it-works-title">How it works?</h2>
         <div className="steps-container">
             <div className="step-item1">
                 <h4 className="step-title">1.Setting sensors</h4>

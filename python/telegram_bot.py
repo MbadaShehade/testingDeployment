@@ -25,27 +25,6 @@ def get_mongodb_connection():
         print(f"MongoDB connection error: {e}")
         return None
 
-def send_telegram_message(message, user_chat_id=None):
-    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    # Use provided chat_id or fall back to default from .env
-    chat_id = user_chat_id or os.getenv('TELEGRAM_CHAT_ID')
-    
-    url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-    data = {
-        'chat_id': chat_id,
-        'text': message
-    }
-    
-    try:
-        response = requests.post(url, data=data)
-        if response.status_code == 200:
-            print("Message sent successfully!")
-        else:
-            print(f"Failed to send message. Status code: {response.status_code}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
 def send_telegram_pdf(hive_id=None, temperature=None, humidity=None, user_chat_id=None, temperature_image=None, humidity_image=None, username=None, send_now=False, force_white_background=False, report_type=None, air_pump_status=None):
     bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
     # Use provided chat_id or fall back to default from .env
