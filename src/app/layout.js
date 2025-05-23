@@ -23,7 +23,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   // Initialize MQTT monitoring service on server
-  fetchServerMQTTMonitor();
+  // fetchServerMQTTMonitor();
   
   return (
     <html lang="en" suppressHydrationWarning>
