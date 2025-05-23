@@ -17,7 +17,6 @@ export async function POST(request) {
       );
     }
     
-    
     // Return all beehives of the user
     return NextResponse.json({
       beehives: user.beehives || []
