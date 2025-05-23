@@ -1,5 +1,6 @@
-export const dynamic = "force-dynamic";
 'use client';
+export const dynamic = "force-dynamic";
+
 
 import './hiveDetails.css';
 import React, { useState, useEffect, useRef } from 'react';
