@@ -13,6 +13,7 @@ from io import BytesIO
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
+
 # Load environment variables
 load_dotenv('.env.local')
 
@@ -30,46 +31,6 @@ def get_mongodb_connection():
         print(f"MongoDB connection error: {e}")
         return None
 
-class PDFBorder(Flowable):
-    """Custom Flowable to draw a decorative border around the page"""
-    
-    def __init__(self, width, height):
-        Flowable.__init__(self)
-        self.width = width
-        self.height = height
-        
-    def draw(self):
-        # Get the canvas
-        canvas = self.canv
-        
-        # Save the canvas state
-        canvas.saveState()
-        
-        # Set up border style
-        canvas.setStrokeColor(colors.orange)
-        canvas.setLineWidth(2)
-        
-        # Draw main outer border
-        canvas.rect(10, 10, self.width - 20, self.height - 20)
-        
-        # Draw decorative inner border
-        canvas.setStrokeColor(colors.darkorange)
-        canvas.setLineWidth(1)
-        canvas.rect(15, 15, self.width - 30, self.height - 30)
-        
-        # Add decorative corners
-        corner_size = 15
-        # Top-left corner
-        canvas.line(15, 15 + corner_size, 15 + corner_size, 15)
-        # Top-right corner
-        canvas.line(self.width - 15 - corner_size, 15, self.width - 15, 15 + corner_size)
-        # Bottom-left corner
-        canvas.line(15, self.height - 15 - corner_size, 15 + corner_size, self.height - 15)
-        # Bottom-right corner
-        canvas.line(self.width - 15 - corner_size, self.height - 15, self.width - 15, self.height - 15 - corner_size)
-        
-        # Restore the canvas state
-        canvas.restoreState()
 
 class PageTemplate(canvas.Canvas):
     """Class to create a PDF with a decorative border on each page"""
@@ -183,24 +144,6 @@ def create_placeholder_chart(chart_type, value=None):
     return base64.b64encode(image_png).decode('utf-8')
 
 def create_hive_report_pdf(filename="hive_report.pdf", hive_id=None, temperature=None, humidity=None, temperature_image=None, humidity_image=None, username=None, force_white_background=False, report_type=None, air_pump_status=None):
-    """
-    Create a PDF report with the current temperature and humidity data from a beehive.
-    
-    Args:
-        filename (str): The name of the output PDF file
-        hive_id (str): The ID of the hive
-        temperature (float): Current temperature reading
-        humidity (float): Current humidity reading
-        temperature_image (str): Base64 encoded temperature graph image
-        humidity_image (str): Base64 encoded humidity graph image
-        username (str): Name of the user generating the report
-        force_white_background (bool): If True, always generate new placeholder charts with white backgrounds
-        report_type (str): Type of report (Automatic, Manual, etc.)
-        air_pump_status (str): Status of the air pump (ON or OFF)
-    
-    Returns:
-        str: Path to the created PDF file
-    """
     # Try to load data if values are not provided
     if (temperature is None or humidity is None) and hive_id is not None:
         try:

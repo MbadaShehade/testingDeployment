@@ -7,35 +7,22 @@ import { useRouter, usePathname } from 'next/navigation';
 export default function Navigation({ isLoggedIn, hiveDetails }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   
   useEffect(() => {
+    // Mark as mounted to enable client-side rendering
+    setIsMounted(true);
+    
+    // Set initial window width
     setWindowWidth(window.innerWidth);
+    
     const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-
-    // Handle page refresh - don't force scroll to top if there's a hash
-    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
-      if (window.location.hash) {
-        // Don't scroll to top if there's a hash, let the hash handler work
-        router.replace(window.location.pathname + window.location.hash);
-      } else {
-        // Only scroll to top if there's no hash
-        window.scrollTo(0, 0);
-      }
-    } 
-    else if (window.location.hash && pathname === '/') {
-      const targetId = window.location.hash.substring(1);
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-  
+    
+    // Handle click outside to close menu
     const handleClickOutside = (event) => {
       if (menuOpen && 
           menuRef.current && 
@@ -46,6 +33,22 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       }
     };
 
+    // Handle scroll to hash
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
+      if (window.location.hash) {
+        router.replace(window.location.pathname);
+      }
+    } 
+    else if (window.location.hash && pathname === '/') {
+      const targetId = window.location.hash.substring(1);
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Add event listeners
+    window.addEventListener('resize', handleResize);
     document.addEventListener('mousedown', handleClickOutside);
     
     return () => {
@@ -69,14 +72,30 @@ export default function Navigation({ isLoggedIn, hiveDetails }) {
       if (targetElement) {
         // Scroll immediately without delay
         targetElement.scrollIntoView({ behavior: 'smooth' });
-        
-        // Update URL without page reload, for bookmarking
-        window.history.pushState(null, '', `#${id}`);
       }
     } else {
       router.push(`/#${id}`);
     }
   };
+
+  // If not mounted, return a placeholder structure that matches client render
+  if (!isMounted) {
+    return (
+      <>
+        {!isLoggedIn && !hiveDetails && (
+          <nav>
+            <ul className="nav-links">
+              <li><a href="#problem" className="nav-link"><i>The Problem</i></a></li>
+              <li><a href="#how-it-works" className="nav-link"><i>Our Solution</i></a></li>
+            </ul>
+          </nav>
+        )}
+        <div className="header-controls">
+          <ThemeToggle />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

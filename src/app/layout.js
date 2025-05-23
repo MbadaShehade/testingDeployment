@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata = {
   title: "HiveGuard - Protect Your Hive With IOT",
   description: "HiveGuard offers an innovative IoT-based monitoring system that prevents mold growth in beehives.",
@@ -27,11 +28,8 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        {/* Add a style to hide content until theme is applied */}
+        <link rel="icon" href="/beeHiveGuard.png" />
         <style dangerouslySetInnerHTML={{ __html: `
-          .theme-loading {
-            visibility: hidden;
-          }
           html {
             scroll-behavior: smooth;
             scroll-padding-top: 70px;
@@ -40,20 +38,11 @@ export default function RootLayout({ children }) {
             scroll-behavior: smooth;
           }
         `}} />
-        {/* Script to prevent flash of unstyled content and handle page refresh */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // Add theme-loading class to body instead of html
-                  document.body.classList.add('theme-loading');
-                  
-                  // Remove theme-loading class after a short delay
-                  setTimeout(function() {
-                    document.body.classList.remove('theme-loading');
-                  }, 50);
-
                   // Handle page refresh - only scroll to top if there's no hash
                   if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
                     if (!window.location.hash) {

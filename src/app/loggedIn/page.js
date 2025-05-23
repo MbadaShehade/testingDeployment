@@ -162,6 +162,10 @@ export default function LoggedInPage() {
         <button
           onClick={handleLogoutClick}
           className='logout-button'
+          style={{
+            background: 'linear-gradient(to right, #c53030, #7f1d1d)',
+            color: 'white'
+          }}
         >
           <Image 
             src={"/logout.png"} 
@@ -192,7 +196,8 @@ export default function LoggedInPage() {
         username={username} 
         password={userPassword}
         hiveGroups={hiveGroups} 
-        setHiveGroups={setHiveGroups} 
+        setHiveGroups={setHiveGroups}
+        returnFromHive={searchParams.get('returnFromHive') === 'true'}
       />
       
       
