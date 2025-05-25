@@ -19,5 +19,3 @@ export default function LoggedInPageWrapper(props) {
     </Suspense>
   );
 }
-
-// Move the main logic to LoggedInPageInner (rename the original default export)
