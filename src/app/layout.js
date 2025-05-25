@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import Footer from "./components/ServerComponents/Footer/Footer";
+// import Footer from "./components/ServerComponents/Footer/Footer";
 import { fetchServerMQTTMonitor } from './_lib/mqtt-helpers';
 
 const geistSans = Geist({
@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "HiveGuard - Protect Your Hive With IOT",
@@ -22,7 +23,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   // Initialize MQTT monitoring service on server
-  fetchServerMQTTMonitor();
+  // fetchServerMQTTMonitor();
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -63,7 +64,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="App">
             {children}
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </ThemeProvider>    
       </body>   
