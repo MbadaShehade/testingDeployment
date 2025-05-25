@@ -10,6 +10,7 @@ import FlowersRenderer from './components/ClientComponents/FlowersRenderer/Flowe
 import SwipeUpButton from './components/ClientComponents/SwipeUpButton/SwipeUpButton';
 import ScrollHandler from './components/ClientComponents/ScrollHandler/ScrollHandler';
 
+
 export default function Home() {
   return (
     <div className="App">
