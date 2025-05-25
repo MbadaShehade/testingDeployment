@@ -135,7 +135,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         return;
       }
 
-      const client = mqtt.connect('wss://test.mosquitto.org:8080', {
+      const client = mqtt.connect('ws://test.mosquitto.org:8080', {
         clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
         clean: true,
         reconnectPeriod: 0,
