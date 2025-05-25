@@ -26,6 +26,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
   useEffect(() => {
     setMounted(true);
     
+    
     // If returning from hive details, show a brief loading state
     if (returnFromHive) {
       const timer = setTimeout(() => {
@@ -139,25 +140,27 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
         clean: true,
         reconnectPeriod: 0,
-        connectTimeout: 30000, 
-        keepalive: 60,       
-        resubscribe: false,   
-        protocol: 'wss',       
-        qos: 1               
+        connectTimeout: 10000, // 10 seconds max for connection
+        keepalive: 60,
+        resubscribe: false,
+        protocol: 'ws',
+        qos: 1
       });
 
+      // Both timeouts set to 10 seconds
       let connectionTimeout = setTimeout(() => {
         if (client) {
+          clearTimeout(dataTimeout);
           client.end(true);
           setMessage({ text: 'Connection timeout. Please try again.', type: 'error' });
           setTimeout(() => setMessage({ text: '', type: '' }), 3000);
           setIsLoading(false);
         }
-      }, 31000);
+      }, 10000); // 10 seconds
 
-      // --- DATA TIMEOUT: If no sensor data received in 10 seconds, show error and stop loading ---
       let dataTimeout = setTimeout(() => {
         if (client) {
+          clearTimeout(connectionTimeout);
           client.end(true);
           setMessage({ text: 'No sensor data received. Please check your hive sensors.', type: 'error' });
           setTimeout(() => setMessage({ text: '', type: '' }), 4000);
