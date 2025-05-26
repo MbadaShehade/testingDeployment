@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import PDFDocument from 'pdfkit';
 
 export async function POST(request) {
   try {
@@ -23,57 +24,72 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'chatId is required' }, { status: 400 });
     }
 
-    // 1. Send a text message summarizing the report
-    let text = `🐝 Hive Report\n`;
-    if (username) text += `User: ${username}\n`;
-    if (hiveId) text += `Hive ID: ${hiveId}\n`;
-    if (typeof temperature === 'number') text += `Temperature: ${temperature}°C\n`;
-    if (typeof humidity === 'number') text += `Humidity: ${humidity}%\n`;
-    if (airPumpStatus) text += `Air Pump: ${airPumpStatus}\n`;
-    if (reportType) text += `Report Type: ${reportType}\n`;
+    // 1. Generate PDF in memory
+    const doc = new PDFDocument({ autoFirstPage: false });
+    let buffers = [];
+    doc.on('data', buffers.push.bind(buffers));
 
-    const sendMessageUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const sendPhotoUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+    // Add a page and write content
+    doc.addPage();
+    doc.fontSize(20).text('🐝 Hive Report', { align: 'center' });
+    doc.moveDown();
+    if (username) doc.fontSize(14).text(`User: ${username}`);
+    if (hiveId) doc.fontSize(14).text(`Hive ID: ${hiveId}`);
+    if (typeof temperature === 'number') doc.fontSize(14).text(`Temperature: ${temperature}°C`);
+    if (typeof humidity === 'number') doc.fontSize(14).text(`Humidity: ${humidity}%`);
+    if (airPumpStatus) doc.fontSize(14).text(`Air Pump: ${airPumpStatus}`);
+    if (reportType) doc.fontSize(14).text(`Report Type: ${reportType}`);
+    doc.moveDown();
 
-    // Send the text message
-    const msgRes = await fetch(sendMessageUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
-    const msgData = await msgRes.json();
-    if (!msgData.ok) {
-      return NextResponse.json({ success: false, message: 'Failed to send Telegram message', error: msgData.description }, { status: 500 });
-    }
-
-    // Helper to send a base64 image as photo
-    async function sendBase64Image(base64, caption) {
+    // Helper to embed base64 PNG image
+    function embedBase64Image(base64, label) {
       if (!base64) return;
-      // Remove data URL prefix if present
       const matches = base64.match(/^data:image\/(png|jpeg);base64,(.+)$/);
       const b64 = matches ? matches[2] : base64;
       const buffer = Buffer.from(b64, 'base64');
-      const formData = new FormData();
-      formData.append('chat_id', chatId);
-      formData.append('photo', new Blob([buffer], { type: 'image/png' }), 'chart.png');
-      if (caption) formData.append('caption', caption);
-      const res = await fetch(sendPhotoUrl, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.description || 'Failed to send photo');
+      doc.addPage();
+      doc.fontSize(16).text(label, { align: 'center' });
+      doc.moveDown();
+      try {
+        doc.image(buffer, {
+          fit: [450, 400],
+          align: 'center',
+          valign: 'center',
+        });
+      } catch (e) {
+        doc.fontSize(12).fillColor('red').text('Failed to embed image.', { align: 'center' });
+      }
+      doc.moveDown();
     }
 
-    // Send temperature image if provided
+    // Embed images if provided
     if (temperature_image) {
-      await sendBase64Image(temperature_image, 'Temperature Chart');
+      embedBase64Image(temperature_image, 'Temperature Chart');
     }
-    // Send humidity image if provided
     if (humidity_image) {
-      await sendBase64Image(humidity_image, 'Humidity Chart');
+      embedBase64Image(humidity_image, 'Humidity Chart');
     }
 
-    return NextResponse.json({ success: true, message: 'Telegram report sent successfully' });
+    doc.end();
+
+    // Wait for PDF buffer
+    await new Promise(resolve => doc.on('end', resolve));
+    const pdfBuffer = Buffer.concat(buffers);
+
+    // 2. Send PDF to Telegram
+    const formData = new FormData();
+    formData.append('chat_id', chatId);
+    formData.append('document', new Blob([pdfBuffer], { type: 'application/pdf' }), 'HiveReport.pdf');
+
+    const sendDocUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`;
+    const res = await fetch(sendDocUrl, { method: 'POST', body: formData });
+    const tgData = await res.json();
+    if (!tgData.ok) {
+      return NextResponse.json({ success: false, message: 'Failed to send PDF', error: tgData.description }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, message: 'PDF report sent successfully' });
   } catch (error) {
-    console.error('Error sending Telegram report:', error);
+    console.error('Error sending Telegram PDF:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 } 
