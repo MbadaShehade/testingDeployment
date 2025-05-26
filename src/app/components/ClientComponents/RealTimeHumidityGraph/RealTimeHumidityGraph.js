@@ -22,8 +22,11 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+<<<<<<< HEAD
 
 const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), { ssr: false });
+=======
+>>>>>>> 7ac35d8b1401eedf49936fbe4ed9f5b704280e23
 
 const RealTimeHumidityGraph = ({ 
   theme, 
