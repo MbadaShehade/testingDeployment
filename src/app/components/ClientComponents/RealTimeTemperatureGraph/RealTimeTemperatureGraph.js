@@ -1,8 +1,30 @@
 'use client';
 
 import React from 'react';
-import { Line } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
 import { Download } from 'lucide-react';
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Tooltip,
+  Legend
+);
+
+const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), { ssr: false });
 
 const RealTimeTemperatureGraph = ({ 
   theme, 
@@ -13,6 +35,8 @@ const RealTimeTemperatureGraph = ({
   setActiveDropdown, 
   handleExport 
 }) => {
+  console.log('temperatureData', temperatureData);
+  console.log('chartOptions', chartOptions);
   return (
     <div className="chart-section">
       <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
@@ -22,6 +46,7 @@ const RealTimeTemperatureGraph = ({
         Date: {formatDate(new Date())}
       </div>
       <div className="chart-wrapper" id="temperature-chart">
+       
         <Line data={temperatureData} options={chartOptions} />
       </div>
       <div className="export-container">

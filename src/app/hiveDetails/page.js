@@ -571,10 +571,10 @@ const HiveDetails = () => {
       const data = await response.json();
       if (data.success) {
         if (!isAutoReport) {
-          setSuccessMessage('Hive report PDF sent to your Telegram successfully!');
+          setSuccessMessage('Hive report sent to your Telegram successfully!');
           // Hide the message after 5 seconds
           setTimeout(() => {
-            if (successMessage === 'Hive report PDF sent to your Telegram successfully!') {
+            if (successMessage === 'Hive report sent to your Telegram successfully!') {
               setSuccessMessage('');
             }
           }, 5000);
@@ -1966,7 +1966,7 @@ const HiveDetails = () => {
           padding: '20px',
           marginBottom: '20px'
         }}>
-          <h2>PDF Report</h2>
+          <h2>Hive Report</h2>
           <p>
             Get report manually via Telegram or wait for automatic report every 24 hours
           </p>

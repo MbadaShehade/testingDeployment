@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Line } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
 import { Download } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -22,6 +22,8 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), { ssr: false });
 
 const RealTimeHumidityGraph = ({ 
   theme, 
