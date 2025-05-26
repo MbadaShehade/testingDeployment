@@ -28,6 +28,18 @@ import {
 } from 'chart.js';
 import dynamic from 'next/dynamic';
 
+const RealTimeTemperatureGraph = dynamic(
+  () => import('../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph'),
+  { ssr: false }
+);
+const RealTimeHumidityGraph = dynamic(
+  () => import('../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph'),
+  { ssr: false }
+);
+const HistoricalDataGraph = dynamic(
+  () => import('../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph'),
+  { ssr: false }
+);
 
 ChartJS.register(
   CategoryScale,
