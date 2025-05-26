@@ -2,6 +2,26 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Download } from 'lucide-react';
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Tooltip,
+  Legend
+);
 
 const RealTimeHumidityGraph = ({ 
   theme, 
@@ -12,6 +32,9 @@ const RealTimeHumidityGraph = ({
   setActiveDropdown, 
   handleExport 
 }) => {
+  console.log('humidityData', humidityData);
+  console.log('chartOptions', chartOptions);
+
   return (
     <div className="chart-section">
       <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
