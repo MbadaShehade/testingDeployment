@@ -261,6 +261,11 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    const theme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.className = theme;
+  }, []);
+
   if (!mounted) return null;
 
   return (
