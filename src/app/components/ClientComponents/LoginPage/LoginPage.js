@@ -29,7 +29,7 @@ export default function LoginPage() {
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const modalRef = useRef(null);
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
+  const { theme } = useTheme();
 
   // Only show the UI after mounting to avoid hydration mismatch
   useEffect(() => {
@@ -261,10 +261,10 @@ export default function LoginPage() {
     }
   };
 
-  if (!mounted || !resolvedTheme) return null;
+  if (!mounted) return null;
 
   return (
-    <div className={`login-container theme-${resolvedTheme}`}>
+    <div className={`login-container theme-${theme}`}>
       {(isLoading || isSuccess) && (
         <div className="loading-overlay">
           <div className="loading-card">
