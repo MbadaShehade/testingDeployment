@@ -9,9 +9,6 @@ import Header from '../components/ClientComponents/Header/Header';
 import { useRouter } from 'next/navigation';
 import { Thermometer, Droplets, CheckCircle, RefreshCw, Trash2 } from 'lucide-react';
 import FlowersRenderer from '../components/ClientComponents/FlowersRenderer/FlowersRenderer';
-import RealTimeTemperatureGraph from '../components/ClientComponents/RealTimeTemperatureGraph/RealTimeTemperatureGraph';
-import RealTimeHumidityGraph from '../components/ClientComponents/RealTimeHumidityGraph/RealTimeHumidityGraph';
-import HistoricalDataGraph from '../components/ClientComponents/HistoricalDataGraph/HistoricalDataGraph';
 import TelegramModals from '../components/ClientComponents/TelegramModals/TelegramModals';
 import ClearHistoryModal from '../components/ClientComponents/ClearHistoryModal/ClearHistoryModal';
 import mqtt from 'mqtt';
@@ -29,6 +26,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import dynamic from 'next/dynamic';
 
 
 ChartJS.register(
