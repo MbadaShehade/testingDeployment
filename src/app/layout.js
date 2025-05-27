@@ -41,6 +41,7 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              document.documentElement.classList.add('theme-loading');
               (function() {
                 try {
                   // Set theme class on <html> as early as possible
@@ -52,6 +53,7 @@ export default function RootLayout({ children }) {
                 } catch (e) {
                   // fallback: do nothing
                 }
+                document.documentElement.classList.remove('theme-loading');
               })();
             `,
           }}
