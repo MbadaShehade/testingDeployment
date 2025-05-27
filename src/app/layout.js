@@ -43,6 +43,24 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 try {
+                  // Set theme class on <html> as early as possible
+                  var theme = localStorage.getItem('theme');
+                  if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  // fallback: do nothing
+                }
+              })();
+            `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
                   // Handle page refresh - only scroll to top if there's no hash
                   if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
                     if (!window.location.hash) {
