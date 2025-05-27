@@ -26,6 +26,9 @@ const RealTimeTemperatureGraph = ({
           console.log('RealTimeTemperatureGraph: temperatureData =', temperatureData);
           console.log('RealTimeTemperatureGraph: temperatureData.labels =', temperatureData.labels);
           console.log('RealTimeTemperatureGraph: temperatureData.datasets =', temperatureData.datasets);
+          if (temperatureData.datasets && temperatureData.datasets[0]) {
+            console.log('RealTimeTemperatureGraph: temperatureData.datasets[0].data =', temperatureData.datasets[0].data);
+          }
           return null;
         })()}
         <Line data={temperatureData} options={chartOptions} />
