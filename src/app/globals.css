@@ -12,10 +12,6 @@ html {
   transition: background-color 0.3s ease;
 }
 
-html.theme-loading body {
-  opacity: 0 !important;
-}
-
 /* Use class selector instead of html element selector for theme loading */
 .theme-loading {
   transition: none !important;

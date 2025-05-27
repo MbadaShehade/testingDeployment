@@ -41,19 +41,15 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              document.documentElement.classList.add('theme-loading');
               (function() {
                 try {
                   // Set theme class on <html> as early as possible
-                  var theme = localStorage.getItem('theme');
-                  if (!theme) {
-                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  }
-                  document.documentElement.classList.add(theme);
+                  // Always set theme to light, ignoring previous user selection
+                  document.documentElement.classList.add('light');
+                  localStorage.setItem('theme', 'light');
                 } catch (e) {
                   // fallback: do nothing
                 }
-                document.documentElement.classList.remove('theme-loading');
               })();
             `,
           }}
@@ -80,7 +76,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <div className="App">
             {children}
             <Footer />
