@@ -155,7 +155,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
           setTimeout(() => setMessage({ text: '', type: '' }), 3000);
           setIsLoading(false);
         }
-      }, 15000); // 15 seconds
+      }, 25000); // 25 seconds
 
       let dataTimeout = setTimeout(() => {
         if (client) {
@@ -165,7 +165,7 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
           setTimeout(() => setMessage({ text: '', type: '' }), 4000);
           setIsLoading(false);
         }
-      }, 10000); // 10 seconds
+      }, 25000); // 5 seconds
 
       client.on('connect', () => {
         clearTimeout(connectionTimeout);
