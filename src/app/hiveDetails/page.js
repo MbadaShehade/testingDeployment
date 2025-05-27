@@ -652,16 +652,26 @@ const HiveDetails = () => {
   useEffect(() => {
     async function fetchHistoricalData() {
       if (!hiveId || !email) return;
-      // Optionally add start/end date params for filtering
       const response = await fetch(`/api/hive-history?hiveId=${hiveId}&email=${email}`);
       const { data } = await response.json();
-      // Sanitize data for Chart.js
+
+      // Filter out entries with missing timestamp or both values missing
+      const filtered = data.filter(
+        d =>
+          d.timestamp &&
+          (typeof d.temperature === 'number' || typeof d.humidity === 'number')
+      );
+
+      console.log('Filtered historical data for chart:', filtered);
+
       setHistoricalData({
-        labels: data.map(d => d.timestamp ? new Date(d.timestamp).toLocaleDateString() : ''),
+        labels: filtered.map(d => new Date(d.timestamp).toLocaleDateString()),
         datasets: [
           {
             label: 'Temperature (°C)',
-            data: data.map(d => (typeof d.temperature === 'number' ? d.temperature : null)),
+            data: filtered.map(d =>
+              typeof d.temperature === 'number' ? d.temperature : null
+            ),
             borderColor: '#ba6719',
             backgroundColor: '#ba6719',
             tension: 0.4,
@@ -672,7 +682,9 @@ const HiveDetails = () => {
           },
           {
             label: 'Humidity (%)',
-            data: data.map(d => (typeof d.humidity === 'number' ? d.humidity : null)),
+            data: filtered.map(d =>
+              typeof d.humidity === 'number' ? d.humidity : null
+            ),
             borderColor: '#0EA5E9',
             backgroundColor: '#0EA5E9',
             tension: 0.4,
