@@ -1,5 +1,6 @@
 'use client';
 
+import '@/app/_lib/chartjs-setup';
 import './hiveDetails.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
