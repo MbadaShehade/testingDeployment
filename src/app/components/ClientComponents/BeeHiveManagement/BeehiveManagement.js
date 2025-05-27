@@ -136,34 +136,17 @@ const BeehiveManagement = ({email, username, password, hiveGroups, setHiveGroups
         return;
       }
 
-<<<<<<< HEAD
-      const client = mqtt.connect('wss://test.mosquitto.org:8080', {
+      const client = mqtt.connect('ws://test.mosquitto.org:8080', {
         clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
         clean: true,
         reconnectPeriod: 0,
         connectTimeout: 30000, 
         keepalive: 60,       
         resubscribe: false,   
-        protocol: 'wss',       
+        protocol: 'ws',       
         qos: 1               
       });
 
-
-      
-=======
-      const client = mqtt.connect('wss://test.mosquitto.org:8081', {
-        clientId: `hiveguard_${Math.random().toString(16).substr(2, 8)}`,
-        clean: true,
-        reconnectPeriod: 0,
-        connectTimeout: 10000, // 10 seconds max for connection
-        keepalive: 60,
-        resubscribe: false,
-        protocol: 'wss',
-        qos: 1
-      });
-
-      // Both timeouts set to 10 seconds
->>>>>>> 7ac35d8b1401eedf49936fbe4ed9f5b704280e23
       let connectionTimeout = setTimeout(() => {
         if (client) {
           clearTimeout(dataTimeout);
