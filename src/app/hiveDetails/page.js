@@ -19,29 +19,9 @@ import { Chart } from 'chart.js/auto';
 import { MQTT_URL } from '../_lib/mqtt-config';
 import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
 import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-const MAX_DATA_POINTS = 10;
+const MAX_DATA_POINTS = 20;
 
 const formatTime = (date) => {
   return date.toLocaleTimeString('en-US', {
@@ -59,10 +39,6 @@ const formatDate = (date) => {
   return `${day}/${month}/${year}`;
 };
 
-const sortDates = (dates) => {
-  if (!Array.isArray(dates)) return [];
-  return [...new Set(dates)].sort();
-};
 
 const HiveDetails = () => {
   const searchParams = useSearchParams();
@@ -91,8 +67,9 @@ const HiveDetails = () => {
     humidity: null,
     airPump: "OFF" 
   });  
+
   const [airPumpActivations, setAirPumpActivations] = useState(() => {
-    // Try to load from localStorage as fallback
+    
     if (typeof window !== 'undefined') {
       try {
         const savedActivations = localStorage.getItem(`airPumpActivations_${hiveId}`);
@@ -107,7 +84,6 @@ const HiveDetails = () => {
   });
   
 
-  // Save activations to localStorage whenever they change
   useEffect(() => {
     if (typeof window !== 'undefined' && airPumpActivations.length > 0) {
       try {
@@ -650,54 +626,20 @@ const HiveDetails = () => {
   
   // Load saved historical data on mount
   useEffect(() => {
-    async function fetchHistoricalData() {
-      if (!hiveId || !email) return;
-      const response = await fetch(`/api/hive-history?hiveId=${hiveId}&email=${email}`);
-      const { data } = await response.json();
-
-      // Filter out entries with missing timestamp or both values missing
-      const filtered = data.filter(
-        d =>
-          d.timestamp &&
-          (typeof d.temperature === 'number' || typeof d.humidity === 'number')
-      );
-
-      console.log('Filtered historical data for chart:', filtered);
-
-      setHistoricalData({
-        labels: filtered.map(d => new Date(d.timestamp).toLocaleDateString()),
-        datasets: [
-          {
-            label: 'Temperature (°C)',
-            data: filtered.map(d =>
-              typeof d.temperature === 'number' ? d.temperature : null
-            ),
-            borderColor: '#ba6719',
-            backgroundColor: '#ba6719',
-            tension: 0.4,
-            pointRadius: 2,
-            borderWidth: 2,
-            fill: false,
-            yAxisID: 'y'
-          },
-          {
-            label: 'Humidity (%)',
-            data: filtered.map(d =>
-              typeof d.humidity === 'number' ? d.humidity : null
-            ),
-            borderColor: '#0EA5E9',
-            backgroundColor: '#0EA5E9',
-            tension: 0.4,
-            pointRadius: 2,
-            borderWidth: 2,
-            fill: false,
-            yAxisID: 'y2'
+    if (typeof window !== 'undefined' && hiveId) {
+      const savedData = localStorage.getItem(`historicalData_hive_${hiveId}`);
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          if (parsedData.labels && parsedData.datasets) {
+            setHistoricalData(parsedData);
           }
-        ]
-      });
+        } catch (e) {
+          console.error('Error loading historical data', e);
+        }
+      }
     }
-    fetchHistoricalData();
-  }, [hiveId, email, historicalDateRange]);
+  }, [hiveId]);
 
   // Add useEffect to save historical data whenever it changes
   useEffect(() => {
@@ -1423,7 +1365,10 @@ const HiveDetails = () => {
 
         // Now tempTopic and humidityTopic are in scope
         if (topic === tempTopic) {
+            console.log('Updating temperature value:', value);
             setHiveData(prev => ({ ...prev, temperature: value }));
+            
+            // Update temperature chart data
             setTemperatureData(prev => {
                 const newLabels = [...prev.labels.slice(1), currentTime];
                 const newData = [...prev.datasets[0].data.slice(1), value];
@@ -1435,19 +1380,93 @@ const HiveDetails = () => {
                     }]
                 };
             });
-            // Save to MongoDB
-            fetch('/api/hive-history', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                hiveId,
-                email,
-                temperature: value,
-                timestamp: new Date().toISOString()
-              })
+
+            // Update historical data for temperature
+            setHistoricalData(prev => {
+                if (!prev || !prev.labels || !prev.datasets) {
+                    const initialState = {
+                        labels: [currentDate],
+                        datasets: [
+                            {
+                                label: 'Temperature (°C)',
+                                data: [value],
+                                borderColor: '#ba6719',
+                                backgroundColor: '#ba6719',
+                                tension: 0.4,
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Humidity (%)',
+                                data: [null],
+                                borderColor: '#0EA5E9',
+                                backgroundColor: '#0EA5E9',
+                                tension: 0.4,
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y2'
+                            }
+                        ]
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(initialState));
+                    return initialState;
+                }
+
+                // Find if we already have data for today
+                const todayIndex = prev.labels.indexOf(currentDate);
+                
+                if (todayIndex === -1) {
+                    // If no data for today, add new entry
+                    const newState = {
+                        labels: [...prev.labels, currentDate],
+                        datasets: prev.datasets.map(dataset => {
+                            if (dataset.label.includes('Temperature')) {
+                                return {
+                                    ...dataset,
+                                    data: [...dataset.data, value]
+                                };
+                            }
+                            if (dataset.label.includes('Humidity')) {
+                                return {
+                                    ...dataset,
+                                    data: [...dataset.data, null]
+                                };
+                            }
+                            return dataset;
+                        })
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newState));
+                    return newState;
+                } else {
+                    // Always update the temperature value for today
+                    const newState = {
+                        ...prev,
+                        datasets: prev.datasets.map(dataset => {
+                            if (dataset.label.includes('Temperature')) {
+                                const newData = [...dataset.data];
+                                // Update the value if it's higher than the current maximum
+                                newData[todayIndex] = Math.max(newData[todayIndex] || -Infinity, value);
+                                return {
+                                    ...dataset,
+                                    data: newData
+                                };
+                            }
+                            return dataset;
+                        })
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newState));
+                    return newState;
+                }
             });
+
         } else if (topic === humidityTopic) {
+            console.log('Updating humidity value:', value);
             setHiveData(prev => ({ ...prev, humidity: value }));
+            
+            // Update humidity chart data
             setHumidityData(prev => {
                 const newLabels = [...prev.labels.slice(1), currentTime];
                 const newData = [...prev.datasets[0].data.slice(1), value];
@@ -1459,16 +1478,86 @@ const HiveDetails = () => {
                     }]
                 };
             });
-            // Save to MongoDB
-            fetch('/api/hive-history', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                hiveId,
-                email,
-                humidity: value,
-                timestamp: new Date().toISOString()
-              })
+
+            // Update historical data for humidity
+            setHistoricalData(prev => {
+                if (!prev || !prev.labels || !prev.datasets) {
+                    const initialState = {
+                        labels: [currentDate],
+                        datasets: [
+                            {
+                                label: 'Temperature (°C)',
+                                data: [null],
+                                borderColor: '#ba6719',
+                                backgroundColor: '#ba6719',
+                                tension: 0.4,
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Humidity (%)',
+                                data: [value],
+                                borderColor: '#0EA5E9',
+                                backgroundColor: '#0EA5E9',
+                                tension: 0.4,
+                                pointRadius: 2,
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y2'
+                            }
+                        ]
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(initialState));
+                    return initialState;
+                }
+
+                // Find if we already have data for today
+                const todayIndex = prev.labels.indexOf(currentDate);
+                
+                if (todayIndex === -1) {
+                    // If no data for today, add new entry
+                    const newState = {
+                        labels: [...prev.labels, currentDate],
+                        datasets: prev.datasets.map(dataset => {
+                            if (dataset.label.includes('Humidity')) {
+                                return {
+                                    ...dataset,
+                                    data: [...dataset.data, value]
+                                };
+                            }
+                            if (dataset.label.includes('Temperature')) {
+                                return {
+                                    ...dataset,
+                                    data: [...dataset.data, null]
+                                };
+                            }
+                            return dataset;
+                        })
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newState));
+                    return newState;
+                } else {
+                    // Always update the humidity value for today
+                    const newState = {
+                        ...prev,
+                        datasets: prev.datasets.map(dataset => {
+                            if (dataset.label.includes('Humidity')) {
+                                const newData = [...dataset.data];
+                                // Update the value if it's higher than the current maximum
+                                newData[todayIndex] = Math.max(newData[todayIndex] || -Infinity, value);
+                                return {
+                                    ...dataset,
+                                    data: newData
+                                };
+                            }
+                            return dataset;
+                        })
+                    };
+                    localStorage.setItem(`historicalData_hive_${hiveId}`, JSON.stringify(newState));
+                    return newState;
+                }
             });
         }
 
@@ -1903,6 +1992,7 @@ const HiveDetails = () => {
             {/* The automatic reporting button has been removed as reports are sent automatically every minute */}
           </div>
         </div>
+
 
         <div className="charts-container">
           <RealTimeTemperatureGraph 

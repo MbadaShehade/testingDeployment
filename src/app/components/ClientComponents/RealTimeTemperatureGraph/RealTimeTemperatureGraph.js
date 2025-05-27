@@ -22,6 +22,12 @@ const RealTimeTemperatureGraph = ({
         Date: {formatDate(new Date())}
       </div>
       <div className="chart-wrapper" id="temperature-chart">
+        {(() => {
+          console.log('RealTimeTemperatureGraph: temperatureData =', temperatureData);
+          console.log('RealTimeTemperatureGraph: temperatureData.labels =', temperatureData.labels);
+          console.log('RealTimeTemperatureGraph: temperatureData.datasets =', temperatureData.datasets);
+          return null;
+        })()}
         <Line data={temperatureData} options={chartOptions} />
       </div>
       <div className="export-container">
