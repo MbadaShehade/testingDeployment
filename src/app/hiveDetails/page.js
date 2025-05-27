@@ -655,13 +655,13 @@ const HiveDetails = () => {
       // Optionally add start/end date params for filtering
       const response = await fetch(`/api/hive-history?hiveId=${hiveId}&email=${email}`);
       const { data } = await response.json();
-      // Transform data to chart format
+      // Sanitize data for Chart.js
       setHistoricalData({
-        labels: data.map(d => new Date(d.timestamp).toLocaleDateString()),
+        labels: data.map(d => d.timestamp ? new Date(d.timestamp).toLocaleDateString() : ''),
         datasets: [
           {
             label: 'Temperature (°C)',
-            data: data.map(d => d.temperature),
+            data: data.map(d => (typeof d.temperature === 'number' ? d.temperature : null)),
             borderColor: '#ba6719',
             backgroundColor: '#ba6719',
             tension: 0.4,
@@ -672,7 +672,7 @@ const HiveDetails = () => {
           },
           {
             label: 'Humidity (%)',
-            data: data.map(d => d.humidity),
+            data: data.map(d => (typeof d.humidity === 'number' ? d.humidity : null)),
             borderColor: '#0EA5E9',
             backgroundColor: '#0EA5E9',
             tension: 0.4,
