@@ -24,6 +24,7 @@ import domtoimage from 'dom-to-image';
 
 const MAX_DATA_POINTS = 20;
 
+
 const formatTime = (date) => {
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -422,108 +423,6 @@ const HiveDetails = () => {
     
     setSending(true);
     try {
-    
-      // Save current data to a JSON file on the server for persistence
-      await fetch('/api/save-hive-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          hiveId: hiveId,
-          temperature: hiveData.temperature,
-          humidity: hiveData.humidity,
-          email: email 
-        }),
-      });
-      
-      const tempCanvas = document.querySelector('#temperature-chart canvas');
-      const humidityCanvas = document.querySelector('#humidity-chart canvas');
-      
-      if (!tempCanvas || !humidityCanvas) {
-        console.error('Chart canvases not found');
-        setSending(false);
-        return;
-      }
-      
-      // Get chart instances
-      const tempChart = Chart.getChart(tempCanvas);
-      const humidityChart = Chart.getChart(humidityCanvas);
-      
-      if (!tempChart || !humidityChart) {
-        console.error('Chart instances not found');
-        setSending(false);
-        return;
-      }
-      
-      // Store original settings
-      const originalSettings = {
-        temperature: {
-          yTicksColor: tempChart.options.scales.y.ticks.color,
-          xTicksColor: tempChart.options.scales.x.ticks.color,
-          yGridColor: tempChart.options.scales.y.grid.color,
-          xGridColor: tempChart.options.scales.x.grid.color,
-          legendColor: tempChart.options.plugins.legend.labels.color
-        },
-        humidity: {
-          yTicksColor: humidityChart.options.scales.y.ticks.color,
-          xTicksColor: humidityChart.options.scales.x.ticks.color,
-          yGridColor: humidityChart.options.scales.y.grid.color,
-          xGridColor: humidityChart.options.scales.x.grid.color,
-          legendColor: humidityChart.options.plugins.legend.labels.color
-        }
-      };
-      
-      tempChart.options.scales.y.ticks.color = '#000000';
-      tempChart.options.scales.x.ticks.color = '#000000';
-      tempChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
-      tempChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
-      tempChart.options.plugins.legend.labels.color = '#000000';
-      tempChart.update();
-      
-      humidityChart.options.scales.y.ticks.color = '#000000';
-      humidityChart.options.scales.x.ticks.color = '#000000';
-      humidityChart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.2)';
-      humidityChart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.2)';
-      humidityChart.options.plugins.legend.labels.color = '#000000';
-      humidityChart.update();
-      
-      // Create temporary canvases with white backgrounds
-      const createOptimizedImage = (canvas) => {
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const ctx = tempCanvas.getContext('2d');
-        
-        // Fill with white background
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw the chart on top
-        ctx.drawImage(canvas, 0, 0);
-        
-        return tempCanvas.toDataURL('image/png');
-      };
-      
-      // capture the current state of the canvas as PNG with white background
-      const temperatureImage = createOptimizedImage(tempCanvas);
-      const humidityImage = createOptimizedImage(humidityCanvas);
-      
-      // Restore original chart settings
-      tempChart.options.scales.y.ticks.color = originalSettings.temperature.yTicksColor;
-      tempChart.options.scales.x.ticks.color = originalSettings.temperature.xTicksColor;
-      tempChart.options.scales.y.grid.color = originalSettings.temperature.yGridColor;
-      tempChart.options.scales.x.grid.color = originalSettings.temperature.xGridColor;
-      tempChart.options.plugins.legend.labels.color = originalSettings.temperature.legendColor;
-      tempChart.update();
-      
-      humidityChart.options.scales.y.ticks.color = originalSettings.humidity.yTicksColor;
-      humidityChart.options.scales.x.ticks.color = originalSettings.humidity.xTicksColor;
-      humidityChart.options.scales.y.grid.color = originalSettings.humidity.yGridColor;
-      humidityChart.options.scales.x.grid.color = originalSettings.humidity.xGridColor;
-      humidityChart.options.plugins.legend.labels.color = originalSettings.humidity.legendColor;
-      humidityChart.update();
-      
       const username = searchParams.get('username') || 'User';
       
       const response = await fetch('/api/send-telegram', {
@@ -536,15 +435,13 @@ const HiveDetails = () => {
           temperature: hiveData.temperature,
           humidity: hiveData.humidity,
           chatId: telegramChatId,
-          temperature_image: temperatureImage,
-          humidity_image: humidityImage,
           username: username,
           autoReport: isAutoReport,
-          forceWhiteBackground: true,  
           reportType: isAutoReport ? "Automatic In-App Report" : "Manual User Requested Report",
-          airPumpStatus: hiveData.airPump || "OFF"  
+          airPumpStatus: hiveData.airPump || "OFF"
         }),
       });
+      
       const data = await response.json();
       if (data.success) {
         if (!isAutoReport) {
