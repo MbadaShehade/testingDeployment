@@ -1652,67 +1652,55 @@ const HiveDetails = () => {
   };
 
   const handleExport = (chartType, format) => {
-    const canvas = document.querySelector(`#${chartType}-chart canvas`);
-    if (!canvas) {
-      alert('Cannot find chart to export. Please try again.');
+    const svg = document.querySelector(`#${chartType}-chart svg`);
+    if (!svg) {
+      setActiveDropdown(null);
       return;
     }
 
-    try {
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = canvas.width * 2; // Double the resolution for better quality
-      tempCanvas.height = canvas.height * 2;
-      const tempCtx = tempCanvas.getContext('2d');
-      
-      // Scale for better resolution
-      tempCtx.scale(2, 2);
-      
-      // First fill with theme background
-      tempCtx.fillStyle = theme === 'dark' ? '#1e293b' : '#ffffff';
-      tempCtx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Then draw the original canvas content (with its current styling)
-      tempCtx.drawImage(canvas, 0, 0);
-      
-      // Set proper MIME type and quality
-      let mimeType, quality;
-      switch (format) {
-        case 'png':
-          mimeType = 'image/png';
-          quality = 1.0;
-          break;
-        case 'jpg':
-          mimeType = 'image/jpeg';
-          quality = 0.95; // High quality setting for JPEG
-          break;
-        default:
-          mimeType = 'image/png';
-          quality = 1.0;
-      }
+    // Serialize SVG
+    const serializer = new XMLSerializer();
+    let svgString = serializer.serializeToString(svg);
 
-      // Create and trigger download
+    // Add background color
+    const width = svg.width.baseVal.value || 600;
+    const height = svg.height.baseVal.value || 300;
+    const bgColor = theme === 'dark' ? '#1e293b' : '#ffffff';
+    svgString = svgString.replace(
+      '<svg',
+      `<svg style="background-color:${bgColor};"`
+    );
+
+    // Create image
+    const img = new window.Image();
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      canvas.width = width * 2;
+      canvas.height = height * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Download
       const link = document.createElement('a');
       link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
-      link.href = tempCanvas.toDataURL(mimeType, quality);
+      link.href = canvas.toDataURL(format === 'jpg' ? 'image/jpeg' : 'image/png');
       link.click();
-      
-      // Clean up
-      setTimeout(() => URL.revokeObjectURL(link.href), 100);
-    } catch (error) {
-      console.error('Error exporting chart:', error);
-      // Fallback to direct canvas export if the enhanced method fails
-      try {
-        const link = document.createElement('a');
-        link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
-        link.href = canvas.toDataURL(format === 'jpg' ? 'image/jpeg' : 'image/png');
-        link.click();
-      } catch (fallbackError) {
-        console.error('Fallback export failed:', fallbackError);
-        alert('Failed to export chart. Your browser may not support this feature.');
-      }
-    }
-    
-    setActiveDropdown(null);
+
+      URL.revokeObjectURL(url);
+      setActiveDropdown(null);
+    };
+
+    img.onerror = function () {
+      setActiveDropdown(null);
+      URL.revokeObjectURL(url);
+    };
+
+    img.src = url;
   };
 
   // Close dropdown when clicking outside

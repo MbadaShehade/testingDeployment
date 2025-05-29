@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Line } from 'react-chartjs-2';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Download } from 'lucide-react';
 
 const RealTimeTemperatureGraph = ({ 
@@ -13,6 +13,14 @@ const RealTimeTemperatureGraph = ({
   setActiveDropdown, 
   handleExport 
 }) => {
+  // Transform data for Recharts
+  const rechartsData = temperatureData && temperatureData.labels && temperatureData.datasets && temperatureData.datasets[0]
+    ? temperatureData.labels.map((label, idx) => ({
+        name: label,
+        value: temperatureData.datasets[0].data[idx]
+      }))
+    : [];
+
   return (
     <div className="chart-section">
       <h1 className={`temperature-title ${theme === 'dark' ? 'dark' : 'light'}`}>
@@ -22,16 +30,20 @@ const RealTimeTemperatureGraph = ({
         Date: {formatDate(new Date())}
       </div>
       <div className="chart-wrapper" id="temperature-chart">
-        {(() => {
-          console.log('RealTimeTemperatureGraph: temperatureData =', temperatureData);
-          console.log('RealTimeTemperatureGraph: temperatureData.labels =', temperatureData.labels);
-          console.log('RealTimeTemperatureGraph: temperatureData.datasets =', temperatureData.datasets);
-          if (temperatureData.datasets && temperatureData.datasets[0]) {
-            console.log('RealTimeTemperatureGraph: temperatureData.datasets[0].data =', temperatureData.datasets[0].data);
-          }
-          return null;
-        })()}
-        <Line data={temperatureData} options={chartOptions} />
+        {rechartsData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={rechartsData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div>No data available</div>
+        )}
       </div>
       <div className="export-container">
         <button 
