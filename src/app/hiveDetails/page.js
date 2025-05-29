@@ -19,7 +19,7 @@ import mqtt from 'mqtt';
 import { MQTT_URL } from '../_lib/mqtt-config';
 import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
 import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
-
+import { Chart } from 'chart.js/auto';
 
 const MAX_DATA_POINTS = 20;
 
@@ -754,8 +754,90 @@ const HiveDetails = () => {
   // Chart options
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 750
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        grid: {
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+        },
+        ticks: {
+          color: theme === 'dark' ? '#fff' : '#000',
+          precision: 2, // Set precision to ensure consistent decimal places
+          callback: function(value) {
+            return value.toFixed(2);
+          }
+        },
+        // Improve y-axis scaling to better reflect data
+        suggestedMin: function(context) {
+          if (!context.chart.data.datasets[0].data || context.chart.data.datasets[0].data.length === 0) {
+            return 0;
+          }
+          const dataMin = Math.min(...context.chart.data.datasets[0].data.filter(v => v !== null && v !== undefined));
+          // Ensure min is below the data minimum
+          return dataMin - Math.max(0.5, dataMin * 0.03);
+        },
+        suggestedMax: function(context) {
+          if (!context.chart.data.datasets[0].data || context.chart.data.datasets[0].data.length === 0) {
+            return 100;
+          }
+          const dataMax = Math.max(...context.chart.data.datasets[0].data.filter(v => v !== null && v !== undefined));
+          // Ensure max is above the data maximum
+          return dataMax + Math.max(0.5, dataMax * 0.03);
+        }
+      },
+      x: {
+        grid: {
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+        },
+        ticks: {
+          color: theme === 'dark' ? '#fff' : '#000',
+          maxRotation: 45,
+          minRotation: 45,
+          font: {
+            size: 11
+          }
+        }
+      }
+    },
     plugins: {
-      legend: { display: true }
+      legend: {
+        labels: {
+          color: theme === 'dark' ? '#fff' : '#000',
+          font: {
+            family: 'FreeMono, monospace'
+          }
+        }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        backgroundColor: theme === 'dark' ? '#1E293B' : 'white',
+        titleColor: theme === 'dark' ? '#fff' : '#000',
+        bodyColor: theme === 'dark' ? '#fff' : '#000',
+        borderColor: theme === 'dark' ? '#fff' : '#000',
+        borderWidth: 1,
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y.toFixed(2);
+            }
+            return label;
+          }
+        }
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
     }
   };
 
