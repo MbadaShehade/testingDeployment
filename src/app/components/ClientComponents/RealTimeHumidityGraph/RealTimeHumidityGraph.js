@@ -32,12 +32,37 @@ const RealTimeHumidityGraph = ({
         {rechartsData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={rechartsData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="value" stroke="#8884d8" />
+              <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#fff2' : '#ccc'} />
+              <XAxis
+                dataKey="name"
+                stroke={theme === 'dark' ? '#fff' : '#000'}
+                tick={{ fill: theme === 'dark' ? '#fff' : '#000' }}
+              />
+              <YAxis
+                stroke={theme === 'dark' ? '#fff' : '#000'}
+                tick={{ fill: theme === 'dark' ? '#fff' : '#000' }}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: theme === 'dark' ? '#1e293b' : '#fff',
+                  color: theme === 'dark' ? '#fff' : '#000',
+                  border: '1px solid #8884d8'
+                }}
+                labelStyle={{ color: theme === 'dark' ? '#fff' : '#000' }}
+                itemStyle={{ color: theme === 'dark' ? '#fff' : '#000' }}
+              />
+              <Legend
+                wrapperStyle={{
+                  color: theme === 'dark' ? '#fff' : '#000'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name="Humidity (%)"
+                stroke={theme === 'dark' ? '#fff' : '#8884d8'}
+                dot={{ stroke: theme === 'dark' ? '#fff' : '#8884d8', fill: theme === 'dark' ? '#fff' : '#8884d8' }}
+              />
             </LineChart>
           </ResponsiveContainer>
         ) : (

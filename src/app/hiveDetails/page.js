@@ -20,6 +20,7 @@ import { MQTT_URL } from '../_lib/mqtt-config';
 import { checkMQTTMonitorStatus } from '@/app/_lib/mqtt-helpers';
 import { saveTimerState, loadTimerState, clearTimerState } from '@/app/_lib/timerStorage';
 import { Chart } from 'chart.js/auto';
+import domtoimage from 'dom-to-image';
 
 const MAX_DATA_POINTS = 20;
 
@@ -1652,55 +1653,52 @@ const HiveDetails = () => {
   };
 
   const handleExport = (chartType, format) => {
-    const svg = document.querySelector(`#${chartType}-chart svg`);
-    if (!svg) {
-      setActiveDropdown(null);
-      return;
-    }
+    setTimeout(() => {
+      const chartWrapper = document.querySelector(`#${chartType}-chart`);
+      if (!chartWrapper) {
+        alert('Chart image not found. Please make sure the chart is visible.');
+        setActiveDropdown(null);
+        return;
+      }
+      const bgColor = theme === 'dark' ? '#1e293b' : '#ffffff';
 
-    // Serialize SVG
-    const serializer = new XMLSerializer();
-    let svgString = serializer.serializeToString(svg);
+      // Save original style
+      const originalPaddingBottom = chartWrapper.style.paddingBottom;
+      // Add extra padding to ensure legend/labels are visible
+      chartWrapper.style.paddingBottom = '48px';
 
-    // Add background color
-    const width = svg.width.baseVal.value || 600;
-    const height = svg.height.baseVal.value || 300;
-    const bgColor = theme === 'dark' ? '#1e293b' : '#ffffff';
-    svgString = svgString.replace(
-      '<svg',
-      `<svg style="background-color:${bgColor};"`
-    );
-
-    // Create image
-    const img = new window.Image();
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
-
-    img.onload = function () {
-      const canvas = document.createElement('canvas');
-      canvas.width = width * 2;
-      canvas.height = height * 2;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      // Download
-      const link = document.createElement('a');
-      link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
-      link.href = canvas.toDataURL(format === 'jpg' ? 'image/jpeg' : 'image/png');
-      link.click();
-
-      URL.revokeObjectURL(url);
-      setActiveDropdown(null);
-    };
-
-    img.onerror = function () {
-      setActiveDropdown(null);
-      URL.revokeObjectURL(url);
-    };
-
-    img.src = url;
+      const exportOptions = {
+        bgcolor: bgColor,
+        style: {
+          backgroundColor: bgColor,
+        },
+        width: chartWrapper.offsetWidth,
+        height: chartWrapper.offsetHeight,
+        filter: (node) => {
+          if (node.classList && (node.classList.contains('export-button') || node.classList.contains('export-dropdown'))) {
+            return false;
+          }
+          return true;
+        }
+      };
+      const exportFn = format === 'jpg' ? domtoimage.toJpeg : domtoimage.toPng;
+      exportFn(chartWrapper, exportOptions)
+        .then((dataUrl) => {
+          const link = document.createElement('a');
+          link.download = `${chartType}-data-${formatDate(new Date())}.${format}`;
+          link.href = dataUrl;
+          link.click();
+          setActiveDropdown(null);
+        })
+        .catch((error) => {
+          alert('Failed to export chart image.');
+          setActiveDropdown(null);
+        })
+        .finally(() => {
+          // Restore original padding
+          chartWrapper.style.paddingBottom = originalPaddingBottom;
+        });
+    }, 100);
   };
 
   // Close dropdown when clicking outside
