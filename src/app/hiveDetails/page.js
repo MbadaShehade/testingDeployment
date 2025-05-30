@@ -425,6 +425,48 @@ const HiveDetails = () => {
     try {
       const username = searchParams.get('username') || 'User';
       
+      // Get the chart containers
+      const tempChartContainer = document.querySelector('#temperature-chart');
+      const humidityChartContainer = document.querySelector('#humidity-chart');
+      
+      // Use domtoimage to capture the entire chart containers
+      let tempChartBase64 = null;
+      let humidityChartBase64 = null;
+      
+      try {
+        if (tempChartContainer) {
+          const tempDataUrl = await domtoimage.toPng(tempChartContainer, {
+            bgcolor: theme === 'dark' ? '#1e293b' : '#ffffff',
+            style: {
+              backgroundColor: theme === 'dark' ? '#1e293b' : '#ffffff'
+            },
+            width: tempChartContainer.offsetWidth,
+            height: tempChartContainer.offsetHeight,
+            filter: (node) => {
+              return !node.classList?.contains('export-button') && !node.classList?.contains('export-dropdown');
+            }
+          });
+          tempChartBase64 = tempDataUrl.split(',')[1];
+        }
+        
+        if (humidityChartContainer) {
+          const humidityDataUrl = await domtoimage.toPng(humidityChartContainer, {
+            bgcolor: theme === 'dark' ? '#1e293b' : '#ffffff',
+            style: {
+              backgroundColor: theme === 'dark' ? '#1e293b' : '#ffffff'
+            },
+            width: humidityChartContainer.offsetWidth,
+            height: humidityChartContainer.offsetHeight,
+            filter: (node) => {
+              return !node.classList?.contains('export-button') && !node.classList?.contains('export-dropdown');
+            }
+          });
+          humidityChartBase64 = humidityDataUrl.split(',')[1];
+        }
+      } catch (imageError) {
+        console.error('Error capturing chart images:', imageError);
+      }
+      
       const response = await fetch('/api/send-telegram', {
         method: 'POST',
         headers: {
@@ -438,7 +480,9 @@ const HiveDetails = () => {
           username: username,
           autoReport: isAutoReport,
           reportType: isAutoReport ? "Automatic In-App Report" : "Manual User Requested Report",
-          airPumpStatus: hiveData.airPump || "OFF"
+          airPumpStatus: hiveData.airPump || "OFF",
+          tempChartBase64,
+          humidityChartBase64
         }),
       });
       
@@ -1827,7 +1871,7 @@ const HiveDetails = () => {
         }}>
           <h2>Hive Report</h2>
           <p>
-            Get report manually via Telegram or wait for automatic report every 24 hours
+            Get report manually via Telegram
           </p>
           
           {successMessage && (
